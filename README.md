@@ -1,4 +1,4 @@
-# Das "rain" Projekt (ranking insights)
+# Das "BRAIN" Projekt (Badminton RAnking INsights)
 
 Basierend auf umfangreichen Datenbeständen werden mittels Analytics(*) Zusammenhänge und Erkenntnisse über die DBV Ranglistentabellen U19 veranschaulicht.
 
