@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JWS U19 Rangliste (Eigenberechnung) - BRAIN</title>
+<link rel="stylesheet" href="assets/rangliste.css">
+</head>
+<body>
+<div class="page">
+  <h1>JWS U19 Rangliste (Eigenberechnung)</h1>
+
+  <p class="variant-note">
+    Es gibt auch eine <a href="dbv-rl/rangliste-eigene-ak.html">Variante &bdquo;eigene
+    Altersklasse&ldquo;</a>, in der jeder Spieler seine Punkte immer aus dem Tabellenblock
+    seiner eigenen Altersklasse erhaelt statt aus dem der tatsaechlich gespielten Konkurrenz.
+  </p>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-current" data-tab="current">Rangliste</div>
+    <div class="tab" id="tab-history" data-tab="history">Vergangene Ranglisten</div>
+  </div>
+
+  <div id="history-picker" style="display:none; margin-bottom:14px;">
+    <label for="week-select" style="font-size:0.85rem; color:#666;">Kalenderwoche waehlen:</label>
+    <select id="week-select"></select>
+  </div>
+
+  <div class="filters">
+    <div>
+      <label for="f-dis">Disziplin</label>
+      <select id="f-dis"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-gs">Geschlecht</label>
+      <select id="f-gs"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-akl">Altersklasse</label>
+      <select id="f-akl"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-gruppe">Gruppe</label>
+      <select id="f-gruppe"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-lv">Landesverband</label>
+      <select id="f-lv"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-bezirk">Bezirk</label>
+      <input type="text" id="f-bezirk" placeholder="">
+    </div>
+    <div>
+      <label for="f-vorname">Vorname</label>
+      <input type="text" id="f-vorname" placeholder="">
+    </div>
+    <div>
+      <label for="f-nachname">Nachname</label>
+      <input type="text" id="f-nachname" placeholder="">
+    </div>
+    <div>
+      <label for="f-verein">Verein</label>
+      <input type="text" id="f-verein" placeholder="">
+    </div>
+  </div>
+
+  <div class="meta-row">
+    <div>
+      <a id="download-link" href="#" download>Download Rangliste als Excel-Datei</a>
+      &nbsp;|&nbsp;
+      <button id="reset-filters" type="button">Filter zuruecksetzen</button>
+    </div>
+    <div id="updated-at"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="ranking-table">
+      <thead><tr id="table-head"></tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+  <p class="row-count" id="row-count"></p>
+</div>
+
+<script src="assets/rangliste.js"></script>
+</body>
+</html>
