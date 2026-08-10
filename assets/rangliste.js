@@ -44,18 +44,6 @@ function uniqueSorted(rows, key) {
 }
 
 function fillSelect(select, values, keepFirst = true) {
-  if (select.multiple) {
-    const current = Array.from(select.selectedOptions).map(o => o.value);
-    select.innerHTML = "";
-    for (const v of values) {
-      const opt = document.createElement("option");
-      opt.value = v;
-      opt.textContent = v;
-      opt.selected = current.includes(v);
-      select.appendChild(opt);
-    }
-    return;
-  }
   const current = select.value;
   const firstOption = keepFirst ? select.querySelector("option") : null;
   select.innerHTML = "";
@@ -81,7 +69,7 @@ function getFilters() {
   return {
     DIS: document.getElementById("f-dis").value,
     GS: document.getElementById("f-gs").value,
-    AKL2: Array.from(document.getElementById("f-akl").selectedOptions).map(o => o.value),
+    AKL2: document.getElementById("f-akl").value,
     Gruppe: document.getElementById("f-gruppe").value,
     LVName: document.getElementById("f-lv").value,
     Bezirk: document.getElementById("f-bezirk").value.trim().toLowerCase(),
@@ -91,12 +79,21 @@ function getFilters() {
   };
 }
 
+function aklNumber(v) {
+  const m = /^U(\d+)/.exec(v || "");
+  return m ? Number(m[1]) : null;
+}
+
 function applyFilters(rows) {
   const f = getFilters();
+  const aklMax = f.AKL2 ? aklNumber(f.AKL2) : null;
   return rows.filter(r => {
     if (f.DIS && r.DIS !== f.DIS) return false;
     if (f.GS && r.GS !== f.GS) return false;
-    if (f.AKL2.length && !f.AKL2.includes(r.AKL2)) return false;
+    if (aklMax !== null) {
+      const v = aklNumber(r.AKL2);
+      if (v === null || v > aklMax) return false;
+    }
     if (f.Gruppe && r.Gruppe !== f.Gruppe) return false;
     if (f.LVName && r.LVName !== f.LVName) return false;
     if (f.Bezirk && !String(r.Bezirk || "").toLowerCase().includes(f.Bezirk)) return false;
@@ -245,12 +242,7 @@ function setupFilterListeners() {
   }
   document.getElementById("reset-filters").addEventListener("click", () => {
     for (const id of ids) {
-      const el = document.getElementById(id);
-      if (el.multiple) {
-        for (const opt of el.options) opt.selected = false;
-      } else {
-        el.value = "";
-      }
+      document.getElementById(id).value = "";
     }
     render();
   });
