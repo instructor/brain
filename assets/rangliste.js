@@ -178,7 +178,6 @@ async function loadWeek(week) {
   populateFilterOptions(state.rows);
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;
   document.getElementById("updated-at").textContent = `zuletzt aktualisiert: ${week.updated_at}`;
-  document.getElementById("download-link").href = week.xlsx_file;
   render();
 }
 
