@@ -21,11 +21,13 @@ const COLUMNS = [
   { key: "ClubID", label: "ClubID" },
 ];
 
+const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
+
 const state = {
   index: null,
   currentWeek: null,   // {year, kw, ...} aus index.json
   rows: [],
-  sortKey: "Ranglistenplatz",
+  sortKey: "DIS",
   sortDir: "asc",
   tab: "current",
 };
@@ -42,6 +44,18 @@ function uniqueSorted(rows, key) {
 }
 
 function fillSelect(select, values, keepFirst = true) {
+  if (select.multiple) {
+    const current = Array.from(select.selectedOptions).map(o => o.value);
+    select.innerHTML = "";
+    for (const v of values) {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      opt.selected = current.includes(v);
+      select.appendChild(opt);
+    }
+    return;
+  }
   const current = select.value;
   const firstOption = keepFirst ? select.querySelector("option") : null;
   select.innerHTML = "";
@@ -67,7 +81,7 @@ function getFilters() {
   return {
     DIS: document.getElementById("f-dis").value,
     GS: document.getElementById("f-gs").value,
-    AKL2: document.getElementById("f-akl").value,
+    AKL2: Array.from(document.getElementById("f-akl").selectedOptions).map(o => o.value),
     Gruppe: document.getElementById("f-gruppe").value,
     LVName: document.getElementById("f-lv").value,
     Bezirk: document.getElementById("f-bezirk").value.trim().toLowerCase(),
@@ -82,7 +96,7 @@ function applyFilters(rows) {
   return rows.filter(r => {
     if (f.DIS && r.DIS !== f.DIS) return false;
     if (f.GS && r.GS !== f.GS) return false;
-    if (f.AKL2 && r.AKL2 !== f.AKL2) return false;
+    if (f.AKL2.length && !f.AKL2.includes(r.AKL2)) return false;
     if (f.Gruppe && r.Gruppe !== f.Gruppe) return false;
     if (f.LVName && r.LVName !== f.LVName) return false;
     if (f.Bezirk && !String(r.Bezirk || "").toLowerCase().includes(f.Bezirk)) return false;
@@ -93,11 +107,21 @@ function applyFilters(rows) {
   });
 }
 
+function disRank(v) {
+  const i = DIS_ORDER.indexOf(v);
+  return i === -1 ? DIS_ORDER.length : i;
+}
+
 function sortRows(rows) {
   const { sortKey, sortDir } = state;
   const col = COLUMNS.find(c => c.key === sortKey);
   const dir = sortDir === "asc" ? 1 : -1;
   return [...rows].sort((a, b) => {
+    if (sortKey === "DIS") {
+      const d = (disRank(a.DIS) - disRank(b.DIS)) * dir;
+      if (d !== 0) return d;
+      return Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz);
+    }
     let av = a[sortKey], bv = b[sortKey];
     if (av === null || av === undefined) av = "";
     if (bv === null || bv === undefined) bv = "";
@@ -222,7 +246,11 @@ function setupFilterListeners() {
   document.getElementById("reset-filters").addEventListener("click", () => {
     for (const id of ids) {
       const el = document.getElementById(id);
-      if (el.tagName === "SELECT") el.value = ""; else el.value = "";
+      if (el.multiple) {
+        for (const opt of el.options) opt.selected = false;
+      } else {
+        el.value = "";
+      }
     }
     render();
   });
