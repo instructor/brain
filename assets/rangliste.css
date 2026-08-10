@@ -111,6 +111,17 @@ a { color: var(--accent); }
 }
 #reset-filters:hover { background: var(--header-bg); }
 
+.loading-indicator {
+  margin-left: 10px;
+  color: var(--accent);
+  font-weight: bold;
+  animation: loading-pulse 0.8s ease-in-out infinite;
+}
+@keyframes loading-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
 /* Table */
 .table-wrap {
   overflow-x: auto;

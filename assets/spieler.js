@@ -35,7 +35,7 @@ async function init() {
     summaryBody.appendChild(tr);
   }
   if (myRanking.length === 0) {
-    summaryBody.innerHTML = '<tr><td colspan="3" class="empty-state">Keine Ranglisten-Eintraege fuer diese Woche.</td></tr>';
+    summaryBody.innerHTML = '<tr><td colspan="3" class="empty-state">Keine Ranglisten-Einträge für diese Woche.</td></tr>';
   }
 
   const myDetails = details.filter(d => String(d.SpielerID) === spielerId);

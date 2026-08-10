@@ -158,7 +158,7 @@ function renderBody(rows) {
     const td = document.createElement("td");
     td.colSpan = COLUMNS.length;
     td.className = "empty-state";
-    td.textContent = "Keine Eintraege fuer die aktuelle Filterauswahl.";
+    td.textContent = "Keine Einträge für die aktuelle Filterauswahl.";
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
@@ -185,12 +185,22 @@ function renderBody(rows) {
 }
 
 function render() {
-  renderHead();
-  const filtered = applyFilters(state.rows);
-  const sorted = sortRows(filtered);
-  renderBody(sorted);
-  document.getElementById("row-count").textContent =
-    `${sorted.length} von ${state.rows.length} Eintraegen`;
+  const loadingEl = document.getElementById("loading-indicator");
+  loadingEl.style.display = "inline";
+  // Doppeltes rAF erzwingt einen Paint mit sichtbarem Wartezeichen, bevor die
+  // synchrone Filter-/Sortier-/Render-Arbeit (bei ~18000 Zeilen spürbar) startet.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      renderHead();
+      const filtered = applyFilters(state.rows);
+      const sorted = sortRows(filtered);
+      sorted.forEach((r, i) => { r.FRang = i + 1; });
+      renderBody(sorted);
+      document.getElementById("row-count").textContent =
+        `${sorted.length} von ${state.rows.length} Einträgen`;
+      loadingEl.style.display = "none";
+    });
+  });
 }
 
 async function loadWeek(week) {
@@ -252,7 +262,7 @@ async function init() {
   state.index = await fetchJson("data/index.json");
   if (!state.index.latest) {
     document.getElementById("table-body").innerHTML =
-      '<tr><td class="empty-state">Keine Ranglisten-Daten gefunden. export_ranking_web.py ausfuehren.</td></tr>';
+      '<tr><td class="empty-state">Keine Ranglisten-Daten gefunden. export_ranking_web.py ausführen.</td></tr>';
     return;
   }
   setupTabs();
