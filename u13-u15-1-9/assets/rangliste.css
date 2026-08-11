@@ -1,0 +1,205 @@
+:root {
+  --border: #ddd;
+  --bg: #ffffff;
+  --bg-alt: #f7f7f7;
+  --accent: #8b1e2d;
+  --text: #222;
+  --text-muted: #666;
+  --header-bg: #f0f0f0;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: oldlace;
+  color: var(--text);
+  margin: 0;
+  padding: 20px;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 24px 28px;
+}
+
+h1 {
+  font-size: 1.3rem;
+  margin: 0 0 16px;
+}
+
+a { color: var(--accent); }
+
+.variant-note {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin: 0 0 18px;
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: 18px;
+}
+.tab {
+  padding: 8px 16px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.tab.active {
+  background: var(--bg);
+  color: var(--accent);
+  font-weight: bold;
+  border-color: var(--accent);
+}
+
+/* Filter bar */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px 20px;
+  margin-bottom: 14px;
+}
+.filters label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+.filters input, .filters select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+#reset-filters {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+#reset-filters:hover { background: var(--header-bg); }
+
+.loading-indicator {
+  margin-left: 10px;
+  color: var(--accent);
+  font-weight: bold;
+  animation: loading-pulse 0.8s ease-in-out infinite;
+}
+@keyframes loading-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Table */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.87rem;
+  white-space: nowrap;
+}
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--header-bg);
+  border-bottom: 2px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+}
+thead th:hover { background: #e6e6e6; }
+thead th.sorted-asc::after { content: " \25B2"; font-size: 0.7em; }
+thead th.sorted-desc::after { content: " \25BC"; font-size: 0.7em; }
+tbody td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+tbody tr:nth-child(even) { background: var(--bg-alt); }
+tbody tr:hover { background: #fbeee9; cursor: pointer; }
+
+.empty-state {
+  padding: 30px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.row-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+/* Player detail page */
+.summary-table, .results-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 22px;
+  font-size: 0.88rem;
+}
+.summary-table th, .summary-table td,
+.results-table th, .results-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+.summary-table th, .results-table th { background: var(--header-bg); }
+.results-table tr.top5 td:first-child::before { content: "\2605 "; color: var(--accent); }
+
+.player-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.player-header h1 { margin: 0; }
+.player-header .spieler-id { color: var(--text-muted); font-size: 0.9rem; }
+
+.dis-block h2 {
+  font-size: 1.05rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+.dis-total {
+  text-align: right;
+  font-weight: bold;
+  padding: 6px 10px;
+}
+
+.back-link { display: inline-block; margin-bottom: 14px; font-size: 0.9rem; }
