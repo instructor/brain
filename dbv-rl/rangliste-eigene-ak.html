@@ -38,8 +38,15 @@
       <select id="f-gs"><option value="">-- alle --</option></select>
     </div>
     <div>
-      <label for="f-akl">Altersklasse (bis einschl.)</label>
-      <select id="f-akl"><option value="">-- alle --</option></select>
+      <label for="f-akl-input">Altersklasse</label>
+      <div class="ms" id="f-akl-ms">
+        <div class="ms-control" id="f-akl-control">
+          <span class="ms-chips" id="f-akl-chips"></span>
+          <input type="text" id="f-akl-input" class="ms-input" autocomplete="off" placeholder="-- alle --">
+          <button type="button" class="ms-clear" id="f-akl-clearall" title="Auswahl löschen" hidden>&times;</button>
+        </div>
+        <ul class="ms-options" id="f-akl-options" role="listbox" hidden></ul>
+      </div>
     </div>
     <div>
       <label for="f-gruppe">Gruppe</label>

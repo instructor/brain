@@ -90,6 +90,87 @@ a { color: var(--accent); }
   font-size: 0.9rem;
 }
 
+/* Altersklasse: Mehrfachauswahl-Combobox (Chips + Dropdown), Vorbild badminton.de */
+.ms { position: relative; }
+.ms-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 30px;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  cursor: text;
+}
+.ms-control:focus-within { border-color: var(--accent); }
+.ms-chips { display: contents; }
+.ms-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--header-bg);
+  border-radius: 3px;
+  padding: 1px 5px 1px 7px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.ms-chip button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--text-muted);
+}
+.ms-chip button:hover { color: var(--accent); }
+.ms-input {
+  flex: 1 1 60px;
+  min-width: 60px;
+  border: none;
+  outline: none;
+  padding: 2px 0;
+  font-size: 0.9rem;
+  background: transparent;
+}
+.ms-clear {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+.ms-clear:hover { color: var(--accent); }
+.ms-options {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+.ms-option {
+  padding: 5px 10px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.ms-option.is-active { background: var(--accent); color: #fff; }
+.ms-option.is-selected:not(.is-active) { background: var(--header-bg); color: var(--text-muted); }
+.ms-option.is-empty { color: var(--text-muted); cursor: default; text-align: center; padding: 8px; }
+
 .meta-row {
   display: flex;
   justify-content: space-between;
