@@ -277,10 +277,20 @@ tbody tr:hover { background: #fbeee9; cursor: pointer; }
   border-bottom: 1px solid var(--border);
   padding-bottom: 4px;
 }
+.dis-block h3 {
+  font-size: 0.92rem;
+  font-weight: bold;
+  margin: 16px 0 4px;
+  color: var(--text-muted);
+}
 .dis-total {
   text-align: right;
   font-weight: bold;
   padding: 6px 10px;
 }
+.results-table tr.win td:first-child { border-left: 3px solid #2a7a2a; }
+.results-table tr.loss td:first-child { border-left: 3px solid #a12a2a; }
+.delta-pos { color: #2a7a2a; font-weight: bold; }
+.delta-neg { color: #a12a2a; font-weight: bold; }
 
 .back-link { display: inline-block; margin-bottom: 14px; font-size: 0.9rem; }

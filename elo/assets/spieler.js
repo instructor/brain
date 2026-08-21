@@ -38,6 +38,10 @@ async function init() {
     summaryBody.innerHTML = '<tr><td colspan="3" class="empty-state">Keine Ranglisten-Einträge für diese Woche.</td></tr>';
   }
 
+  // Elo-Detailschema (siehe build_elo_ranking.py DETAIL_COLUMNS): pro Zeile ein Match, nicht ein
+  // Turnier-Gesamtergebnis -- letzte 5 Turniere je Disziplin, davon jeweils alle Matches
+  // (User-Vorgabe 2026-08-21). Turnier-Reihenfolge/Match-Reihenfolge folgt der Datenreihenfolge
+  // (build_detail_rows liefert bereits neueste-zuerst).
   const myDetails = details.filter(d => String(d.SpielerID) === spielerId);
   const byDis = {};
   for (const d of myDetails) {
@@ -47,44 +51,71 @@ async function init() {
   const container = document.getElementById("dis-blocks");
   const disOrder = myRanking.map(r => r.DIS);
   for (const dis of disOrder) {
-    const rows = (byDis[dis] || []).slice().sort((a, b) => b.Punkte - a.Punkte);
+    const rows = byDis[dis] || [];
     const block = document.createElement("div");
     block.className = "dis-block";
 
     const heading = document.createElement("h2");
-    heading.textContent = `${dis} Ergebnisse`;
+    heading.textContent = `${dis} — letzte Turniere`;
     block.appendChild(heading);
 
-    const table = document.createElement("table");
-    table.className = "results-table";
-    table.innerHTML = `<thead><tr>
-        <th>Turnier</th><th>Konkurrenz</th><th>Woche</th><th>Platz</th><th>Punkte</th>
-      </tr></thead>`;
-    const tbody = document.createElement("tbody");
-    let top5Sum = 0;
-    for (const row of rows) {
-      const tr = document.createElement("tr");
-      if (row.IstTop5) { tr.classList.add("top5"); top5Sum += row.Punkte || 0; }
-      tr.innerHTML = `
-        <td>${row.RankingTournamentName ?? ""}</td>
-        <td>${row.Konkurrenz ?? ""}</td>
-        <td>${weekLabel(row.Jahr, row.KW)}</td>
-        <td>${row.Platz ?? ""}</td>
-        <td>${row.Punkte ?? ""}</td>`;
-      tbody.appendChild(tr);
+    if (rows.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent = "Keine erfassten Matches für diese Disziplin.";
+      block.appendChild(empty);
+      container.appendChild(block);
+      continue;
     }
-    table.appendChild(tbody);
-    block.appendChild(table);
 
-    const total = document.createElement("p");
-    total.className = "dis-total";
-    total.textContent = `Summe (beste 5, ★ markiert): ${top5Sum} Punkte`;
-    block.appendChild(total);
+    const byTurnier = {};
+    const turnierOrder = [];
+    for (const row of rows) {
+      if (!(row.Turnier in byTurnier)) { byTurnier[row.Turnier] = []; turnierOrder.push(row.Turnier); }
+      byTurnier[row.Turnier].push(row);
+    }
+
+    for (const turnier of turnierOrder) {
+      const matches = byTurnier[turnier];
+      const sub = document.createElement("h3");
+      sub.textContent = `${turnier} (${matches[0].Datum})`;
+      block.appendChild(sub);
+
+      const table = document.createElement("table");
+      table.className = "results-table";
+      table.innerHTML = `<thead><tr>
+          <th>Datum</th><th>Gegner</th><th>Ergebnis</th><th>Erwartungswert</th>
+          <th>Rating vorher → nachher</th><th>Δ</th>
+        </tr></thead>`;
+      const tbody = document.createElement("tbody");
+      let netDelta = 0;
+      for (const m of matches) {
+        const tr = document.createElement("tr");
+        tr.classList.add(m.Ergebnis === "Sieg" ? "win" : "loss");
+        const delta = m.Delta ?? 0;
+        netDelta += delta;
+        tr.innerHTML = `
+          <td>${m.Datum ?? ""}</td>
+          <td>${m.Gegner ?? ""}</td>
+          <td>${m.Ergebnis ?? ""}</td>
+          <td>${m.Erwartungswert != null ? (m.Erwartungswert * 100).toFixed(1) + " %" : ""}</td>
+          <td>${m.RatingVorher ?? ""} → ${m.RatingNachher ?? ""}</td>
+          <td class="${delta >= 0 ? "delta-pos" : "delta-neg"}">${delta >= 0 ? "+" : ""}${delta.toFixed(1)}</td>`;
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      block.appendChild(table);
+
+      const total = document.createElement("p");
+      total.className = "dis-total";
+      total.textContent = `Rating-Änderung in diesem Turnier: ${netDelta >= 0 ? "+" : ""}${netDelta.toFixed(1)}`;
+      block.appendChild(total);
+    }
 
     container.appendChild(block);
   }
   if (disOrder.length === 0) {
-    container.innerHTML = '<p class="empty-state">Keine Turnierergebnisse gefunden.</p>';
+    container.innerHTML = '<p class="empty-state">Keine Ranglisten-Einträge gefunden.</p>';
   }
 }
 
