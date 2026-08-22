@@ -133,6 +133,13 @@ async function init() {
   if (disOrder.length === 0) {
     container.innerHTML = '<p class="empty-state">Keine Ranglisten-Einträge gefunden.</p>';
   }
+  document.getElementById("loading-indicator").style.display = "none";
 }
 
-init();
+init().catch(err => {
+  console.error("Fehler beim Laden der Spielerdetails:", err);
+  const loadingEl = document.getElementById("loading-indicator");
+  if (loadingEl) loadingEl.style.display = "none";
+  document.getElementById("dis-blocks").innerHTML =
+    `<p class="empty-state">Fehler beim Laden der Daten: ${err.message}</p>`;
+});
