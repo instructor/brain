@@ -11,6 +11,21 @@ function weekLabel(jahr, kw) {
   return `${jahr}-${String(kw).padStart(2, "0")}`;
 }
 
+// Muss zu rangliste.js' Filter/Renumbering passen, sonst zeigt diese Seite einen anderen
+// Ranglistenplatz als die Tabelle (siehe dort fuer Begruendung).
+const VALID_SPIELER_ID_RE = /^\d{2}-.+$/;
+function renumberRanglistenplatz(rows) {
+  const byDis = new Map();
+  for (const r of rows) {
+    if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
+    byDis.get(r.DIS).push(r);
+  }
+  for (const group of byDis.values()) {
+    group.sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
+    group.forEach((r, i) => { r.Ranglistenplatz = i + 1; });
+  }
+}
+
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const spielerId = params.get("id");
@@ -22,10 +37,12 @@ async function init() {
   document.getElementById("player-id").textContent = `(${spielerId})`;
 
   const stem = `${year}_KW${String(kw).padStart(2, "0")}`;
-  const [ranking, details] = await Promise.all([
+  const [rankingRaw, details] = await Promise.all([
     fetchJson(`data/kw/${stem}_ranking.json`),
     fetchJson(`data/kw/${stem}_details.json`),
   ]);
+  const ranking = rankingRaw.filter(r => VALID_SPIELER_ID_RE.test(r.SpielerID || ""));
+  renumberRanglistenplatz(ranking);
 
   const myRanking = ranking.filter(r => String(r.SpielerID) === spielerId);
   const summaryBody = document.getElementById("summary-body");
@@ -77,10 +94,11 @@ async function init() {
 
     for (const turnier of turnierOrder) {
       const matches = byTurnier[turnier];
-      // Partner nur bei Doppel/Mixed vorhanden (siehe elo_engine._log_team) -- Spalte pro
-      // Turnier-Block ein-/ausblenden statt fest je DIS, damit die Tabelle robust bleibt, falls
-      // ein Turnier abweichend erfasst wurde (User-Vorgabe 2026-08-22).
-      const hasPartner = matches.some(m => m.Partner);
+      // Ein Turnier in Doppel/Mixed wird mit genau einem Partner gespielt (User-Vorgabe
+      // 2026-08-22) -- deshalb einmalig nach dem Turniernamen aufgefuehrt statt als eigene
+      // Tabellenspalte. Datum-Spalte entfaellt ebenfalls, da das Turnierdatum schon in der
+      // Ueberschrift steht (siehe unten "(Datum)").
+      const partnerName = matches.find(m => m.Partner)?.Partner;
       const sub = document.createElement("h3");
       if (matches[0].TurnierURL) {
         const link = document.createElement("a");
@@ -93,12 +111,15 @@ async function init() {
       } else {
         sub.textContent = `${turnier} (${matches[0].Datum})`;
       }
+      if (partnerName) {
+        sub.append(` — Partner: ${partnerName}`);
+      }
       block.appendChild(sub);
 
       const table = document.createElement("table");
       table.className = "results-table";
       table.innerHTML = `<thead><tr>
-          <th>Datum</th><th>Gegner</th>${hasPartner ? "<th>Partner</th>" : ""}
+          <th>Gegner</th>
           <th>Ergebnis</th><th>Erwartungswert</th>
           <th>Rating vorher → nachher</th><th>Δ</th>
         </tr></thead>`;
@@ -110,9 +131,7 @@ async function init() {
         const delta = m.Delta ?? 0;
         netDelta += delta;
         tr.innerHTML = `
-          <td>${m.Datum ?? ""}</td>
           <td>${m.Gegner ?? ""}</td>
-          ${hasPartner ? `<td>${m.Partner ?? ""}</td>` : ""}
           <td>${m.Ergebnis ?? ""}</td>
           <td>${m.Erwartungswert != null ? (m.Erwartungswert * 100).toFixed(1) + " %" : ""}</td>
           <td>${m.RatingVorher ?? ""} → ${m.RatingNachher ?? ""}</td>

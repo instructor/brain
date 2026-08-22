@@ -7,8 +7,6 @@ const COLUMNS = [
   { key: "FRang", label: "FRang", numeric: true },
   { key: "Nachname", label: "Nachname" },
   { key: "Vorname", label: "Vorname" },
-  { key: "GS", label: "GS" },
-  { key: "SpielerID", label: "SpielerID" },
   { key: "GJahr", label: "GJahr", numeric: true },
   { key: "AKL1", label: "AKL1" },
   { key: "AKL2", label: "AKL2" },
@@ -23,10 +21,67 @@ const COLUMNS = [
   { key: "Bezirk", label: "Bezirk" },
   { key: "LVName", label: "LVName" },
   { key: "Gruppe", label: "Gruppe" },
+  { key: "SpielerID", label: "SpielerID" },
   { key: "ClubID", label: "ClubID" },
 ];
 
 const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
+
+// Nur Spieler mit regulaerer DBV-SpielerID anzeigen (2 Ziffern + Bindestrich + weitere
+// Zeichen, z.B. "07-047769") -- das Format auslaendischer Teilnehmer ohne DBV-Mitgliedschaft
+// ("LAND-Name", z.B. "CZE-SoucekCyril") faellt bewusst durch, siehe CLAUDE.md "Rein
+// deutsch"-Regel. Betrifft in der Praxis fast nur diese Elo-Variante (~1.200 von 26.600
+// Zeilen bei KW30/2026, da elo_engine direkt aus exportMatchData rechnet statt aus der
+// DBV-Rangliste). User-Vorgabe 2026-08-22: solche Zeilen streichen und ohne sie
+// durchnummerieren.
+const VALID_SPIELER_ID_RE = /^\d{2}-.+$/;
+
+// Nach dem Filtern muss der je DIS global durchnummerierte Ranglistenplatz luecken-frei neu
+// vergeben werden (sonst blieben entfernte Spieler als Zahlensprung sichtbar) -- Reihenfolge
+// bleibt die urspruengliche (Ranglistenplatz aufsteigend).
+function renumberRanglistenplatz(rows) {
+  const byDis = new Map();
+  for (const r of rows) {
+    if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
+    byDis.get(r.DIS).push(r);
+  }
+  for (const group of byDis.values()) {
+    group.sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
+    group.forEach((r, i) => { r.Ranglistenplatz = i + 1; });
+  }
+}
+
+// Spaltenbreiten als Vielfaches der jeweiligen Header-Textbreite (User-Vorgabe 2026-08-22):
+// Nachname/Vorname 1,5x, Verein 2x, Bezirk 3x. Wird per Canvas-Textmessung exakt anhand der
+// tatsaechlich gerenderten Schriftart bestimmt (nicht nur ueber "ch"-Einheiten geschaetzt) und
+// als eine dynamische Stylesheet-Regel injiziert, die th UND td ueber [data-key] trifft --
+// robust gegenueber spaeterer Spaltenumsortierung.
+const COLUMN_WIDTH_MULTIPLIERS = { Nachname: 1.5, Vorname: 1.5, Verein: 2, Bezirk: 3 };
+let _measureCanvas = null;
+function measureTextWidth(text, font) {
+  if (!_measureCanvas) _measureCanvas = document.createElement("canvas");
+  const ctx = _measureCanvas.getContext("2d");
+  ctx.font = font;
+  return ctx.measureText(text).width;
+}
+function applyColumnWidths() {
+  let styleEl = document.getElementById("column-width-style");
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "column-width-style";
+    document.head.appendChild(styleEl);
+  }
+  const sampleTh = document.querySelector("#table-head th");
+  const font = sampleTh ? getComputedStyle(sampleTh).font : getComputedStyle(document.body).font;
+  const rules = [];
+  for (const [key, multiplier] of Object.entries(COLUMN_WIDTH_MULTIPLIERS)) {
+    const col = COLUMNS.find(c => c.key === key);
+    if (!col) continue;
+    const target = Math.ceil(measureTextWidth(col.label, font) * multiplier);
+    rules.push(`th[data-key="${key}"], td[data-key="${key}"] { max-width: ${target}px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`);
+  }
+  styleEl.textContent = rules.join("\n");
+}
 
 const state = {
   index: null,
@@ -177,6 +232,7 @@ function renderHead() {
     });
     tr.appendChild(th);
   }
+  applyColumnWidths();
 }
 
 function renderBody(rows) {
@@ -197,8 +253,22 @@ function renderBody(rows) {
     const tr = document.createElement("tr");
     for (const col of COLUMNS) {
       const td = document.createElement("td");
-      const v = row[col.key];
-      td.textContent = (v === null || v === undefined) ? "" : v;
+      td.dataset.key = col.key;
+      const raw = row[col.key];
+      let display = (raw === null || raw === undefined) ? "" : raw;
+      // "DBV-Gruppe X" -> "X" bzw. LVName auf die ersten 3 Zeichen (= LV-Kuerzel, z.B.
+      // "BAW-Baden-Wuerttemberg" -> "BAW") kuerzen -- nur Anzeige, Filterwerte bleiben
+      // unveraendert die vollen Rohwerte.
+      if (col.key === "Gruppe" && typeof display === "string") {
+        display = display.replace(/DBV-Gruppe\s*/i, "").trim();
+      } else if (col.key === "LVName" && typeof display === "string") {
+        display = display.slice(0, 3);
+      }
+      td.textContent = display;
+      if (raw !== null && raw !== undefined &&
+          (COLUMN_WIDTH_MULTIPLIERS[col.key] || col.key === "LVName" || col.key === "Gruppe")) {
+        td.title = String(raw);
+      }
       tr.appendChild(td);
     }
     tr.addEventListener("click", () => {
@@ -235,7 +305,9 @@ function render() {
 async function loadWeek(week) {
   document.getElementById("loading-indicator").style.display = "inline";
   state.currentWeek = week;
-  state.rows = await fetchJson(week.ranking_file);
+  const rawRows = await fetchJson(week.ranking_file);
+  state.rows = rawRows.filter(r => VALID_SPIELER_ID_RE.test(r.SpielerID || ""));
+  renumberRanglistenplatz(state.rows);
   populateFilterOptions(state.rows);
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;
   document.getElementById("updated-at").textContent = `zuletzt aktualisiert: ${week.updated_at}`;

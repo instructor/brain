@@ -11,6 +11,45 @@ function weekLabel(jahr, kw) {
   return `${jahr}-${String(kw).padStart(2, "0")}`;
 }
 
+// Muss zu rangliste.js' Filter/Renumbering passen, sonst zeigt diese Seite einen anderen
+// Ranglistenplatz als die Tabelle (siehe dort fuer Begruendung).
+const VALID_SPIELER_ID_RE = /^\d{2}-.+$/;
+function renumberRanglistenplatz(rows) {
+  const byDis = new Map();
+  for (const r of rows) {
+    if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
+    byDis.get(r.DIS).push(r);
+  }
+  for (const group of byDis.values()) {
+    group.sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
+    group.forEach((r, i) => { r.Ranglistenplatz = i + 1; });
+  }
+}
+
+// Breite der "Turnier"-Spalte auf das 5-fache der Header-Textbreite begrenzen (User-Vorgabe
+// 2026-08-22), per Canvas-Textmessung wie bei rangliste.js -- einmalig injizierte Stylesheet-
+// Regel, greift ueber alle DIS-Bloecke der Seite (Turnier ist immer die erste Spalte).
+let _measureCanvas = null;
+function measureTextWidth(text, font) {
+  if (!_measureCanvas) _measureCanvas = document.createElement("canvas");
+  const ctx = _measureCanvas.getContext("2d");
+  ctx.font = font;
+  return ctx.measureText(text).width;
+}
+function applyTurnierColumnWidth() {
+  let styleEl = document.getElementById("turnier-col-style");
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "turnier-col-style";
+    document.head.appendChild(styleEl);
+  }
+  const font = getComputedStyle(document.body).font || "14px Arial";
+  const target = Math.ceil(measureTextWidth("Turnier", font) * 5);
+  styleEl.textContent =
+    `.results-table th.col-turnier, .results-table td.col-turnier { max-width: ${target}px; ` +
+    `overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`;
+}
+
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const spielerId = params.get("id");
@@ -22,10 +61,12 @@ async function init() {
   document.getElementById("player-id").textContent = `(${spielerId})`;
 
   const stem = `${year}_KW${String(kw).padStart(2, "0")}`;
-  const [ranking, details] = await Promise.all([
+  const [rankingRaw, details] = await Promise.all([
     fetchJson(`data/kw/${stem}_ranking.json`),
     fetchJson(`data/kw/${stem}_details.json`),
   ]);
+  const ranking = rankingRaw.filter(r => VALID_SPIELER_ID_RE.test(r.SpielerID || ""));
+  renumberRanglistenplatz(ranking);
 
   const myRanking = ranking.filter(r => String(r.SpielerID) === spielerId);
   const summaryBody = document.getElementById("summary-body");
@@ -58,15 +99,22 @@ async function init() {
     const table = document.createElement("table");
     table.className = "results-table";
     table.innerHTML = `<thead><tr>
-        <th>Turnier</th><th>Konkurrenz</th><th>Woche</th><th>Platz</th><th>Punkte</th>
+        <th class="col-turnier">Turnier</th><th>Konkurrenz</th><th>Woche</th><th>Platz</th><th>Punkte</th>
       </tr></thead>`;
     const tbody = document.createElement("tbody");
     let top5Sum = 0;
     for (const row of rows) {
       const tr = document.createElement("tr");
       if (row.IstTop5) { tr.classList.add("top5"); top5Sum += row.Punkte || 0; }
+      // Turnier verlinken wie auf der Elo-Detailseite (dbv.turnier.de), wenn eine URL
+      // bekannt ist (siehe export_ranking_web.py TurnierURL-Anreicherung); sonst reiner Text.
+      const name = row.RankingTournamentName ?? "";
+      const nameAttr = name.replace(/"/g, "&quot;");
+      const turnierCell = row.TurnierURL
+        ? `<a href="${row.TurnierURL}" target="_blank" rel="noopener">${name}</a>`
+        : name;
       tr.innerHTML = `
-        <td>${row.RankingTournamentName ?? ""}</td>
+        <td class="col-turnier" title="${nameAttr}">${turnierCell}</td>
         <td>${row.Konkurrenz ?? ""}</td>
         <td>${weekLabel(row.Jahr, row.KW)}</td>
         <td>${row.Platz ?? ""}</td>
@@ -86,6 +134,7 @@ async function init() {
   if (disOrder.length === 0) {
     container.innerHTML = '<p class="empty-state">Keine Turnierergebnisse gefunden.</p>';
   }
+  applyTurnierColumnWidth();
   document.getElementById("loading-indicator").style.display = "none";
 }
 
