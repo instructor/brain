@@ -13,7 +13,12 @@ const COLUMNS = [
   { key: "AKL1", label: "AKL1" },
   { key: "AKL2", label: "AKL2" },
   { key: "Points", label: "Punkte", numeric: true },
-  { key: "Turniere", label: "Turniere", numeric: true },
+  // Anzeige "34/56/16" (Anzahl DISTINKTER Turniere je Jahr aus TOURNAMENT_COUNT_YEARS in
+  // build_elo_ranking.py, aktuell 2024/2025/2026 -- bei einer Erweiterung dieser Liste muss das
+  // Label hier manuell mitgezogen werden, siehe Kommentar dort). sortKey zeigt auf das separate
+  // numerische TurniereTotal-Feld, da der String selbst nicht sinnvoll numerisch sortierbar ist.
+  { key: "Turniere", label: "#Turniere\n2024/25/26", numeric: true, sortKey: "TurniereTotal",
+    multiline: true },
   { key: "Verein", label: "Verein" },
   { key: "Bezirk", label: "Bezirk" },
   { key: "LVName", label: "LVName" },
@@ -141,7 +146,8 @@ function sortRows(rows) {
       if (d !== 0) return d;
       return Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz);
     }
-    let av = a[sortKey], bv = b[sortKey];
+    const compareKey = col && col.sortKey ? col.sortKey : sortKey;
+    let av = a[compareKey], bv = b[compareKey];
     if (av === null || av === undefined) av = "";
     if (bv === null || bv === undefined) bv = "";
     if (col && col.numeric) return (Number(av) - Number(bv)) * dir;
@@ -156,6 +162,7 @@ function renderHead() {
     const th = document.createElement("th");
     th.textContent = col.label;
     th.dataset.key = col.key;
+    if (col.multiline) th.classList.add("th-multiline");
     if (state.sortKey === col.key) {
       th.classList.add(state.sortDir === "asc" ? "sorted-asc" : "sorted-desc");
     }

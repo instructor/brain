@@ -226,6 +226,9 @@ thead th {
   user-select: none;
 }
 thead th:hover { background: #e6e6e6; }
+/* "#Turniere\n2024/25/26"-Spaltenkopf: table setzt white-space:nowrap global, hier gezielt
+   aufgehoben, damit der eingebettete \n (siehe rangliste.js COLUMNS) als Zeilenumbruch wirkt. */
+thead th.th-multiline { white-space: pre-line; line-height: 1.25; }
 thead th.sorted-asc::after { content: " \25B2"; font-size: 0.7em; }
 thead th.sorted-desc::after { content: " \25BC"; font-size: 0.7em; }
 tbody td {

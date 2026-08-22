@@ -77,14 +77,29 @@ async function init() {
 
     for (const turnier of turnierOrder) {
       const matches = byTurnier[turnier];
+      // Partner nur bei Doppel/Mixed vorhanden (siehe elo_engine._log_team) -- Spalte pro
+      // Turnier-Block ein-/ausblenden statt fest je DIS, damit die Tabelle robust bleibt, falls
+      // ein Turnier abweichend erfasst wurde (User-Vorgabe 2026-08-22).
+      const hasPartner = matches.some(m => m.Partner);
       const sub = document.createElement("h3");
-      sub.textContent = `${turnier} (${matches[0].Datum})`;
+      if (matches[0].TurnierURL) {
+        const link = document.createElement("a");
+        link.href = matches[0].TurnierURL;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = turnier;
+        sub.appendChild(link);
+        sub.append(` (${matches[0].Datum})`);
+      } else {
+        sub.textContent = `${turnier} (${matches[0].Datum})`;
+      }
       block.appendChild(sub);
 
       const table = document.createElement("table");
       table.className = "results-table";
       table.innerHTML = `<thead><tr>
-          <th>Datum</th><th>Gegner</th><th>Ergebnis</th><th>Erwartungswert</th>
+          <th>Datum</th><th>Gegner</th>${hasPartner ? "<th>Partner</th>" : ""}
+          <th>Ergebnis</th><th>Erwartungswert</th>
           <th>Rating vorher → nachher</th><th>Δ</th>
         </tr></thead>`;
       const tbody = document.createElement("tbody");
@@ -97,6 +112,7 @@ async function init() {
         tr.innerHTML = `
           <td>${m.Datum ?? ""}</td>
           <td>${m.Gegner ?? ""}</td>
+          ${hasPartner ? `<td>${m.Partner ?? ""}</td>` : ""}
           <td>${m.Ergebnis ?? ""}</td>
           <td>${m.Erwartungswert != null ? (m.Erwartungswert * 100).toFixed(1) + " %" : ""}</td>
           <td>${m.RatingVorher ?? ""} → ${m.RatingNachher ?? ""}</td>
