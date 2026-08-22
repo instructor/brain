@@ -196,6 +196,7 @@ a { color: var(--accent); }
   margin-left: 10px;
   color: var(--accent);
   font-weight: bold;
+  font-size: 1.3rem;
   animation: loading-pulse 0.8s ease-in-out infinite;
 }
 @keyframes loading-pulse {

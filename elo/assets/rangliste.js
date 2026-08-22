@@ -233,6 +233,7 @@ function render() {
 }
 
 async function loadWeek(week) {
+  document.getElementById("loading-indicator").style.display = "inline";
   state.currentWeek = week;
   state.rows = await fetchJson(week.ranking_file);
   populateFilterOptions(state.rows);
@@ -429,8 +430,10 @@ function setupFilterListeners() {
 }
 
 async function init() {
+  document.getElementById("loading-indicator").style.display = "inline";
   state.index = await fetchJson("data/index.json");
   if (!state.index.latest) {
+    document.getElementById("loading-indicator").style.display = "none";
     document.getElementById("table-body").innerHTML =
       '<tr><td class="empty-state">Keine Ranglisten-Daten gefunden. export_ranking_web.py ausführen.</td></tr>';
     return;
@@ -441,4 +444,10 @@ async function init() {
   await loadWeek(state.index.latest);
 }
 
-init();
+init().catch(err => {
+  console.error("Fehler beim Initialisieren der Rangliste:", err);
+  const loadingEl = document.getElementById("loading-indicator");
+  if (loadingEl) loadingEl.style.display = "none";
+  document.getElementById("table-body").innerHTML =
+    `<tr><td class="empty-state">Fehler beim Laden der Daten: ${err.message}</td></tr>`;
+});
