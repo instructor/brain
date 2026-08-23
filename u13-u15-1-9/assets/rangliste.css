@@ -171,6 +171,26 @@ a { color: var(--accent); }
 .ms-option.is-selected:not(.is-active) { background: var(--header-bg); color: var(--text-muted); }
 .ms-option.is-empty { color: var(--text-muted); cursor: default; text-align: center; padding: 8px; }
 
+.filters-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 14px;
+}
+.search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+.search-btn:hover { background: #6e1723; }
+
 .meta-row {
   display: flex;
   justify-content: space-between;

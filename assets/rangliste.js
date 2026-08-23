@@ -29,6 +29,13 @@ const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
 // durchnummerieren.
 const VALID_SPIELER_ID_RE = /^\d{2}-.+$/;
 
+// Schalter (User-Vorgabe 2026-08-24): true = Filter (Selects, Textfelder, Altersklasse-
+// Mehrfachauswahl) werden erst bei Klick auf den "Suche"-Button bzw. Enter in einem Textfeld
+// angewendet -- wie im Original https://www.badminton.de/.../u19-rangliste/. false = bisherige
+// Technik bleibt erhalten: jede Filteraenderung aktualisiert die Tabelle sofort. In beiden
+// Faellen zeigt das erstmalige Laden einer Woche unveraendert alle Datensaetze.
+const SEARCH_REQUIRES_SUBMIT = true;
+
 // Nach dem Filtern muss der je DIS global durchnummerierte Ranglistenplatz luecken-frei neu
 // vergeben werden (sonst blieben entfernte Spieler als Zahlensprung sichtbar) -- Reihenfolge
 // bleibt die urspruengliche (Ranglistenplatz aufsteigend).
@@ -274,6 +281,13 @@ function renderBody(rows) {
   tbody.appendChild(frag);
 }
 
+// Wird von allen Filter-Steuerelementen aufgerufen statt direkt render() -- so entscheidet
+// allein SEARCH_REQUIRES_SUBMIT, ob eine Filteraenderung sofort wirkt oder erst der
+// "Suche"-Button (bzw. Enter) sie anwendet.
+function applyFilterChange() {
+  if (!SEARCH_REQUIRES_SUBMIT) render();
+}
+
 function render() {
   const loadingEl = document.getElementById("loading-indicator");
   loadingEl.style.display = "inline";
@@ -369,7 +383,7 @@ function setupAklWidget() {
         state.aklSelected.delete(value);
         renderChips();
         renderList();
-        render();
+        applyFilterChange();
       });
       chip.appendChild(btn);
       chip.appendChild(text);
@@ -416,7 +430,7 @@ function setupAklWidget() {
     renderList();
     openList();
     input.focus();
-    render();
+    applyFilterChange();
   }
 
   function openList() {
@@ -454,7 +468,7 @@ function setupAklWidget() {
       state.aklSelected.delete(last);
       renderChips();
       renderList();
-      render();
+      applyFilterChange();
     }
   });
   clearAllBtn.addEventListener("click", (evt) => {
@@ -463,7 +477,7 @@ function setupAklWidget() {
     input.value = "";
     renderChips();
     renderList();
-    render();
+    applyFilterChange();
   });
   document.addEventListener("click", (evt) => {
     if (!document.getElementById("f-akl-ms").contains(evt.target)) closeList();
@@ -476,10 +490,18 @@ function setupFilterListeners() {
   const ids = ["f-dis", "f-gs", "f-gruppe", "f-lv", "f-bezirk", "f-vorname", "f-nachname", "f-verein"];
   for (const id of ids) {
     const el = document.getElementById(id);
-    el.addEventListener("input", render);
-    el.addEventListener("change", render);
+    el.addEventListener("input", applyFilterChange);
+    el.addEventListener("change", applyFilterChange);
+    if (SEARCH_REQUIRES_SUBMIT) {
+      // Enter in einem Textfeld loest die Suche direkt aus, ohne dass der Button geklickt
+      // werden muss (Vorbild badminton.de).
+      el.addEventListener("keydown", (evt) => {
+        if (evt.key === "Enter") { evt.preventDefault(); render(); }
+      });
+    }
   }
   setupAklWidget();
+  document.getElementById("btn-search").addEventListener("click", render);
   document.getElementById("reset-filters").addEventListener("click", () => {
     for (const id of ids) {
       document.getElementById(id).value = "";
