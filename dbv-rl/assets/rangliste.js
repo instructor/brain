@@ -36,6 +36,15 @@ const VALID_SPIELER_ID_RE = /^\d{2}-.+$/;
 // Faellen zeigt das erstmalige Laden einer Woche unveraendert alle Datensaetze.
 const SEARCH_REQUIRES_SUBMIT = true;
 
+// Performance (User-Vorgabe 2026-08-24): bei ~18000-26000 Zeilen dauerte das initiale
+// renderBody() aller Zeilen ~10s (DOM-Knoten- und Listener-Erzeugung). Statt sofort alle
+// gefilterten/sortierten Zeilen zu rendern, werden nur die ersten PAGE_SIZE gerendert; der
+// Rest wird per "Mehr laden"-Button bzw. automatisch beim Scrollen nachgeladen
+// (siehe loadMore()/state.visibleCount). state.visibleCount wird ausschliesslich in render()
+// gesetzt, das bei jeder Filter-/Sortier-/Wochenaenderung laeuft -- so zeigt ein neuer Filter
+// nie nur noch die alten sichtbaren Zeilen von vorher.
+const PAGE_SIZE = 1000;
+
 // Nach dem Filtern muss der je DIS global durchnummerierte Ranglistenplatz luecken-frei neu
 // vergeben werden (sonst blieben entfernte Spieler als Zahlensprung sichtbar) -- Reihenfolge
 // bleibt die urspruengliche (Ranglistenplatz aufsteigend).
@@ -93,7 +102,11 @@ const state = {
   aklOptions: [],       // [{value,label}], gebaut aus AKL2 (grob) + AKL1 (fein) der aktuellen Woche
   aklSelected: new Set(),
   aklActiveIndex: -1,
+  sortedRows: [],        // volle gefilterte+sortierte Liste der aktuellen Woche (fuer loadMore())
+  visibleCount: 0,        // wie viele davon aktuell im DOM stehen
 };
+
+let loadMoreObserver = null;
 
 async function fetchJson(path) {
   const res = await fetch(path);
@@ -233,19 +246,11 @@ function renderHead() {
   applyColumnWidths();
 }
 
-function renderBody(rows) {
-  const tbody = document.getElementById("table-body");
-  tbody.innerHTML = "";
-  if (rows.length === 0) {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = COLUMNS.length;
-    td.className = "empty-state";
-    td.textContent = "Keine Einträge für die aktuelle Filterauswahl.";
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-    return;
-  }
+// Baut ein DocumentFragment mit <tr>-Zeilen fuer die uebergebenen (bereits gefilterten/
+// sortierten und ggf. schon geslicten) Zeilen. Getrennt von renderBody()/loadMore(), damit
+// beide dieselbe Zeilenerzeugung nutzen -- renderBody() ersetzt den gesamten tbody-Inhalt,
+// loadMore() haengt nur an.
+function buildRowFragment(rows) {
   const frag = document.createDocumentFragment();
   for (const row of rows) {
     const tr = document.createElement("tr");
@@ -278,7 +283,56 @@ function renderBody(rows) {
     });
     frag.appendChild(tr);
   }
-  tbody.appendChild(frag);
+  return frag;
+}
+
+function renderBody(rows) {
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = "";
+  if (rows.length === 0) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = COLUMNS.length;
+    td.className = "empty-state";
+    td.textContent = "Keine Einträge für die aktuelle Filterauswahl.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+  tbody.appendChild(buildRowFragment(rows));
+}
+
+// Haengt die naechsten PAGE_SIZE Zeilen aus state.sortedRows an den bestehenden tbody an,
+// statt neu zu rendern. Wird per Klick auf "Mehr laden" oder automatisch beim Scrollen
+// (siehe setupLoadMoreObserver) aufgerufen.
+function loadMore() {
+  const { sortedRows, visibleCount } = state;
+  const next = Math.min(visibleCount + PAGE_SIZE, sortedRows.length);
+  if (next <= visibleCount) return;
+  document.getElementById("table-body").appendChild(buildRowFragment(sortedRows.slice(visibleCount, next)));
+  state.visibleCount = next;
+  updateLoadMoreControl();
+}
+
+function updateLoadMoreControl() {
+  const row = document.getElementById("load-more-row");
+  const info = document.getElementById("load-more-info");
+  const remaining = state.sortedRows.length - state.visibleCount;
+  if (remaining <= 0) {
+    row.style.display = "none";
+    return;
+  }
+  row.style.display = "flex";
+  info.textContent = `${state.visibleCount} von ${state.sortedRows.length} angezeigt`;
+}
+
+function setupLoadMoreObserver() {
+  const sentinel = document.getElementById("load-more-row");
+  document.getElementById("btn-load-more").addEventListener("click", loadMore);
+  loadMoreObserver = new IntersectionObserver((entries) => {
+    if (entries.some(e => e.isIntersecting)) loadMore();
+  }, { rootMargin: "800px 0px" });
+  loadMoreObserver.observe(sentinel);
 }
 
 // Wird von allen Filter-Steuerelementen aufgerufen statt direkt render() -- so entscheidet
@@ -299,7 +353,10 @@ function render() {
       const filtered = applyFilters(state.rows);
       const sorted = sortRows(filtered);
       sorted.forEach((r, i) => { r.FRang = i + 1; });
-      renderBody(sorted);
+      state.sortedRows = sorted;
+      state.visibleCount = Math.min(PAGE_SIZE, sorted.length);
+      renderBody(sorted.slice(0, state.visibleCount));
+      updateLoadMoreControl();
       document.getElementById("row-count").textContent =
         `${sorted.length} von ${state.rows.length} Einträgen`;
       loadingEl.style.display = "none";
@@ -526,6 +583,7 @@ async function init() {
   setupTabs();
   setupWeekSelect();
   setupFilterListeners();
+  setupLoadMoreObserver();
   await loadWeek(state.index.latest);
 }
 
