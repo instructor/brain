@@ -1,0 +1,123 @@
+/* Zusatz-Stylesheet nur fuer die eigene-ak-bonus-Spielerdetailseite: Badges, Aufklapp-Panels je
+   hoehergespieltem Turnier, Stat-Strip, Match-Tabelle. Baut auf den Tokens aus rangliste.css auf
+   (--accent/--border/--bg/--bg-alt/--header-bg/--text/--text-muted, siehe dort) -- wird NACH
+   rangliste.css geladen, die Variablen sind also bereits verfuegbar. Sieg/Niederlage-Gruen/Rot
+   sind hier wie schon in elo/assets/rangliste.css direkt hartkodiert (#2a7a2a/#a12a2a), nicht als
+   neue globale Tokens, um rangliste.css selbst unveraendert zu lassen (variantenuebergreifend
+   geteilte Datei). */
+
+:root {
+  --win: #2a7a2a;
+  --loss: #a12a2a;
+  --hoch: #8a6410;
+  --hoch-bg: #f4ecd8;
+  --gap: #9a5b00;
+  --gap-bg: #fbeed9;
+}
+
+.tourn-table tr.top5 td:first-child::before { content: "\2605 "; color: var(--accent); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.badge-hoch { background: var(--hoch-bg); color: var(--hoch); border: 1px solid #e2d2a6; }
+.badge-bonus { background: #e8f3e8; color: var(--win); border: 1px solid #c3ddc3; }
+.badge-nobonus { background: var(--header-bg); color: var(--text-muted); border: 1px solid var(--border); }
+.badge-gap { background: var(--gap-bg); color: var(--gap); border: 1px solid #edd6a3; }
+
+details.hoch-panel {
+  margin: 0 0 16px;
+  border: 1px solid #e2d2a6;
+  border-left: 4px solid var(--hoch);
+  border-radius: 0 4px 4px 0;
+  background: #fffdf8;
+}
+details.hoch-panel summary {
+  cursor: pointer;
+  padding: 9px 14px;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  list-style: none;
+}
+details.hoch-panel summary::-webkit-details-marker { display: none; }
+details.hoch-panel summary::before {
+  content: "▸";
+  color: var(--hoch);
+  transition: transform 0.15s ease;
+  flex: none;
+}
+details.hoch-panel[open] summary::before { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) {
+  details.hoch-panel summary::before { transition: none; }
+}
+.hoch-panel .sum-turnier { font-weight: bold; }
+.hoch-panel .sum-meta { color: var(--text-muted); font-size: 0.83rem; }
+.hoch-panel .sum-spacer { flex: 1; }
+.hoch-panel .panel-body { padding: 2px 14px 14px; }
+
+.stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: var(--bg);
+}
+.stat-strip .stat {
+  flex: 1 1 120px;
+  padding: 7px 11px;
+  border-right: 1px solid var(--border);
+}
+.stat-strip .stat:last-child { border-right: none; }
+.stat-strip .stat-label {
+  display: block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.stat-strip .stat-value { font-size: 1.02rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+.stat-strip .stat-final { background: var(--hoch-bg); }
+.stat-strip .stat-final .stat-value { color: var(--hoch); }
+
+.match-table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+.match-table th, .match-table td { border-bottom: 1px solid var(--border); padding: 6px 9px; text-align: left; }
+.match-table th { background: var(--header-bg); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--text-muted); }
+.match-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.match-table tr.win td:first-child { border-left: 3px solid var(--win); }
+.match-table tr.loss td:first-child { border-left: 3px solid var(--loss); }
+.match-table td.stronger { color: var(--win); font-weight: bold; }
+.match-table .grund { color: var(--text-muted); font-size: 0.82rem; }
+
+.hoeherspiel-footnote { font-size: 0.79rem; color: var(--text-muted); margin: 6px 0 14px; }
+
+.gap-note {
+  background: var(--gap-bg);
+  border: 1px solid #edd6a3;
+  border-radius: 4px;
+  padding: 9px 13px;
+  font-size: 0.86rem;
+  color: #6b4400;
+  line-height: 1.5;
+}
+.gap-note strong { color: var(--gap); }
+
+.hoeherspiel-legend { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--border); }
+.hoeherspiel-legend h3 { font-size: 0.92rem; margin: 0 0 10px; }
+.hoeherspiel-legend dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; font-size: 0.84rem; }
+.hoeherspiel-legend dt { white-space: nowrap; }
+.hoeherspiel-legend dd { margin: 0; color: var(--text-muted); }

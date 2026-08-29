@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spielerdetails - BRAIN Rangliste (eigene AK + Höherspielen-Bonus)</title>
+<link rel="stylesheet" href="assets/rangliste.css">
+<link rel="stylesheet" href="assets/hoeherspiel.css">
+</head>
+<body>
+<div class="page">
+  <a class="back-link" href="rangliste-eigene-ak-bonus.html">&larr; zurück zur Rangliste (eigene AK + Höherspielen-Bonus)</a>
+  <span id="loading-indicator" class="loading-indicator">wird geladen …</span>
+
+  <div class="player-header">
+    <h1 id="player-name">Rangliste von ...</h1>
+    <span class="spieler-id" id="player-id"></span>
+  </div>
+
+  <table class="summary-table" id="summary-table">
+    <thead><tr><th>Disziplin</th><th>Rang</th><th>Punkte</th></tr></thead>
+    <tbody id="summary-body"></tbody>
+  </table>
+
+  <div id="dis-blocks"></div>
+
+  <div class="legend hoeherspiel-legend">
+    <h3>Legende: Bonus-Status</h3>
+    <dl>
+      <dt><span class="badge badge-hoch">höhergespielt</span></dt>
+      <dd>Turnier in einer Konkurrenz-Altersklasse, die höher liegt als die eigene Spieler-Altersklasse (O19 zählt dabei immer als „höher“ als jede Jugend-AK, auch mehrstufiges Hochspielen z. B. U13→U17 ist u.U. möglich).</dd>
+      <dt><span class="badge badge-bonus">Bonus +X</span></dt>
+      <dd>Mindestens ein Sieg dieses Turniers war gegen einen nativen und stärkeren Gegner — Bonus &gt; 0 wurde angewendet.</dd>
+      <dt><span class="badge badge-nobonus">kein Bonus</span></dt>
+      <dd>Hochgespielt, aber kein einziger Sieg erfüllte die Bonus-Bedingung (z. B. nur Niederlagen, oder Gegner nicht nativ/nicht stärker) — Bonus = 0, Zeile wird trotzdem vollständig angezeigt.</dd>
+      <dt><span class="badge badge-gap">BWF/BEC-Punkte</span></dt>
+      <dd>Bei internationalen BWF/BEC-Turnieren werden die Punkte der gespielten AK vergeben.</dd>
+      <dt><span class="badge badge-gap">Datenlücke</span></dt>
+      <dd>Systemfehler, deshalb zunächst Bonus = 0 und bitte Rückmeldung an Systemverwaltung.</dd>
+    </dl>
+  </div>
+</div>
+
+<script src="assets/spieler.js"></script>
+</body>
+</html>
