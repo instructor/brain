@@ -83,6 +83,8 @@ function bonusBadgeHtml(row) {
       return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-gap">BWF/BEC-Punkte</span>`;
     case "datenluecke":
       return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-gap">Datenlücke</span>`;
+    case "o19_ohne_matchdaten":
+      return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-o19">O19 RLT/Mst</span>`;
     default:
       return `<span class="badge badge-hoch">höhergespielt</span>`;
   }
@@ -96,6 +98,7 @@ function renderHochPanel(row) {
   const badge = row.BonusStatus === "bonus_angewendet" ? `<span class="badge badge-bonus">Bonus ${fmtSigned(row.Bonus)}</span>`
     : row.BonusStatus === "kein_bonus" ? `<span class="badge badge-nobonus">kein Bonus</span>`
     : row.BonusStatus === "bwf_bec_punkte" ? `<span class="badge badge-gap">BWF/BEC-Punkte</span>`
+    : row.BonusStatus === "o19_ohne_matchdaten" ? `<span class="badge badge-o19">O19 RLT/Mst</span>`
     : `<span class="badge badge-gap">Datenlücke</span>`;
   summary.innerHTML = `
     <span class="sum-turnier">${escapeHtml(row.RankingTournamentName)}</span>
@@ -134,10 +137,16 @@ function renderHochPanel(row) {
       ? `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th><th>Gegner-Status</th><th>Grund</th></tr></thead>`
       : `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th><th>Gegner nativ?</th><th>Vorwochenpunkte eigene → Gegner</th><th>Grund</th></tr></thead>`;
     const tbody = document.createElement("tbody");
+    // Die 3 hervorgehobenen Spalteneintraege (Ergebnis "Sieg", "Gegner nativ? ja", Vorwochenpunkte
+    // bei staerkerem Gegner) werden NICHT als reiner gruener Text auf dem <td> dargestellt (kaum
+    // sichtbarer Kontrast), sondern als abgerundetes gruenes Pill-Label um den Wert herum (User-
+    // Vorgabe 2026-08-29, .stronger jetzt eine <span>-Pille statt einer td-Textfarbe, siehe
+    // hoeherspiel.css).
+    const pill = (text) => `<span class="stronger">${text}</span>`;
     for (const m of row.Matches) {
       const tr = document.createElement("tr");
       tr.classList.add(m.Ergebnis === "Sieg" ? "win" : "loss");
-      const ergebnisCls = m.Ergebnis === "Sieg" ? "stronger" : "";
+      const ergebnisHtml = m.Ergebnis === "Sieg" ? pill(m.Ergebnis) : m.Ergebnis;
       const gegner = escapeHtml((m.Gegner || []).join(" / "));
       if (hasO19) {
         const status = m.GegnerErwachsen === true ? "native O19-Spieler/in"
@@ -145,23 +154,23 @@ function renderHochPanel(row) {
         tr.innerHTML = `
           <td>${m.Runde ?? ""}</td>
           <td>${gegner}</td>
-          <td class="${ergebnisCls}">${m.Ergebnis}</td>
+          <td>${ergebnisHtml}</td>
           <td>${status}</td>
           <td class="grund">${escapeHtml(m.Grund)}</td>`;
       } else {
-        const nativCls = m.GegnerNativ === true ? "stronger" : "";
-        const nativText = m.GegnerNativ === true ? "ja" : m.GegnerNativ === false ? "nein" : "—";
+        const nativText = m.GegnerNativ === true ? pill("ja") : m.GegnerNativ === false ? "nein" : "—";
         const hatPunkte = m.EigenePunkte != null && m.GegnerPunkte != null;
         const staerker = hatPunkte && m.GegnerPunkte > m.EigenePunkte;
-        const punkteText = hatPunkte
+        const punkteRaw = hatPunkte
           ? `${fmtNum(m.EigenePunkte)} → ${fmtNum(m.GegnerPunkte)}${(m.Gegner || []).length > 1 ? " (Ø)" : ""}`
           : "—";
+        const punkteText = staerker ? pill(punkteRaw) : punkteRaw;
         tr.innerHTML = `
           <td>${m.Runde ?? ""}</td>
           <td>${gegner}</td>
-          <td class="${ergebnisCls}">${m.Ergebnis}</td>
-          <td class="${nativCls}">${nativText}</td>
-          <td class="num ${staerker ? "stronger" : ""}">${punkteText}</td>
+          <td>${ergebnisHtml}</td>
+          <td>${nativText}</td>
+          <td class="num">${punkteText}</td>
           <td class="grund">${escapeHtml(m.Grund)}</td>`;
       }
       tbody.appendChild(tr);
@@ -174,6 +183,14 @@ function renderHochPanel(row) {
     note.innerHTML = `<strong>BWF/BEC-Punkte</strong> — Bei internationalen BWF/BEC-Turnieren ` +
       `zählen die vollen Punkte der gespielten Altersklasse, auch weil die Matchdaten und ` +
       `Ergebnisse nicht vorliegen.`;
+    body.appendChild(note);
+  } else if (row.BonusStatus === "o19_ohne_matchdaten") {
+    const note = document.createElement("div");
+    note.className = "gap-note note-o19";
+    note.innerHTML = `<strong>O19 RLT/Mst</strong> — für Ranglistenturniere/Meisterschaften der ` +
+      `Aktiven (O19) liegen hier keine Matchdaten vor. Bonus wird bei Sieg über O19-Spieler ` +
+      `vergeben, unabhängig von der Spielstärke des O19-Spielers (da diese nicht bekannt ist auf ` +
+      `Basis der U19-Rangliste) — ohne Matchdaten aber nicht ermittelbar, daher Bonus = 0 Punkte.`;
     body.appendChild(note);
   } else if (row.BonusStatus === "datenluecke") {
     const note = document.createElement("div");

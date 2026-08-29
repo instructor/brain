@@ -13,6 +13,8 @@
   --hoch-bg: #f4ecd8;
   --gap: #9a5b00;
   --gap-bg: #fbeed9;
+  --o19: #2a5a8a;
+  --o19-bg: #e8f0f8;
 }
 
 .tourn-table tr.top5 td:first-child::before { content: "\2605 "; color: var(--accent); }
@@ -33,6 +35,7 @@
 .badge-bonus { background: #e8f3e8; color: var(--win); border: 1px solid #c3ddc3; }
 .badge-nobonus { background: var(--header-bg); color: var(--text-muted); border: 1px solid var(--border); }
 .badge-gap { background: var(--gap-bg); color: var(--gap); border: 1px solid #edd6a3; }
+.badge-o19 { background: var(--o19-bg); color: var(--o19); border: 1px solid #c3d7ec; }
 
 details.hoch-panel {
   margin: 0 0 16px;
@@ -100,7 +103,19 @@ details.hoch-panel[open] summary::before { transform: rotate(90deg); }
 .match-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .match-table tr.win td:first-child { border-left: 3px solid var(--win); }
 .match-table tr.loss td:first-child { border-left: 3px solid var(--loss); }
-.match-table td.stronger { color: var(--win); font-weight: bold; }
+/* Hervorhebung von "staerkerer"/"nativer"/"Sieg"-Werten in der Match-Tabelle: bewusst ein
+   abgerundetes Pill-Label um den Wert (wie bei den Status-Badges), nicht mehr nur gruener Text auf
+   weissem Grund -- reiner Text war kaum sichtbarer Kontrast (User-Vorgabe 2026-08-29). Betrifft
+   .stronger jetzt als <span> um den jeweiligen Zellinhalt, nicht mehr als Klasse auf dem <td>. */
+.match-table .stronger {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #e8f3e8;
+  color: var(--win);
+  font-weight: 600;
+  border: 1px solid #c3ddc3;
+}
 .match-table .grund { color: var(--text-muted); font-size: 0.82rem; }
 
 .hoeherspiel-footnote { font-size: 0.79rem; color: var(--text-muted); margin: 6px 0 14px; }
@@ -115,6 +130,8 @@ details.hoch-panel[open] summary::before { transform: rotate(90deg); }
   line-height: 1.5;
 }
 .gap-note strong { color: var(--gap); }
+.gap-note.note-o19 { background: var(--o19-bg); border-color: #c3d7ec; color: #1f3f5c; }
+.gap-note.note-o19 strong { color: var(--o19); }
 
 .hoeherspiel-legend { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--border); }
 .hoeherspiel-legend h3 { font-size: 0.92rem; margin: 0 0 10px; }

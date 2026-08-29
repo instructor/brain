@@ -261,8 +261,9 @@ thead th.sorted-desc::after { content: " \25BC"; font-size: 0.7em; }
   cursor: col-resize;
   user-select: none;
   touch-action: none;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
 }
-.col-resizer:hover, .col-resizer.resizing { background: rgba(139, 30, 45, 0.3); }
+.col-resizer:hover, .col-resizer.resizing { background: rgba(139, 30, 45, 0.3); border-right-color: rgba(139, 30, 45, 0.5); }
 tbody td {
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);
