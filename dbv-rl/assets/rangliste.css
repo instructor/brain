@@ -249,6 +249,17 @@ thead th {
 thead th:hover { background: #e6e6e6; }
 thead th.sorted-asc::after { content: " \25B2"; font-size: 0.7em; }
 thead th.sorted-desc::after { content: " \25BC"; font-size: 0.7em; }
+.col-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+.col-resizer:hover, .col-resizer.resizing { background: rgba(139, 30, 45, 0.3); }
 tbody td {
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);

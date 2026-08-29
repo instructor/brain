@@ -73,6 +73,45 @@ function measureTextWidth(text, font) {
   ctx.font = font;
   return ctx.measureText(text).width;
 }
+// Manuelles Verbreitern/Verschmalern per Drag am Spaltenrand (User-Vorgabe 2026-08-29: die
+// Multiplikator-Breiten oben reichen z.B. bei langen Vereinsnamen nicht aus) -- ueberschreibt die
+// Multiplikator-Breite je Spalte, sobald der Nutzer sie einmal manuell gezogen hat. Pro Seite
+// (nicht global) in localStorage gemerkt, da alle Varianten dieselbe Origin teilen, aber
+// unterschiedliche Spaltensaetze haben -- location.pathname als Schluessel haelt das JS
+// variantenagnostisch (kein hartkodierter Variantenname, siehe Konvention oben).
+const COL_WIDTH_STORAGE_KEY = "col-widths:" + location.pathname;
+let customColumnWidths = {};
+try {
+  customColumnWidths = JSON.parse(localStorage.getItem(COL_WIDTH_STORAGE_KEY) || "{}");
+} catch { customColumnWidths = {}; }
+
+function saveCustomColumnWidths() {
+  try { localStorage.setItem(COL_WIDTH_STORAGE_KEY, JSON.stringify(customColumnWidths)); } catch {}
+}
+
+function startColumnResize(e, th, col) {
+  e.preventDefault();
+  e.stopPropagation();
+  const startX = e.clientX;
+  const startWidth = th.getBoundingClientRect().width;
+  const resizer = e.currentTarget;
+  resizer.classList.add("resizing");
+
+  function onMove(ev) {
+    const newWidth = Math.max(30, Math.round(startWidth + (ev.clientX - startX)));
+    customColumnWidths[col.key] = newWidth;
+    applyColumnWidths();
+  }
+  function onUp() {
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    resizer.classList.remove("resizing");
+    saveCustomColumnWidths();
+  }
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+}
+
 function applyColumnWidths() {
   let styleEl = document.getElementById("column-width-style");
   if (!styleEl) {
@@ -83,11 +122,16 @@ function applyColumnWidths() {
   const sampleTh = document.querySelector("#table-head th");
   const font = sampleTh ? getComputedStyle(sampleTh).font : getComputedStyle(document.body).font;
   const rules = [];
-  for (const [key, multiplier] of Object.entries(COLUMN_WIDTH_MULTIPLIERS)) {
-    const col = COLUMNS.find(c => c.key === key);
-    if (!col) continue;
+  for (const col of COLUMNS) {
+    const custom = customColumnWidths[col.key];
+    if (custom) {
+      rules.push(`th[data-key="${col.key}"], td[data-key="${col.key}"] { width: ${custom}px; min-width: ${custom}px; max-width: ${custom}px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`);
+      continue;
+    }
+    const multiplier = COLUMN_WIDTH_MULTIPLIERS[col.key];
+    if (!multiplier) continue;
     const target = Math.ceil(measureTextWidth(col.label, font) * multiplier);
-    rules.push(`th[data-key="${key}"], td[data-key="${key}"] { max-width: ${target}px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`);
+    rules.push(`th[data-key="${col.key}"], td[data-key="${col.key}"] { max-width: ${target}px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`);
   }
   styleEl.textContent = rules.join("\n");
 }
@@ -241,6 +285,18 @@ function renderHead() {
       }
       render();
     });
+    const resizer = document.createElement("span");
+    resizer.className = "col-resizer";
+    resizer.title = "Ziehen zum Verbreitern/Verschmälern, Doppelklick zum Zurücksetzen";
+    resizer.addEventListener("mousedown", (e) => startColumnResize(e, th, col));
+    resizer.addEventListener("click", (e) => e.stopPropagation());
+    resizer.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      delete customColumnWidths[col.key];
+      saveCustomColumnWidths();
+      applyColumnWidths();
+    });
+    th.appendChild(resizer);
     tr.appendChild(th);
   }
   applyColumnWidths();
