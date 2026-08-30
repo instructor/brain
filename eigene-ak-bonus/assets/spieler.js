@@ -135,7 +135,7 @@ function renderHochPanel(row) {
     table.className = "match-table";
     table.innerHTML = hasO19
       ? `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th><th>Gegner-Status</th><th>Grund</th></tr></thead>`
-      : `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th><th>Gegner nativ?</th><th>Vorwochenpunkte eigene → Gegner</th><th>Grund</th></tr></thead>`;
+      : `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th><th>Gegner nativ?</th><th>Ranglistenpunkte<br>eigene → Gegner</th><th>Grund</th></tr></thead>`;
     const tbody = document.createElement("tbody");
     // Die 3 hervorgehobenen Spalteneintraege (Ergebnis "Sieg", "Gegner nativ? ja", Vorwochenpunkte
     // bei staerkerem Gegner) werden NICHT als reiner gruener Text auf dem <td> dargestellt (kaum

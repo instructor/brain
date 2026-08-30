@@ -138,3 +138,15 @@ details.hoch-panel[open] summary::before { transform: rotate(90deg); }
 .hoeherspiel-legend dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; font-size: 0.84rem; }
 .hoeherspiel-legend dt { white-space: nowrap; }
 .hoeherspiel-legend dd { margin: 0; color: var(--text-muted); }
+
+.hoeherspiel-formula {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 9px 13px;
+  margin: 0 0 14px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.hoeherspiel-formula strong { color: var(--text); }
