@@ -2,10 +2,12 @@
 // {ranking,details}.json und zeigt Zusammenfassung + Turnierergebnisse je Disziplin.
 //
 // Erweiterung gegenueber der Basisversion (assets/spieler.js der anderen Varianten, siehe dort):
-// jedes Turnier zeigt zusaetzlich Punkte-eigene-AK/Bonus/Gesamtpunkte, und fuer hoehergespielte
-// Turniere (row.Hoehergespielt) ein Aufklapp-Panel mit Match-fuer-Match-Nachweis des
-// Hoeherspielen-Bonus (siehe hoeherspiel.compute_row_points/ranking_engine.DETAIL_COLUMNS) --
-// auch Bonus=0-Faelle werden angezeigt, nicht nur bonusrelevante Siege (User-Vorgabe 2026-08-28).
+// jedes Turnier zeigt zusaetzlich Punkte-eigene-AK/Bonus/Gesamtpunkte, und JEDES Turnier mit
+// auffindbaren Matchdaten (nicht nur hoehergespielte, siehe row.Hoehergespielt) bekommt ein
+// Aufklapp-Panel mit Match-fuer-Match-Nachweis (siehe hoeherspiel.compute_row_points/
+// hoeherspiel._compute_normal_matches/ranking_engine.DETAIL_COLUMNS) -- auch Bonus=0-Faelle
+// werden angezeigt, nicht nur bonusrelevante Siege (User-Vorgabe 2026-08-28, auf alle Turniere
+// erweitert 2026-08-30).
 
 async function fetchJson(path) {
   const res = await fetch(path);
@@ -85,6 +87,12 @@ function bonusBadgeHtml(row) {
       return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-gap">Datenlücke</span>`;
     case "o19_ohne_matchdaten":
       return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-o19">O19 RLT/Mst</span>`;
+    case "normal_matches":
+    case "normal_bwf_bec":
+    case "normal_datenluecke":
+      // Kein Hochspielen -- kein Badge in der Turnierliste, damit "höhergespielt" weiterhin nur
+      // dort erscheint, wo tatsaechlich hochgespielt wurde.
+      return "";
     default:
       return `<span class="badge badge-hoch">höhergespielt</span>`;
   }
@@ -95,16 +103,14 @@ function renderHochPanel(row) {
   details.className = "hoch-panel";
 
   const summary = document.createElement("summary");
-  const badge = row.BonusStatus === "bonus_angewendet" ? `<span class="badge badge-bonus">Bonus ${fmtSigned(row.Bonus)}</span>`
-    : row.BonusStatus === "kein_bonus" ? `<span class="badge badge-nobonus">kein Bonus</span>`
-    : row.BonusStatus === "bwf_bec_punkte" ? `<span class="badge badge-gap">BWF/BEC-Punkte</span>`
-    : row.BonusStatus === "o19_ohne_matchdaten" ? `<span class="badge badge-o19">O19 RLT/Mst</span>`
-    : `<span class="badge badge-gap">Datenlücke</span>`;
+  // Muss dieselben Badges zeigen wie die Turnierzeile darueber (bonusBadgeHtml) -- vorher fehlte
+  // hier das "höhergespielt"-Badge, so dass die Liste "Höhergespielt + kein Bonus" zeigte, das
+  // aufgeklappte Panel aber nur "kein Bonus" (User-Meldung 2026-08-30, Beispiel Cedric Pascher).
   summary.innerHTML = `
     <span class="sum-turnier">${escapeHtml(row.RankingTournamentName)}</span>
     <span class="sum-meta">${escapeHtml(row.Konkurrenz)} · Platz ${row.Platz ?? "?"} · KW ${weekLabel(row.Jahr, row.KW)}</span>
     <span class="sum-spacer"></span>
-    ${badge}`;
+    ${bonusBadgeHtml(row)}`;
   details.appendChild(summary);
 
   const body = document.createElement("div");
@@ -129,12 +135,17 @@ function renderHochPanel(row) {
   }
   body.appendChild(statStrip);
 
+  const isNormal = row.BonusStatus === "normal_matches" || row.BonusStatus === "normal_bwf_bec"
+    || row.BonusStatus === "normal_datenluecke";
+
   if (row.Matches && row.Matches.length) {
     const hasO19 = row.Matches.some(m => m.GegnerErwachsen !== null && m.GegnerErwachsen !== undefined);
     const table = document.createElement("table");
     table.className = "match-table";
     table.innerHTML = hasO19
       ? `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th><th>Gegner-Status</th><th>Grund</th></tr></thead>`
+      : isNormal
+      ? `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th></tr></thead>`
       : `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th><th>Gegner nativ?</th><th>Ranglistenpunkte<br>eigene → Gegner</th><th>Grund</th></tr></thead>`;
     const tbody = document.createElement("tbody");
     // Die 3 hervorgehobenen Spalteneintraege (Ergebnis "Sieg", "Gegner nativ? ja", Vorwochenpunkte
@@ -157,6 +168,13 @@ function renderHochPanel(row) {
           <td>${ergebnisHtml}</td>
           <td>${status}</td>
           <td class="grund">${escapeHtml(m.Grund)}</td>`;
+      } else if (isNormal) {
+        // Kein Hochspielen -- kein Bonus-Nachweis moeglich/noetig, daher nur der reine
+        // Sieg/Niederlage-Nachweis ohne Native-/Punktevergleichsspalten (User-Vorgabe 2026-08-30).
+        tr.innerHTML = `
+          <td>${m.Runde ?? ""}</td>
+          <td>${gegner}</td>
+          <td>${ergebnisHtml}</td>`;
       } else {
         const nativText = m.GegnerNativ === true ? pill("ja") : m.GegnerNativ === false ? "nein" : "—";
         const hatPunkte = m.EigenePunkte != null && m.GegnerPunkte != null;
@@ -190,13 +208,23 @@ function renderHochPanel(row) {
     note.innerHTML = `<strong>O19 RLT/Mst</strong> — für Ranglistenturniere/Meisterschaften der ` +
       `Aktiven (O19) liegen hier keine Matchdaten vor. Bonus wird bei Sieg über O19-Spieler ` +
       `vergeben, unabhängig von der Spielstärke des O19-Spielers (da diese nicht bekannt ist auf ` +
-      `Basis der U19-Rangliste) — ohne Matchdaten aber nicht ermittelbar, daher Bonus = 0 Punkte.`;
+      `Basis der U19-Rangliste).`;
     body.appendChild(note);
   } else if (row.BonusStatus === "datenluecke") {
     const note = document.createElement("div");
     note.className = "gap-note";
     note.innerHTML = `<strong>Bonus konnte nicht berechnet werden</strong> — für dieses Turnier ` +
       `liegt keine Matchinformation vor. Wertung deshalb mit Bonus = 0 Punkte.`;
+    body.appendChild(note);
+  } else if (row.BonusStatus === "normal_bwf_bec") {
+    const note = document.createElement("div");
+    note.className = "gap-note";
+    note.innerHTML = `Bei internationalen BWF/BEC-Turnieren liegen keine lokalen Matchdaten vor.`;
+    body.appendChild(note);
+  } else if (row.BonusStatus === "normal_datenluecke") {
+    const note = document.createElement("div");
+    note.className = "gap-note";
+    note.innerHTML = `Für dieses Turnier liegt keine Matchinformation vor.`;
     body.appendChild(note);
   }
 
@@ -259,7 +287,11 @@ async function init() {
       </tr></thead>`;
     const tbody = document.createElement("tbody");
     let top5Sum = 0;
-    const hochRows = [];
+    // Alle Turniere mit einem BonusStatus bekommen unten ein Matches-Panel, nicht nur
+    // hoehergespielte (User-Vorgabe 2026-08-30) -- "deviating"-Zeilen (manuelle Nullpunkt-
+    // Strafen/bekannte RP_KT1-Luecken) haben gar keinen BonusStatus (hoeherspiel_detail bleibt
+    // fuer sie None, siehe ranking_engine.build_ranking) und bekommen deshalb bewusst kein Panel.
+    const matchRows = [];
     for (const row of rows) {
       const tr = document.createElement("tr");
       if (row.IstTop5) { tr.classList.add("top5"); top5Sum += row.Punkte || 0; }
@@ -269,8 +301,8 @@ async function init() {
         ? `<a href="${row.TurnierURL}" target="_blank" rel="noopener">${escapeHtml(tname)}</a>`
         : escapeHtml(tname);
       const hoch = !!row.Hoehergespielt;
-      if (hoch) {
-        hochRows.push(row);
+      if (row.BonusStatus) {
+        matchRows.push(row);
         if (row.BonusStatus === "bwf_bec_punkte") anyBwf = true;
       }
       const punkteEigeneAK = hoch ? row.PunkteEigeneAK : row.Punkte;
@@ -281,7 +313,7 @@ async function init() {
         <td>${escapeHtml(row.Konkurrenz)}</td>
         <td>${weekLabel(row.Jahr, row.KW)}</td>
         <td>${row.Platz ?? ""}</td>
-        <td>${hoch ? bonusBadgeHtml(row) : ""}</td>
+        <td>${row.BonusStatus ? bonusBadgeHtml(row) : ""}</td>
         <td class="num">${fmtNum(punkteEigeneAK)}</td>
         <td class="num">${bonusCell}</td>
         <td class="num">${gesamtCell}</td>`;
@@ -295,7 +327,7 @@ async function init() {
     total.textContent = `Summe (beste 5, ★ markiert): ${fmtNum(top5Sum)} Punkte`;
     block.appendChild(total);
 
-    for (const row of hochRows) {
+    for (const row of matchRows) {
       block.appendChild(renderHochPanel(row));
     }
 
