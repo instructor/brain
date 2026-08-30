@@ -57,8 +57,15 @@
       <select id="f-lv"><option value="">-- alle --</option></select>
     </div>
     <div>
-      <label for="f-bezirk">Bezirk</label>
-      <input type="text" id="f-bezirk" placeholder="">
+      <label for="f-bezirk-input">Bezirk</label>
+      <div class="ms" id="f-bezirk-ms">
+        <div class="ms-control" id="f-bezirk-control">
+          <span class="ms-chips" id="f-bezirk-chips"></span>
+          <input type="text" id="f-bezirk-input" class="ms-input" autocomplete="off" placeholder="-- alle --">
+          <button type="button" class="ms-clear" id="f-bezirk-clearall" title="Auswahl löschen" hidden>&times;</button>
+        </div>
+        <ul class="ms-options" id="f-bezirk-options" role="listbox" hidden></ul>
+      </div>
     </div>
     <div>
       <label for="f-vorname">Vorname</label>

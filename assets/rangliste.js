@@ -145,7 +145,8 @@ const state = {
   tab: "current",
   aklOptions: [],       // [{value,label}], gebaut aus AKL2 (grob) + AKL1 (fein) der aktuellen Woche
   aklSelected: new Set(),
-  aklActiveIndex: -1,
+  bezirkOptions: [],     // [{value,label}], alle vorkommenden Bezirke der aktuellen Woche
+  bezirkSelected: new Set(),
   sortedRows: [],        // volle gefilterte+sortierte Liste der aktuellen Woche (fuer loadMore())
   visibleCount: 0,        // wie viele davon aktuell im DOM stehen
 };
@@ -211,6 +212,7 @@ function populateFilterOptions(rows) {
   fillSelect(document.getElementById("f-gruppe"), uniqueSorted(rows, "Gruppe"));
   fillSelect(document.getElementById("f-lv"), uniqueSorted(rows, "LVName"));
   state.aklOptions = buildAklOptions(rows);
+  state.bezirkOptions = uniqueSorted(rows, "Bezirk").map(v => ({ value: v, label: v }));
 }
 
 function getFilters() {
@@ -219,7 +221,6 @@ function getFilters() {
     GS: document.getElementById("f-gs").value,
     Gruppe: document.getElementById("f-gruppe").value,
     LVName: document.getElementById("f-lv").value,
-    Bezirk: document.getElementById("f-bezirk").value.trim().toLowerCase(),
     Vorname: document.getElementById("f-vorname").value.trim().toLowerCase(),
     Nachname: document.getElementById("f-nachname").value.trim().toLowerCase(),
     Verein: document.getElementById("f-verein").value.trim().toLowerCase(),
@@ -229,13 +230,14 @@ function getFilters() {
 function applyFilters(rows) {
   const f = getFilters();
   const akl = state.aklSelected;
+  const bezirk = state.bezirkSelected;
   return rows.filter(r => {
     if (f.DIS && r.DIS !== f.DIS) return false;
     if (f.GS && r.GS !== f.GS) return false;
     if (akl.size > 0 && !akl.has(r.AKL2) && !akl.has(r.AKL1)) return false;
     if (f.Gruppe && r.Gruppe !== f.Gruppe) return false;
     if (f.LVName && r.LVName !== f.LVName) return false;
-    if (f.Bezirk && !String(r.Bezirk || "").toLowerCase().includes(f.Bezirk)) return false;
+    if (bezirk.size > 0 && !bezirk.has(r.Bezirk)) return false;
     if (f.Vorname && !String(r.Vorname || "").toLowerCase().includes(f.Vorname)) return false;
     if (f.Nachname && !String(r.Nachname || "").toLowerCase().includes(f.Nachname)) return false;
     if (f.Verein && !String(r.Verein || "").toLowerCase().includes(f.Verein)) return false;
@@ -463,26 +465,31 @@ function setupWeekSelect() {
   });
 }
 
-// Altersklasse: Mehrfachauswahl-Combobox (Chips im Feld + Dropdown-Liste), Vorbild
-// badminton.de. Ausgewaehlte Werte liegen in state.aklSelected; Klick auf eine Option
-// oder Enter auf der aktiven Zeile schaltet sie an/aus, die Liste bleibt danach offen,
-// damit mehrere Werte nacheinander gewaehlt werden koennen.
-function setupAklWidget() {
-  const control = document.getElementById("f-akl-control");
-  const input = document.getElementById("f-akl-input");
-  const chipsEl = document.getElementById("f-akl-chips");
-  const list = document.getElementById("f-akl-options");
-  const clearAllBtn = document.getElementById("f-akl-clearall");
+// Generische Mehrfachauswahl-Combobox (Chips im Feld + Dropdown-Liste, die beim Tippen filtert),
+// Vorbild badminton.de -- urspruenglich nur fuer Altersklasse, seit 2026-08-31 auch fuer Bezirk
+// (User-Vorgabe: Bezirk soll beim Tippen genauso aufpoppen wie Altersklasse, da ein <select> bei
+// >100 moeglichen Bezirken unhandlich waere). Klick auf eine Option oder Enter auf der aktiven
+// Zeile schaltet sie an/aus, die Liste bleibt danach offen, damit mehrere Werte nacheinander
+// gewaehlt werden koennen. `selected` ist das state.*Selected-Set, `getOptions` liefert bei jedem
+// Aufruf frisch die aktuelle [{value,label}]-Liste (aendert sich pro geladener Woche).
+function createMultiSelectWidget({ msId, controlId, inputId, chipsId, listId, clearAllId,
+                                    getOptions, selected, onChange }) {
+  const control = document.getElementById(controlId);
+  const input = document.getElementById(inputId);
+  const chipsEl = document.getElementById(chipsId);
+  const list = document.getElementById(listId);
+  const clearAllBtn = document.getElementById(clearAllId);
+  let activeIndex = -1;
 
   function visibleOptions() {
     const q = input.value.trim().toLowerCase();
-    const opts = q ? state.aklOptions.filter(o => o.label.toLowerCase().includes(q)) : state.aklOptions;
-    return opts;
+    const opts = getOptions();
+    return q ? opts.filter(o => o.label.toLowerCase().includes(q)) : opts;
   }
 
   function renderChips() {
     chipsEl.innerHTML = "";
-    for (const value of state.aklSelected) {
+    for (const value of selected) {
       const chip = document.createElement("span");
       chip.className = "ms-chip";
       const text = document.createElement("span");
@@ -493,17 +500,17 @@ function setupAklWidget() {
       btn.title = `${value} entfernen`;
       btn.addEventListener("click", (evt) => {
         evt.stopPropagation();
-        state.aklSelected.delete(value);
+        selected.delete(value);
         renderChips();
         renderList();
-        applyFilterChange();
+        onChange();
       });
       chip.appendChild(btn);
       chip.appendChild(text);
       chipsEl.appendChild(chip);
     }
-    clearAllBtn.hidden = state.aklSelected.size === 0;
-    input.placeholder = state.aklSelected.size === 0 ? "-- alle --" : "";
+    clearAllBtn.hidden = selected.size === 0;
+    input.placeholder = selected.size === 0 ? "-- alle --" : "";
   }
 
   function renderList() {
@@ -514,17 +521,17 @@ function setupAklWidget() {
       li.className = "ms-option is-empty";
       li.textContent = "keine Treffer";
       list.appendChild(li);
-      state.aklActiveIndex = -1;
+      activeIndex = -1;
       return;
     }
-    if (state.aklActiveIndex >= opts.length) state.aklActiveIndex = opts.length - 1;
+    if (activeIndex >= opts.length) activeIndex = opts.length - 1;
     opts.forEach((opt, i) => {
       const li = document.createElement("li");
       li.className = "ms-option";
       li.setAttribute("role", "option");
       li.textContent = opt.label;
-      if (state.aklSelected.has(opt.value)) li.classList.add("is-selected");
-      if (i === state.aklActiveIndex) li.classList.add("is-active");
+      if (selected.has(opt.value)) li.classList.add("is-selected");
+      if (i === activeIndex) li.classList.add("is-active");
       li.addEventListener("mousedown", (evt) => {
         // mousedown statt click: verhindert, dass der Input vor der Auswahl den Fokus verliert.
         evt.preventDefault();
@@ -535,15 +542,15 @@ function setupAklWidget() {
   }
 
   function toggleValue(value) {
-    if (state.aklSelected.has(value)) state.aklSelected.delete(value);
-    else state.aklSelected.add(value);
+    if (selected.has(value)) selected.delete(value);
+    else selected.add(value);
     input.value = "";
-    state.aklActiveIndex = -1;
+    activeIndex = -1;
     renderChips();
     renderList();
     openList();
     input.focus();
-    applyFilterChange();
+    onChange();
   }
 
   function openList() {
@@ -552,55 +559,80 @@ function setupAklWidget() {
   }
   function closeList() {
     list.hidden = true;
-    state.aklActiveIndex = -1;
+    activeIndex = -1;
   }
 
   control.addEventListener("click", () => { input.focus(); openList(); });
   input.addEventListener("focus", openList);
-  input.addEventListener("input", () => { state.aklActiveIndex = -1; openList(); });
+  input.addEventListener("input", () => { activeIndex = -1; openList(); });
   input.addEventListener("keydown", (evt) => {
     const opts = visibleOptions();
     if (evt.key === "ArrowDown") {
       evt.preventDefault();
       if (list.hidden) { openList(); return; }
-      state.aklActiveIndex = Math.min(state.aklActiveIndex + 1, opts.length - 1);
+      activeIndex = Math.min(activeIndex + 1, opts.length - 1);
       renderList();
     } else if (evt.key === "ArrowUp") {
       evt.preventDefault();
-      state.aklActiveIndex = Math.max(state.aklActiveIndex - 1, 0);
+      activeIndex = Math.max(activeIndex - 1, 0);
       renderList();
     } else if (evt.key === "Enter") {
       evt.preventDefault();
-      if (!list.hidden && state.aklActiveIndex >= 0 && opts[state.aklActiveIndex]) {
-        toggleValue(opts[state.aklActiveIndex].value);
+      if (!list.hidden && activeIndex >= 0 && opts[activeIndex]) {
+        toggleValue(opts[activeIndex].value);
       }
     } else if (evt.key === "Escape") {
       closeList();
-    } else if (evt.key === "Backspace" && input.value === "" && state.aklSelected.size > 0) {
-      const last = [...state.aklSelected].pop();
-      state.aklSelected.delete(last);
+    } else if (evt.key === "Backspace" && input.value === "" && selected.size > 0) {
+      const last = [...selected].pop();
+      selected.delete(last);
       renderChips();
       renderList();
-      applyFilterChange();
+      onChange();
     }
   });
   clearAllBtn.addEventListener("click", (evt) => {
     evt.stopPropagation();
-    state.aklSelected.clear();
+    selected.clear();
     input.value = "";
     renderChips();
     renderList();
-    applyFilterChange();
+    onChange();
   });
   document.addEventListener("click", (evt) => {
-    if (!document.getElementById("f-akl-ms").contains(evt.target)) closeList();
+    if (!document.getElementById(msId).contains(evt.target)) closeList();
   });
 
   renderChips();
+
+  return {
+    reset() {
+      selected.clear();
+      input.value = "";
+      renderChips();
+      if (!list.hidden) renderList();
+    },
+  };
+}
+
+function setupAklWidget() {
+  return createMultiSelectWidget({
+    msId: "f-akl-ms", controlId: "f-akl-control", inputId: "f-akl-input",
+    chipsId: "f-akl-chips", listId: "f-akl-options", clearAllId: "f-akl-clearall",
+    getOptions: () => state.aklOptions, selected: state.aklSelected, onChange: applyFilterChange,
+  });
+}
+
+function setupBezirkWidget() {
+  return createMultiSelectWidget({
+    msId: "f-bezirk-ms", controlId: "f-bezirk-control", inputId: "f-bezirk-input",
+    chipsId: "f-bezirk-chips", listId: "f-bezirk-options", clearAllId: "f-bezirk-clearall",
+    getOptions: () => state.bezirkOptions, selected: state.bezirkSelected, onChange: applyFilterChange,
+  });
 }
 
 function setupFilterListeners() {
-  const ids = ["f-dis", "f-gs", "f-gruppe", "f-lv", "f-bezirk", "f-vorname", "f-nachname", "f-verein"];
+  const ids = ["f-dis", "f-gs", "f-gruppe", "f-lv", "f-vorname", "f-nachname", "f-verein"];
   for (const id of ids) {
     const el = document.getElementById(id);
     el.addEventListener("input", applyFilterChange);
@@ -613,16 +645,15 @@ function setupFilterListeners() {
       });
     }
   }
-  setupAklWidget();
+  const aklWidget = setupAklWidget();
+  const bezirkWidget = setupBezirkWidget();
   document.getElementById("btn-search").addEventListener("click", render);
   document.getElementById("reset-filters").addEventListener("click", () => {
     for (const id of ids) {
       document.getElementById(id).value = "";
     }
-    state.aklSelected.clear();
-    document.getElementById("f-akl-input").value = "";
-    document.getElementById("f-akl-chips").innerHTML = "";
-    document.getElementById("f-akl-clearall").hidden = true;
+    aklWidget.reset();
+    bezirkWidget.reset();
     render();
   });
 }
