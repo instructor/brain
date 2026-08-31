@@ -200,9 +200,10 @@
     <p class="eyebrow"><a href="rangliste.html" style="color:inherit;">&larr; zurück zur Rangliste</a> &middot; Guete-Vergleich der RL-Varianten</p>
     <h1>H2H-Konkordanzvergleich</h1>
     <p class="subtitle">
-      KW30/2026 &middot; 30 Zielkonkurrenzen (JE/ME/JD/MD/XD &times; U09&ndash;U19) &middot;
-      Konkordanzrate je Variante gegen die H2H-Ground-Truth aus echten Matchergebnissen
-      (<code>compare_rankings_h2h.py</code>).
+      KW30/2026 &middot; 30 Konkurrenzen (JE/ME/JD/MD/XD &times; U09&ndash;U19) &middot;
+      "Wie gut bildet eine Rangliste die Realität ab?" &middot; Ein Teil der Antwort liefert die
+      "Konkordanzrate" je Variante gegen die "H2H-Ground-Truth", das sind reale Matchergebnisse der
+      letzten 12 Monate &middot; Erläuterung der Begriffe am Seitenende.
     </p>
   </header>
 
@@ -1194,27 +1195,28 @@
 
   <footer class="page">
     <p>
-      <strong>Ground Truth:</strong> Sieg-Verhaeltnis je Spielerpaar aus
-      <code>BTP_DOWNLOADS/&lt;year&gt;/KW&lt;NN&gt;/*_exportMatchData_*.csv</code>, 12-Monats-Fenster
-      relativ zu KW30/2026. Konkordanzrate = Anteil der entschiedenen Paare, bei denen die
-      jeweilige Rangliste dieselbe Reihenfolge zeigt wie die Ground Truth. &laquo;beste Variante&raquo;
-      markiert je Konkurrenz/Kachel die hoechste Rate bei aktuell gewaehlter Gewichtung &mdash;
-      keine Aussage ueber statistische Signifikanz bei geringer Beleglage (n).
+      <strong>Ground Truth:</strong> Sieg-Verhältnis je Spielerpaar (= Spieler/Einzelpersonen, die
+      sich in einem Match gegenüberstehen, im Einzel/Doppel/Mixed), 12-Monats-Fenster relativ zu
+      betrachteten KW. Konkordanzrate = Anteil der entschiedenen Paare (= zwei H2H Einzelpersonen),
+      bei denen die jeweilige Rangliste dieselbe Reihenfolge zeigt wie die Ground Truth. &laquo;beste
+      Variante&raquo; markiert je Konkurrenz/Kachel die höchste Rate bei aktuell gewählter
+      Gewichtung &mdash; keine Aussage über statistische Signifikanz bei geringer Beleglage (n).
+      n bzw. N ist die Anzahl H2H-Paaren je Konkurrenz.
     </p>
     <p>
       <strong>Ceiling-Referenz:</strong> Anteil intransitiver Dreiecke im H2H-Graph je Konkurrenz
-      (Spieler a schlaegt b, b schlaegt c, c schlaegt a) subtrahiert von 100&nbsp;% &mdash; ein
+      (Spieler a schlägt b, b schlägt c, c schlägt a) subtrahiert von 100&nbsp;% &mdash; ein
       intransitives Dreieck kann von KEINER Rangliste (einer strikten Totalordnung) in allen drei
       Paarvergleichen gleichzeitig richtig abgebildet werden, die Ceiling markiert also eine
       strukturelle Obergrenze der Konkordanzrate. <strong>Heuristik, keine bewiesene scharfe
-      Schranke</strong> (die exakte maximal erreichbare Rate zu bestimmen ist das NP-schwere
+      Schranke</strong> (die exakte maximal erreichbare Rate zu bestimmen ist das NP-harte
       "Minimum Feedback Arc Set"-Problem) &mdash; gedacht als Faustregel, bevor einzelne
       Konkordanzraten bewertet werden.
     </p>
     <p>
       Quelle: <code>compare_rankings_h2h.py</code> &middot;
-      <code>RESULTS_H2H_COMPARE/h2h_konkordanz_2026_KW30.json</code> &middot;
-      erzeugt von <code>export_h2h_konkordanz_html.py</code>.
+      <code>h2h_konkordanz_2026_KW30.json</code> &middot;
+      erzeugt von <code>export_h2h_konkordanz_html.py</code> (by help of claude code).
     </p>
   </footer>
 </div>
