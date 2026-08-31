@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H2H-Konkordanzvergleich KW30/2026</title>
+
+<style>
+  :root{
+    color-scheme: light;
+    --page-bg:      #f9f9f7;
+    --surface:      #fcfcfb;
+    --surface-alt:  #f1f0eb;
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --ink-3:        #898781;
+    --grid:         #e1e0d9;
+    --border:       rgba(11,11,11,0.10);
+    --bar:          #2a78d6;
+    --bar-track:    #dbe8fa;
+    --good:         #0ca30c;
+    --good-bg:      #e9f7e9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --page-bg:      #0d0d0d;
+      --surface:      #1a1a19;
+      --surface-alt:  #232322;
+      --ink:          #ffffff;
+      --ink-2:        #c3c2b7;
+      --ink-3:        #898781;
+      --grid:         #2c2c2a;
+      --border:       rgba(255,255,255,0.10);
+      --bar:          #3987e5;
+      --bar-track:    #1f2c3d;
+      --good:         #0ca30c;
+      --good-bg:      #10240f;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page-bg:      #0d0d0d;
+    --surface:      #1a1a19;
+    --surface-alt:  #232322;
+    --ink:          #ffffff;
+    --ink-2:        #c3c2b7;
+    --ink-3:        #898781;
+    --grid:         #2c2c2a;
+    --border:       rgba(255,255,255,0.10);
+    --bar:          #3987e5;
+    --bar-track:    #1f2c3d;
+    --good:         #0ca30c;
+    --good-bg:      #10240f;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--page-bg); color:var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap{ max-width:1080px; margin:0 auto; padding:2.5rem 1.25rem 4rem; }
+
+  header.page{ margin-bottom:1.75rem; }
+  .eyebrow{
+    font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-3); font-weight:600; margin:0 0 .4rem;
+  }
+  h1{ font-size:1.6rem; margin:0 0 .3rem; letter-spacing:-.01em; }
+  .subtitle{ color:var(--ink-2); font-size:.9rem; margin:0; line-height:1.5; }
+
+  .toggle-row{
+    display:flex; align-items:center; gap:.75rem; margin:1.5rem 0 1.75rem;
+    flex-wrap:wrap;
+  }
+  .toggle{
+    display:inline-flex; border:1px solid var(--border); border-radius:8px;
+    overflow:hidden; background:var(--surface);
+  }
+  .toggle button{
+    appearance:none; border:0; background:transparent; color:var(--ink-2);
+    font:inherit; font-size:.82rem; font-weight:600; padding:.5rem .9rem;
+    cursor:pointer;
+  }
+  .toggle button.active{ background:var(--bar); color:#fff; }
+  .toggle-hint{ font-size:.78rem; color:var(--ink-3); }
+
+  .tiles{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:.6rem; margin-bottom:2.25rem;
+  }
+  .tile{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:.85rem .95rem;
+  }
+  .tile.leader{ border-color:var(--good); }
+  .tile .name{ font-size:.78rem; color:var(--ink-2); font-weight:600; margin-bottom:.3rem; }
+  .tile .val{ font-size:1.5rem; font-weight:700; letter-spacing:-.01em; }
+  .tile .badge{
+    display:inline-flex; align-items:center; gap:.25rem; margin-top:.35rem;
+    font-size:.72rem; font-weight:600; color:var(--good);
+    background:var(--good-bg); border-radius:5px; padding:.1rem .4rem;
+  }
+
+  .grid{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden;
+  }
+  .grid-head{
+    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(5, minmax(120px,1fr));
+    border-bottom:1px solid var(--grid); background:var(--surface-alt);
+  }
+  .grid-head > div{
+    padding:.6rem .7rem; font-size:.72rem; font-weight:700; color:var(--ink-2);
+    text-transform:uppercase; letter-spacing:.03em;
+  }
+  .ak-row{
+    padding:.4rem .7rem; font-size:.72rem; font-weight:700; letter-spacing:.06em;
+    color:var(--ink-3); background:var(--surface-alt); text-transform:uppercase;
+    border-bottom:1px solid var(--grid); border-top:1px solid var(--grid);
+  }
+  .kon-row{
+    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(5, minmax(120px,1fr));
+    border-bottom:1px solid var(--grid);
+  }
+  .kon-row:last-child{ border-bottom:0; }
+  .kon-label{
+    padding:.55rem .7rem; font-size:.84rem; font-weight:600; display:flex;
+    align-items:baseline; gap:.4rem;
+  }
+  .kon-label .n{ font-size:.72rem; font-weight:500; color:var(--ink-3); }
+  .kon-label .ceiling{
+    font-size:.68rem; font-weight:600; color:var(--ink-3);
+    background:var(--surface-alt); border-radius:5px; padding:.05rem .35rem;
+    cursor:help;
+  }
+  .kon-label .ceiling.low{ color:var(--bar); background:var(--bar-track); }
+  .cell{
+    padding:.55rem .7rem; display:flex; align-items:center; gap:.5rem;
+    border-left:1px solid var(--grid);
+  }
+  .cell .track{
+    flex:1; height:10px; border-radius:5px; background:var(--bar-track);
+    overflow:hidden; position:relative;
+  }
+  .cell .fill{
+    height:100%; border-radius:0 5px 5px 0; background:var(--bar);
+  }
+  .cell .value{
+    font-size:.8rem; color:var(--ink-2); min-width:2.6rem; text-align:right;
+    font-variant-numeric: tabular-nums;
+  }
+  .cell.winner .value{ color:var(--ink); font-weight:700; }
+  .cell.winner .fill{ background: var(--good); }
+  .cell .mark{
+    color:var(--good); font-size:.85rem; line-height:1; visibility:hidden;
+  }
+  .cell.winner .mark{ visibility:visible; }
+
+  table.detail{
+    width:100%; border-collapse:collapse; margin-top:2.25rem; font-size:.78rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    overflow:hidden;
+  }
+  table.detail caption{
+    text-align:left; padding:.75rem .9rem; font-size:.82rem; font-weight:700;
+    color:var(--ink-2); background:var(--surface-alt); border-bottom:1px solid var(--grid);
+  }
+  table.detail th, table.detail td{
+    padding:.4rem .6rem; text-align:right; border-bottom:1px solid var(--grid);
+    font-variant-numeric: tabular-nums;
+  }
+  table.detail th:first-child, table.detail td:first-child{ text-align:left; }
+  table.detail thead th{
+    color:var(--ink-3); font-size:.68rem; text-transform:uppercase; letter-spacing:.03em;
+    font-weight:700; background:var(--surface-alt);
+  }
+  table.detail tbody tr:last-child td{ border-bottom:0; }
+
+  footer.page{
+    margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid var(--border);
+    font-size:.78rem; color:var(--ink-3); line-height:1.6;
+  }
+  footer.page code{
+    background:var(--surface-alt); padding:.05rem .3rem; border-radius:4px;
+    font-size:.85em;
+  }
+
+  @media (max-width: 620px){
+    .grid-head, .kon-row{ grid-template-columns: minmax(90px,1fr) repeat(5, minmax(90px,1fr)); }
+    .grid{ overflow-x:auto; }
+    .grid-head, .kon-row{ min-width:760px; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <p class="eyebrow"><a href="rangliste.html" style="color:inherit;">&larr; zurück zur Rangliste</a> &middot; Guete-Vergleich der RL-Varianten</p>
+    <h1>H2H-Konkordanzvergleich</h1>
+    <p class="subtitle">
+      KW30/2026 &middot; 30 Zielkonkurrenzen (JE/ME/JD/MD/XD &times; U09&ndash;U19) &middot;
+      Konkordanzrate je Variante gegen die H2H-Ground-Truth aus echten Matchergebnissen
+      (<code>compare_rankings_h2h.py</code>).
+    </p>
+  </header>
+
+  <div class="toggle-row">
+    <div class="toggle">
+      <button data-mode="unweighted" class="active">Ungewichtet (je Paar)</button>
+      <button data-mode="weighted">Marge-gewichtet</button>
+    </div>
+    <span class="toggle-hint">Marge-gewichtet: ein 5:0-Ergebnis zaehlt mehr als ein knappes 3:2.</span>
+  </div>
+
+  <div class="tiles">
+    
+        <div class="tile" data-u="78.8033" data-w="79.1100">
+          <div class="name">Original</div>
+          <div class="val">78,8&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="78.9600" data-w="79.4167">
+          <div class="name">eigene-AK</div>
+          <div class="val">79,0&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="78.7500" data-w="79.1900">
+          <div class="name">eigene-AK-simple</div>
+          <div class="val">78,8&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile leader" data-u="79.9467" data-w="81.0267">
+          <div class="name">Elo</div>
+          <div class="val">79,9&nbsp;%</div>
+          <span class="badge" style="display:inline-flex">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="78.5167" data-w="79.6133">
+          <div class="name">Elo-simple</div>
+          <div class="val">78,5&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+  </div>
+
+  <div class="grid">
+    <div class="grid-head">
+      <div>Konkurrenz</div>
+      <div>Original</div><div>eigene-AK</div><div>eigene-AK-simple</div><div>Elo</div><div>Elo-simple</div>
+    </div>
+    <div class="ak-row">Altersklasse U09</div>
+        <div class="kon-row">
+          <div class="kon-label">JE U09 <span class="n">n=433</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,4&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="84.6000" data-w="84.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:84.6%"></div></div>
+            <span class="value">84,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.6000" data-w="81.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.6%"></div></div>
+            <span class="value">80,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.0000" data-w="80.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.0%"></div></div>
+            <span class="value">80,0&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="86.9000" data-w="89.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:86.9%"></div></div>
+            <span class="value">86,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.2000" data-w="83.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.2%"></div></div>
+            <span class="value">81,2&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">ME U09 <span class="n">n=168</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;98,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="81.5000" data-w="84.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.5%"></div></div>
+            <span class="value">81,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.0000" data-w="78.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.0%"></div></div>
+            <span class="value">79,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.0000" data-w="78.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.0%"></div></div>
+            <span class="value">79,0&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="81.8000" data-w="85.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.8%"></div></div>
+            <span class="value">81,8&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="73.9000" data-w="79.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:73.9%"></div></div>
+            <span class="value">73,9&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">JD U09 <span class="n">n=64</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="80.0000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.0%"></div></div>
+            <span class="value">80,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.0000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.0%"></div></div>
+            <span class="value">80,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.0000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.0%"></div></div>
+            <span class="value">80,0&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="90.0000" data-w="90.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:90.0%"></div></div>
+            <span class="value">90,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.0000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.0%"></div></div>
+            <span class="value">80,0&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">MD U09 <span class="n">n=66</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="79.3000" data-w="75.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.3%"></div></div>
+            <span class="value">79,3&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="86.2000" data-w="87.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:86.2%"></div></div>
+            <span class="value">86,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="86.2000" data-w="87.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:86.2%"></div></div>
+            <span class="value">86,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="65.9000" data-w="70.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:65.9%"></div></div>
+            <span class="value">65,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="56.1000" data-w="59.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:56.1%"></div></div>
+            <span class="value">56,1&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">XD U09 <span class="n">n=12</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="100.0000" data-w="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="100.0000" data-w="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="100.0000" data-w="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="100.0000" data-w="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="100.0000" data-w="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U11</div>
+        <div class="kon-row">
+          <div class="kon-label">JE U11 <span class="n">n=4044</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,9&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="77.6000" data-w="78.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.6%"></div></div>
+            <span class="value">77,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.0000" data-w="78.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.0%"></div></div>
+            <span class="value">78,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.8000" data-w="78.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.8%"></div></div>
+            <span class="value">77,8&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="82.4000" data-w="83.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:82.4%"></div></div>
+            <span class="value">82,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.0000" data-w="82.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.0%"></div></div>
+            <span class="value">81,0&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">ME U11 <span class="n">n=2144</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,9&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="80.1000" data-w="80.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.1%"></div></div>
+            <span class="value">80,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.3000" data-w="80.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.3%"></div></div>
+            <span class="value">80,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.5000" data-w="80.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.5%"></div></div>
+            <span class="value">80,5&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="82.9000" data-w="85.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:82.9%"></div></div>
+            <span class="value">82,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.2000" data-w="83.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.2%"></div></div>
+            <span class="value">81,2&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">JD U11 <span class="n">n=2519</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="72.0000" data-w="72.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:72.0%"></div></div>
+            <span class="value">72,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="72.4000" data-w="73.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:72.4%"></div></div>
+            <span class="value">72,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="71.9000" data-w="72.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:71.9%"></div></div>
+            <span class="value">71,9&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.3000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.3%"></div></div>
+            <span class="value">79,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.7000" data-w="79.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.7%"></div></div>
+            <span class="value">78,7&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">MD U11 <span class="n">n=984</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,3&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="81.1000" data-w="81.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.1%"></div></div>
+            <span class="value">81,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.3000" data-w="81.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.3%"></div></div>
+            <span class="value">80,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.1000" data-w="80.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.1%"></div></div>
+            <span class="value">80,1&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="81.5000" data-w="83.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.5%"></div></div>
+            <span class="value">81,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.3000" data-w="81.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.3%"></div></div>
+            <span class="value">80,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">XD U11 <span class="n">n=555</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,7&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="82.5000" data-w="83.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:82.5%"></div></div>
+            <span class="value">82,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.0000" data-w="80.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.0%"></div></div>
+            <span class="value">80,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.0000" data-w="80.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.0%"></div></div>
+            <span class="value">80,0&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="84.3000" data-w="84.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:84.3%"></div></div>
+            <span class="value">84,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="83.6000" data-w="84.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:83.6%"></div></div>
+            <span class="value">83,6&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U13</div>
+        <div class="kon-row">
+          <div class="kon-label">JE U13 <span class="n">n=6678</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="76.0000" data-w="76.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.0%"></div></div>
+            <span class="value">76,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.1000" data-w="77.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.1%"></div></div>
+            <span class="value">77,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.9000" data-w="77.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.9%"></div></div>
+            <span class="value">76,9&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="80.7000" data-w="81.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.7%"></div></div>
+            <span class="value">80,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.2000" data-w="80.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.2%"></div></div>
+            <span class="value">80,2&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">ME U13 <span class="n">n=3964</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,4&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="79.1000" data-w="79.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.1%"></div></div>
+            <span class="value">79,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.2000" data-w="80.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.2%"></div></div>
+            <span class="value">80,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.8000" data-w="80.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.8%"></div></div>
+            <span class="value">79,8&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="81.2000" data-w="81.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.2%"></div></div>
+            <span class="value">81,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.6000" data-w="81.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.6%"></div></div>
+            <span class="value">80,6&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">JD U13 <span class="n">n=5461</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,4&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="80.5000" data-w="81.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.5%"></div></div>
+            <span class="value">80,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.3000" data-w="81.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.3%"></div></div>
+            <span class="value">80,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.9000" data-w="80.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.9%"></div></div>
+            <span class="value">79,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.4000" data-w="80.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.4%"></div></div>
+            <span class="value">79,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.8000" data-w="78.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.8%"></div></div>
+            <span class="value">77,8&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">MD U13 <span class="n">n=3651</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="80.8000" data-w="81.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.8%"></div></div>
+            <span class="value">80,8&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="82.2000" data-w="82.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:82.2%"></div></div>
+            <span class="value">82,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.0000" data-w="81.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.0%"></div></div>
+            <span class="value">81,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.2000" data-w="80.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.2%"></div></div>
+            <span class="value">79,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.4000" data-w="79.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.4%"></div></div>
+            <span class="value">78,4&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">XD U13 <span class="n">n=6350</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,2&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="79.0000" data-w="79.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.0%"></div></div>
+            <span class="value">79,0&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.5000" data-w="79.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.5%"></div></div>
+            <span class="value">79,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.2000" data-w="79.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.2%"></div></div>
+            <span class="value">79,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.8000" data-w="78.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.8%"></div></div>
+            <span class="value">77,8&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.6000" data-w="78.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.6%"></div></div>
+            <span class="value">76,6&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U15</div>
+        <div class="kon-row">
+          <div class="kon-label">JE U15 <span class="n">n=8023</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;93,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="75.9000" data-w="75.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.9%"></div></div>
+            <span class="value">75,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.9000" data-w="75.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.9%"></div></div>
+            <span class="value">75,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.9000" data-w="75.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.9%"></div></div>
+            <span class="value">75,9&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.2000" data-w="79.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.2%"></div></div>
+            <span class="value">79,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.9000" data-w="79.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.9%"></div></div>
+            <span class="value">78,9&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">ME U15 <span class="n">n=4701</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,7&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="77.6000" data-w="77.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.6%"></div></div>
+            <span class="value">77,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.3000" data-w="78.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.3%"></div></div>
+            <span class="value">78,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.3000" data-w="78.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.3%"></div></div>
+            <span class="value">78,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.0000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.0%"></div></div>
+            <span class="value">79,0&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.2000" data-w="80.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.2%"></div></div>
+            <span class="value">79,2&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">JD U15 <span class="n">n=7234</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,8&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="80.1000" data-w="81.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.1%"></div></div>
+            <span class="value">80,1&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="80.5000" data-w="81.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.5%"></div></div>
+            <span class="value">80,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.2000" data-w="81.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.2%"></div></div>
+            <span class="value">80,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.2000" data-w="78.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.2%"></div></div>
+            <span class="value">77,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.5000" data-w="78.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.5%"></div></div>
+            <span class="value">77,5&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">MD U15 <span class="n">n=4741</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="79.6000" data-w="80.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.6%"></div></div>
+            <span class="value">79,6&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.7000" data-w="80.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.7%"></div></div>
+            <span class="value">79,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.6000" data-w="80.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.6%"></div></div>
+            <span class="value">79,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.0000" data-w="78.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.0%"></div></div>
+            <span class="value">77,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.1000" data-w="78.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.1%"></div></div>
+            <span class="value">77,1&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">XD U15 <span class="n">n=7807</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;93,9&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="79.3000" data-w="79.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.3%"></div></div>
+            <span class="value">79,3&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.5000" data-w="79.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.5%"></div></div>
+            <span class="value">79,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.8000" data-w="79.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.8%"></div></div>
+            <span class="value">78,8&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.7000" data-w="76.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.7%"></div></div>
+            <span class="value">75,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.2000" data-w="75.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.2%"></div></div>
+            <span class="value">75,2&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U17</div>
+        <div class="kon-row">
+          <div class="kon-label">JE U17 <span class="n">n=7132</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,6&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="74.5000" data-w="74.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.5%"></div></div>
+            <span class="value">74,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.3000" data-w="75.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.3%"></div></div>
+            <span class="value">75,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.4000" data-w="75.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.4%"></div></div>
+            <span class="value">75,4&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="78.4000" data-w="79.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.4%"></div></div>
+            <span class="value">78,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.3000" data-w="79.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.3%"></div></div>
+            <span class="value">78,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">ME U17 <span class="n">n=4612</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="74.4000" data-w="74.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.4%"></div></div>
+            <span class="value">74,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.7000" data-w="74.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.7%"></div></div>
+            <span class="value">74,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.5000" data-w="74.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.5%"></div></div>
+            <span class="value">74,5&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="80.6000" data-w="81.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.6%"></div></div>
+            <span class="value">80,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.6000" data-w="81.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.6%"></div></div>
+            <span class="value">80,6&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">JD U17 <span class="n">n=6860</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,8&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.0000" data-w="78.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.0%"></div></div>
+            <span class="value">78,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.9000" data-w="78.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.9%"></div></div>
+            <span class="value">77,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.6000" data-w="78.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.6%"></div></div>
+            <span class="value">77,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.6000" data-w="77.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.6%"></div></div>
+            <span class="value">77,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.0000" data-w="77.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.0%"></div></div>
+            <span class="value">77,0&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">MD U17 <span class="n">n=5115</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,3&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="78.6000" data-w="79.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.6%"></div></div>
+            <span class="value">78,6&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.5000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.5%"></div></div>
+            <span class="value">79,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.5000" data-w="80.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.5%"></div></div>
+            <span class="value">79,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.3000" data-w="79.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.3%"></div></div>
+            <span class="value">78,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.6000" data-w="78.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.6%"></div></div>
+            <span class="value">77,6&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">XD U17 <span class="n">n=7854</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;92,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="75.8000" data-w="75.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.8%"></div></div>
+            <span class="value">75,8&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.7000" data-w="76.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.7%"></div></div>
+            <span class="value">75,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.6000" data-w="75.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.6%"></div></div>
+            <span class="value">75,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="73.9000" data-w="74.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:73.9%"></div></div>
+            <span class="value">73,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.1000" data-w="74.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.1%"></div></div>
+            <span class="value">74,1&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U19</div>
+        <div class="kon-row">
+          <div class="kon-label">JE U19 <span class="n">n=5390</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="74.4000" data-w="74.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.4%"></div></div>
+            <span class="value">74,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.3000" data-w="74.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.3%"></div></div>
+            <span class="value">74,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.2000" data-w="74.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.2%"></div></div>
+            <span class="value">74,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.1000" data-w="79.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.1%"></div></div>
+            <span class="value">79,1&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.3000" data-w="79.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.3%"></div></div>
+            <span class="value">79,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">ME U19 <span class="n">n=2981</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,7&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="76.2000" data-w="76.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.2%"></div></div>
+            <span class="value">76,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.3000" data-w="76.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.3%"></div></div>
+            <span class="value">76,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.3000" data-w="76.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.3%"></div></div>
+            <span class="value">76,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="82.5000" data-w="83.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:82.5%"></div></div>
+            <span class="value">82,5&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="83.0000" data-w="84.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:83.0%"></div></div>
+            <span class="value">83,0&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">JD U19 <span class="n">n=5941</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;93,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="74.7000" data-w="75.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.7%"></div></div>
+            <span class="value">74,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.4000" data-w="74.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.4%"></div></div>
+            <span class="value">74,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.0000" data-w="74.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.0%"></div></div>
+            <span class="value">74,0&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="77.5000" data-w="78.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.5%"></div></div>
+            <span class="value">77,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.4000" data-w="78.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.4%"></div></div>
+            <span class="value">77,4&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">MD U19 <span class="n">n=4392</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,8&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="76.5000" data-w="77.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.5%"></div></div>
+            <span class="value">76,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.5000" data-w="77.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.5%"></div></div>
+            <span class="value">76,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.1000" data-w="77.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.1%"></div></div>
+            <span class="value">76,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.9000" data-w="76.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.9%"></div></div>
+            <span class="value">75,9&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="76.9000" data-w="77.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.9%"></div></div>
+            <span class="value">76,9&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label">XD U19 <span class="n">n=7200</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="74.4000" data-w="75.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.4%"></div></div>
+            <span class="value">74,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.2000" data-w="75.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.2%"></div></div>
+            <span class="value">74,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.2000" data-w="75.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.2%"></div></div>
+            <span class="value">74,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="73.2000" data-w="73.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:73.2%"></div></div>
+            <span class="value">73,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="73.8000" data-w="74.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:73.8%"></div></div>
+            <span class="value">73,8&nbsp;%</span>
+          </div>
+        </div>
+  </div>
+
+  <table class="detail">
+    <caption>Alle Werte (unw. = ungewichtet, gew. = marge-gewichtet), je Konkurrenz</caption>
+    <thead>
+      <tr><th rowspan="2">Konkurrenz</th><th rowspan="2">n</th><th rowspan="2">Ceiling&nbsp;%</th><th colspan="2">Original</th><th colspan="2">eigene-AK</th><th colspan="2">eigene-AK-simple</th><th colspan="2">Elo</th><th colspan="2">Elo-simple</th></tr>
+      <tr><th>unw.</th><th>gew.</th><th>unw.</th><th>gew.</th><th>unw.</th><th>gew.</th><th>unw.</th><th>gew.</th><th>unw.</th><th>gew.</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>JE U09</td><td>433</td><td>97,4</td><td>84,6</td><td>84,9</td><td>80,6</td><td>81,1</td><td>80,0</td><td>80,2</td><td>86,9</td><td>89,0</td><td>81,2</td><td>83,8</td></tr><tr><td>ME U09</td><td>168</td><td>98,5</td><td>81,5</td><td>84,3</td><td>79,0</td><td>78,5</td><td>79,0</td><td>78,5</td><td>81,8</td><td>85,2</td><td>73,9</td><td>79,7</td></tr><tr><td>JD U09</td><td>64</td><td>100,0</td><td>80,0</td><td>80,0</td><td>80,0</td><td>80,0</td><td>80,0</td><td>80,0</td><td>90,0</td><td>90,0</td><td>80,0</td><td>80,0</td></tr><tr><td>MD U09</td><td>66</td><td>100,0</td><td>79,3</td><td>75,8</td><td>86,2</td><td>87,9</td><td>86,2</td><td>87,9</td><td>65,9</td><td>70,2</td><td>56,1</td><td>59,6</td></tr><tr><td>XD U09</td><td>12</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td></tr><tr><td>JE U11</td><td>4044</td><td>96,9</td><td>77,6</td><td>78,0</td><td>78,0</td><td>78,9</td><td>77,8</td><td>78,8</td><td>82,4</td><td>83,8</td><td>81,0</td><td>82,3</td></tr><tr><td>ME U11</td><td>2144</td><td>97,9</td><td>80,1</td><td>80,4</td><td>80,3</td><td>80,4</td><td>80,5</td><td>80,7</td><td>82,9</td><td>85,5</td><td>81,2</td><td>83,9</td></tr><tr><td>JD U11</td><td>2519</td><td>97,1</td><td>72,0</td><td>72,7</td><td>72,4</td><td>73,1</td><td>71,9</td><td>72,6</td><td>79,3</td><td>80,0</td><td>78,7</td><td>79,5</td></tr><tr><td>MD U11</td><td>984</td><td>96,3</td><td>81,1</td><td>81,3</td><td>80,3</td><td>81,0</td><td>80,1</td><td>80,6</td><td>81,5</td><td>83,1</td><td>80,3</td><td>81,2</td></tr><tr><td>XD U11</td><td>555</td><td>96,7</td><td>82,5</td><td>83,2</td><td>80,0</td><td>80,8</td><td>80,0</td><td>80,8</td><td>84,3</td><td>84,9</td><td>83,6</td><td>84,2</td></tr><tr><td>JE U13</td><td>6678</td><td>94,1</td><td>76,0</td><td>76,4</td><td>77,1</td><td>77,2</td><td>76,9</td><td>77,0</td><td>80,7</td><td>81,4</td><td>80,2</td><td>80,9</td></tr><tr><td>ME U13</td><td>3964</td><td>96,4</td><td>79,1</td><td>79,3</td><td>80,2</td><td>80,6</td><td>79,8</td><td>80,2</td><td>81,2</td><td>81,7</td><td>80,6</td><td>81,1</td></tr><tr><td>JD U13</td><td>5461</td><td>95,4</td><td>80,5</td><td>81,2</td><td>80,3</td><td>81,0</td><td>79,9</td><td>80,7</td><td>79,4</td><td>80,2</td><td>77,8</td><td>78,6</td></tr><tr><td>MD U13</td><td>3651</td><td>96,5</td><td>80,8</td><td>81,0</td><td>82,2</td><td>82,7</td><td>81,0</td><td>81,3</td><td>79,2</td><td>80,6</td><td>78,4</td><td>79,7</td></tr><tr><td>XD U13</td><td>6350</td><td>94,2</td><td>79,0</td><td>79,2</td><td>79,5</td><td>79,9</td><td>79,2</td><td>79,5</td><td>77,8</td><td>78,9</td><td>76,6</td><td>78,0</td></tr><tr><td>JE U15</td><td>8023</td><td>93,5</td><td>75,9</td><td>75,8</td><td>75,9</td><td>75,9</td><td>75,9</td><td>75,9</td><td>79,2</td><td>79,5</td><td>78,9</td><td>79,2</td></tr><tr><td>ME U15</td><td>4701</td><td>95,7</td><td>77,6</td><td>77,5</td><td>78,3</td><td>78,4</td><td>78,3</td><td>78,3</td><td>79,0</td><td>80,0</td><td>79,2</td><td>80,1</td></tr><tr><td>JD U15</td><td>7234</td><td>95,8</td><td>80,1</td><td>81,2</td><td>80,5</td><td>81,6</td><td>80,2</td><td>81,3</td><td>77,2</td><td>78,4</td><td>77,5</td><td>78,5</td></tr><tr><td>MD U15</td><td>4741</td><td>96,1</td><td>79,6</td><td>80,3</td><td>79,7</td><td>80,4</td><td>79,6</td><td>80,2</td><td>77,0</td><td>78,2</td><td>77,1</td><td>78,2</td></tr><tr><td>XD U15</td><td>7807</td><td>93,9</td><td>79,3</td><td>79,7</td><td>79,5</td><td>79,8</td><td>78,8</td><td>79,3</td><td>75,7</td><td>76,0</td><td>75,2</td><td>75,5</td></tr><tr><td>JE U17</td><td>7132</td><td>94,6</td><td>74,5</td><td>74,9</td><td>75,3</td><td>75,8</td><td>75,4</td><td>75,9</td><td>78,4</td><td>79,3</td><td>78,3</td><td>79,1</td></tr><tr><td>ME U17</td><td>4612</td><td>95,1</td><td>74,4</td><td>74,6</td><td>74,7</td><td>74,8</td><td>74,5</td><td>74,7</td><td>80,6</td><td>81,2</td><td>80,6</td><td>81,2</td></tr><tr><td>JD U17</td><td>6860</td><td>95,8</td><td>78,0</td><td>78,3</td><td>77,9</td><td>78,3</td><td>77,6</td><td>78,0</td><td>77,6</td><td>77,7</td><td>77,0</td><td>77,1</td></tr><tr><td>MD U17</td><td>5115</td><td>96,3</td><td>78,6</td><td>79,0</td><td>79,5</td><td>80,0</td><td>79,5</td><td>80,0</td><td>78,3</td><td>79,4</td><td>77,6</td><td>78,6</td></tr><tr><td>XD U17</td><td>7854</td><td>92,5</td><td>75,8</td><td>75,9</td><td>75,7</td><td>76,0</td><td>75,6</td><td>75,9</td><td>73,9</td><td>74,6</td><td>74,1</td><td>74,5</td></tr><tr><td>JE U19</td><td>5390</td><td>94,1</td><td>74,4</td><td>74,8</td><td>74,3</td><td>74,8</td><td>74,2</td><td>74,7</td><td>79,1</td><td>79,8</td><td>79,3</td><td>79,9</td></tr><tr><td>ME U19</td><td>2981</td><td>95,7</td><td>76,2</td><td>76,1</td><td>76,3</td><td>76,3</td><td>76,3</td><td>76,1</td><td>82,5</td><td>83,5</td><td>83,0</td><td>84,0</td></tr><tr><td>JD U19</td><td>5941</td><td>93,1</td><td>74,7</td><td>75,0</td><td>74,4</td><td>74,7</td><td>74,0</td><td>74,5</td><td>77,5</td><td>78,4</td><td>77,4</td><td>78,2</td></tr><tr><td>MD U19</td><td>4392</td><td>95,8</td><td>76,5</td><td>77,4</td><td>76,5</td><td>77,6</td><td>76,1</td><td>77,1</td><td>75,9</td><td>76,5</td><td>76,9</td><td>77,5</td></tr><tr><td>XD U19</td><td>7200</td><td>94,1</td><td>74,4</td><td>75,1</td><td>74,2</td><td>75,0</td><td>74,2</td><td>75,0</td><td>73,2</td><td>73,8</td><td>73,8</td><td>74,3</td></tr>
+    </tbody>
+  </table>
+
+  <footer class="page">
+    <p>
+      <strong>Ground Truth:</strong> Sieg-Verhaeltnis je Spielerpaar aus
+      <code>BTP_DOWNLOADS/&lt;year&gt;/KW&lt;NN&gt;/*_exportMatchData_*.csv</code>, 12-Monats-Fenster
+      relativ zu KW30/2026. Konkordanzrate = Anteil der entschiedenen Paare, bei denen die
+      jeweilige Rangliste dieselbe Reihenfolge zeigt wie die Ground Truth. &laquo;beste Variante&raquo;
+      markiert je Konkurrenz/Kachel die hoechste Rate bei aktuell gewaehlter Gewichtung &mdash;
+      keine Aussage ueber statistische Signifikanz bei geringer Beleglage (n).
+    </p>
+    <p>
+      <strong>Ceiling-Referenz:</strong> Anteil intransitiver Dreiecke im H2H-Graph je Konkurrenz
+      (Spieler a schlaegt b, b schlaegt c, c schlaegt a) subtrahiert von 100&nbsp;% &mdash; ein
+      intransitives Dreieck kann von KEINER Rangliste (einer strikten Totalordnung) in allen drei
+      Paarvergleichen gleichzeitig richtig abgebildet werden, die Ceiling markiert also eine
+      strukturelle Obergrenze der Konkordanzrate. <strong>Heuristik, keine bewiesene scharfe
+      Schranke</strong> (die exakte maximal erreichbare Rate zu bestimmen ist das NP-schwere
+      "Minimum Feedback Arc Set"-Problem) &mdash; gedacht als Faustregel, bevor einzelne
+      Konkordanzraten bewertet werden.
+    </p>
+    <p>
+      Quelle: <code>compare_rankings_h2h.py</code> &middot;
+      <code>RESULTS_H2H_COMPARE/h2h_konkordanz_2026_KW30.json</code> &middot;
+      erzeugt von <code>export_h2h_konkordanz_html.py</code>.
+    </p>
+  </footer>
+</div>
+
+<script>
+  const toggle = document.querySelector('.toggle');
+  toggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const mode = btn.dataset.mode;
+    document.querySelectorAll('.toggle button').forEach(b => b.classList.toggle('active', b === btn));
+    document.body.dataset.weighting = mode;
+    document.querySelectorAll('[data-u]').forEach(el => {
+      const v = parseFloat(el.dataset[mode === 'weighted' ? 'w' : 'u']);
+      const fill = el.querySelector('.fill');
+      const value = el.querySelector('.value');
+      if (fill) fill.style.width = v + '%';
+      if (value) value.textContent = v.toFixed(1).replace('.', ',') + '\u00a0%';
+    });
+    document.querySelectorAll('.kon-row').forEach(row => {
+      const cells = [...row.querySelectorAll('.cell')];
+      let bestI = -1, bestV = -1;
+      cells.forEach((c, i) => {
+        const v = parseFloat(c.dataset[mode === 'weighted' ? 'w' : 'u']);
+        if (v > bestV) { bestV = v; bestI = i; }
+      });
+      cells.forEach((c, i) => c.classList.toggle('winner', i === bestI));
+    });
+    document.querySelectorAll('.tile').forEach(t => {
+      const v = parseFloat(t.dataset[mode === 'weighted' ? 'w' : 'u']);
+      t.querySelector('.val').textContent = v.toFixed(2).replace('.', ',') + '\u00a0%';
+    });
+    let bestTileV = -1, bestTile = null;
+    document.querySelectorAll('.tile').forEach(t => {
+      const v = parseFloat(t.dataset[mode === 'weighted' ? 'w' : 'u']);
+      if (v > bestTileV) { bestTileV = v; bestTile = t; }
+    });
+    document.querySelectorAll('.tile').forEach(t => {
+      t.classList.toggle('leader', t === bestTile);
+      const badge = t.querySelector('.badge');
+      if (badge) badge.style.display = (t === bestTile) ? 'inline-flex' : 'none';
+    });
+  });
+</script>
+
+</body>
+</html>
