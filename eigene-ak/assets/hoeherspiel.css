@@ -1,4 +1,4 @@
-/* Zusatz-Stylesheet nur fuer die eigene-ak-bonus-Spielerdetailseite: Badges, Aufklapp-Panels je
+/* Zusatz-Stylesheet nur fuer die eigene-ak-Spielerdetailseite: Badges, Aufklapp-Panels je
    hoehergespieltem Turnier, Stat-Strip, Match-Tabelle. Baut auf den Tokens aus rangliste.css auf
    (--accent/--border/--bg/--bg-alt/--header-bg/--text/--text-muted, siehe dort) -- wird NACH
    rangliste.css geladen, die Variablen sind also bereits verfuegbar. Sieg/Niederlage-Gruen/Rot
