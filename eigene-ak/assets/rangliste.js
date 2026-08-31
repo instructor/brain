@@ -397,7 +397,7 @@ function renderH2hCell(td, row) {
   td.className = "h2h-cell";
   td.innerHTML = `<span class="h2h-gruen">${gruen}✓</span> <span class="h2h-rot">${rot}✗</span>`;
   td.addEventListener("mouseenter", (evt) => showH2hTooltip(evt, row));
-  td.addEventListener("mouseleave", hideH2hTooltip);
+  td.addEventListener("mouseleave", scheduleHideH2hTooltip);
 }
 
 // Spalte "H2H in%" (User-Vorgabe 2026-08-31): dieselbe gruen/rot-Bilanz wie "H2H", als
@@ -419,7 +419,7 @@ function renderH2hPercentCell(td, row) {
   td.className = "h2h-cell";
   td.innerHTML = `<span class="${cls}">${pct}%</span>`;
   td.addEventListener("mouseenter", (evt) => showH2hTooltip(evt, row));
-  td.addEventListener("mouseleave", hideH2hTooltip);
+  td.addEventListener("mouseleave", scheduleHideH2hTooltip);
 }
 
 function renderBody(rows) {
@@ -524,11 +524,32 @@ async function mergeH2hData(week) {
 }
 
 let h2hTooltipEl = null;
+let h2hHideTimeout = null;
+
+// Bugfix (2026-09-01): die Box hatte bislang keine eigenen mouseenter/mouseleave-Handler --
+// mouseleave auf der Tabellenzelle schloss sie sofort, sobald die Maus Richtung Box (um dort
+// die bei vielen Nachbarn noetige Scrollbar zu bedienen) bewegt wurde. Ein kurzes Verzoegern des
+// Schliessens (statt sofort) plus eigene Hover-Handler auf der Box selbst laesst sie offen,
+// solange die Maus ueber Zelle ODER Box ist.
+function clearH2hHideTimeout() {
+  if (h2hHideTimeout) {
+    clearTimeout(h2hHideTimeout);
+    h2hHideTimeout = null;
+  }
+}
+
+function scheduleHideH2hTooltip() {
+  clearH2hHideTimeout();
+  h2hHideTimeout = setTimeout(hideH2hTooltip, 150);
+}
+
 function ensureH2hTooltip() {
   if (!h2hTooltipEl) {
     h2hTooltipEl = document.createElement("div");
     h2hTooltipEl.id = "h2h-tooltip";
     h2hTooltipEl.hidden = true;
+    h2hTooltipEl.addEventListener("mouseenter", clearH2hHideTimeout);
+    h2hTooltipEl.addEventListener("mouseleave", scheduleHideH2hTooltip);
     document.body.appendChild(h2hTooltipEl);
   }
   return h2hTooltipEl;
@@ -552,6 +573,7 @@ function escapeHtmlLocal(s) {
 }
 
 function showH2hTooltip(evt, row) {
+  clearH2hHideTimeout();
   const el = ensureH2hTooltip();
   const oben = (row.H2H || []).filter(e => e.Richtung === "oben").slice().reverse();
   const unten = (row.H2H || []).filter(e => e.Richtung === "unten");
