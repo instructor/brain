@@ -250,11 +250,22 @@ async function init() {
   const ranking = rankingRaw.filter(r => VALID_SPIELER_ID_RE.test(r.SpielerID || ""));
   renumberRanglistenplatz(ranking);
 
+  // OriginalRang: Rang desselben Spielers in der Original-Rangliste, zum Vergleich in Klammern
+  // (Datenquelle: data/kw/<stem>_h2h_test.json -- fehlt sie fuer eine Woche, bleibt OriginalRang
+  // schlicht undefined, kein Fehler).
+  let originalRangByKey = new Map();
+  try {
+    const enrichment = await fetchJson(`data/kw/${stem}_h2h_test.json`);
+    originalRangByKey = new Map(enrichment.map(e => [`${e.SpielerID}|${e.DIS}`, e.OriginalRang]));
+  } catch { /* keine Anreicherungsdaten fuer diese Woche */ }
+
   const myRanking = ranking.filter(r => String(r.SpielerID) === spielerId);
   const summaryBody = document.getElementById("summary-body");
   for (const r of myRanking) {
+    const originalRang = originalRangByKey.get(`${r.SpielerID}|${r.DIS}`);
+    const rangText = originalRang != null ? `${r.Ranglistenplatz ?? ""} (${originalRang})` : (r.Ranglistenplatz ?? "");
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${r.DIS}</td><td>${r.Ranglistenplatz ?? ""}</td><td>${fmtNum(r.Points)}</td>`;
+    tr.innerHTML = `<td>${r.DIS}</td><td>${rangText}</td><td>${fmtNum(r.Points)}</td>`;
     summaryBody.appendChild(tr);
   }
   if (myRanking.length === 0) {
