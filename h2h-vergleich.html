@@ -126,19 +126,20 @@
   .kon-row:last-child{ border-bottom:0; }
   .kon-label{
     padding:.55rem .7rem; font-size:.84rem; font-weight:600; display:flex;
-    align-items:baseline; gap:.4rem;
+    align-items:baseline; gap:.4rem; flex-wrap:wrap; row-gap:.3rem;
   }
-  .kon-label .n{ font-size:.72rem; font-weight:500; color:var(--ink-3); }
+  .kon-label .kon-name{ white-space:nowrap; }
+  .kon-label .n{ font-size:.72rem; font-weight:500; color:var(--ink-3); white-space:nowrap; }
   .kon-label .ceiling{
     font-size:.68rem; font-weight:600; color:var(--ink-3);
     background:var(--surface-alt); border-radius:5px; padding:.05rem .35rem;
-    cursor:help;
+    cursor:help; white-space:nowrap;
   }
   .kon-label .ceiling.low{ color:var(--bar); background:var(--bar-track); }
   .kon-label .hochspielen{
     font-size:.68rem; font-weight:600; color:#a3540c;
     background:#fbe9d6; border-radius:5px; padding:.05rem .35rem;
-    cursor:help;
+    cursor:help; white-space:nowrap;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) .kon-label .hochspielen{ color:#f0a860; background:#3a2712; }
@@ -281,7 +282,7 @@
     </div>
     <div class="ak-row">Altersklasse U09</div>
         <div class="kon-row">
-          <div class="kon-label">JE U09 <span class="n">n=429</span>
+          <div class="kon-label"><span class="kon-name">JE U09</span> <span class="n">n=429</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,3&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 186 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U09 entspricht, haben 113 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;60,8&nbsp;%</span>
           </div>
@@ -313,7 +314,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">ME U09 <span class="n">n=166</span>
+          <div class="kon-label"><span class="kon-name">ME U09</span> <span class="n">n=166</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;98,5&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 81 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U09 entspricht, haben 48 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;59,3&nbsp;%</span>
           </div>
@@ -345,7 +346,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">JD U09 <span class="n">n=64</span>
+          <div class="kon-label"><span class="kon-name">JD U09</span> <span class="n">n=64</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 30 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U09 entspricht, haben 24 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;80,0&nbsp;%</span>
           </div>
@@ -377,7 +378,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">MD U09 <span class="n">n=66</span>
+          <div class="kon-label"><span class="kon-name">MD U09</span> <span class="n">n=66</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 22 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U09 entspricht, haben 13 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;59,1&nbsp;%</span>
           </div>
@@ -409,7 +410,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">XD U09 <span class="n">n=12</span>
+          <div class="kon-label"><span class="kon-name">XD U09</span> <span class="n">n=12</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 6 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U09 entspricht, haben 5 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;83,3&nbsp;%</span>
           </div>
@@ -441,7 +442,7 @@
           </div>
         </div><div class="ak-row">Altersklasse U11</div>
         <div class="kon-row">
-          <div class="kon-label">JE U11 <span class="n">n=3979</span>
+          <div class="kon-label"><span class="kon-name">JE U11</span> <span class="n">n=3979</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,1&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 912 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U11 entspricht, haben 369 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;40,5&nbsp;%</span>
           </div>
@@ -473,7 +474,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">ME U11 <span class="n">n=2112</span>
+          <div class="kon-label"><span class="kon-name">ME U11</span> <span class="n">n=2112</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;98,1&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 514 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U11 entspricht, haben 220 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;42,8&nbsp;%</span>
           </div>
@@ -505,7 +506,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">JD U11 <span class="n">n=2480</span>
+          <div class="kon-label"><span class="kon-name">JD U11</span> <span class="n">n=2480</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,1&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 485 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U11 entspricht, haben 207 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;42,7&nbsp;%</span>
           </div>
@@ -537,7 +538,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">MD U11 <span class="n">n=969</span>
+          <div class="kon-label"><span class="kon-name">MD U11</span> <span class="n">n=969</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,2&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 265 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U11 entspricht, haben 118 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;44,5&nbsp;%</span>
           </div>
@@ -569,7 +570,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">XD U11 <span class="n">n=551</span>
+          <div class="kon-label"><span class="kon-name">XD U11</span> <span class="n">n=551</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,7&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 196 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U11 entspricht, haben 70 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;35,7&nbsp;%</span>
           </div>
@@ -601,7 +602,7 @@
           </div>
         </div><div class="ak-row">Altersklasse U13</div>
         <div class="kon-row">
-          <div class="kon-label">JE U13 <span class="n">n=6496</span>
+          <div class="kon-label"><span class="kon-name">JE U13</span> <span class="n">n=6496</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,0&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 1223 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U13 entspricht, haben 454 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;37,1&nbsp;%</span>
           </div>
@@ -633,7 +634,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">ME U13 <span class="n">n=3892</span>
+          <div class="kon-label"><span class="kon-name">ME U13</span> <span class="n">n=3892</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,9&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 802 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U13 entspricht, haben 315 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,3&nbsp;%</span>
           </div>
@@ -665,7 +666,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">JD U13 <span class="n">n=5374</span>
+          <div class="kon-label"><span class="kon-name">JD U13</span> <span class="n">n=5374</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,5&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 726 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U13 entspricht, haben 283 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,0&nbsp;%</span>
           </div>
@@ -697,7 +698,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">MD U13 <span class="n">n=3635</span>
+          <div class="kon-label"><span class="kon-name">MD U13</span> <span class="n">n=3635</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,7&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 516 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U13 entspricht, haben 230 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;44,6&nbsp;%</span>
           </div>
@@ -729,7 +730,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">XD U13 <span class="n">n=6316</span>
+          <div class="kon-label"><span class="kon-name">XD U13</span> <span class="n">n=6316</span>
             <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,2&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 983 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U13 entspricht, haben 392 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,9&nbsp;%</span>
           </div>
@@ -761,7 +762,7 @@
           </div>
         </div><div class="ak-row">Altersklasse U15</div>
         <div class="kon-row">
-          <div class="kon-label">JE U15 <span class="n">n=7818</span>
+          <div class="kon-label"><span class="kon-name">JE U15</span> <span class="n">n=7818</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,0&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 1315 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U15 entspricht, haben 443 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;33,7&nbsp;%</span>
           </div>
@@ -793,7 +794,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">ME U15 <span class="n">n=4585</span>
+          <div class="kon-label"><span class="kon-name">ME U15</span> <span class="n">n=4585</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,6&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 872 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U15 entspricht, haben 332 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;38,1&nbsp;%</span>
           </div>
@@ -825,7 +826,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">JD U15 <span class="n">n=7146</span>
+          <div class="kon-label"><span class="kon-name">JD U15</span> <span class="n">n=7146</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,5&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 822 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U15 entspricht, haben 320 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;38,9&nbsp;%</span>
           </div>
@@ -857,7 +858,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">MD U15 <span class="n">n=4692</span>
+          <div class="kon-label"><span class="kon-name">MD U15</span> <span class="n">n=4692</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,1&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 600 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U15 entspricht, haben 251 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;41,8&nbsp;%</span>
           </div>
@@ -889,7 +890,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">XD U15 <span class="n">n=7723</span>
+          <div class="kon-label"><span class="kon-name">XD U15</span> <span class="n">n=7723</span>
             <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,0&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 869 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U15 entspricht, haben 385 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;44,3&nbsp;%</span>
           </div>
@@ -921,7 +922,7 @@
           </div>
         </div><div class="ak-row">Altersklasse U17</div>
         <div class="kon-row">
-          <div class="kon-label">JE U17 <span class="n">n=6861</span>
+          <div class="kon-label"><span class="kon-name">JE U17</span> <span class="n">n=6861</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,8&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 1211 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U17 entspricht, haben 428 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;35,3&nbsp;%</span>
           </div>
@@ -953,7 +954,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">ME U17 <span class="n">n=4469</span>
+          <div class="kon-label"><span class="kon-name">ME U17</span> <span class="n">n=4469</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,8&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 797 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U17 entspricht, haben 275 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;34,5&nbsp;%</span>
           </div>
@@ -985,7 +986,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">JD U17 <span class="n">n=6722</span>
+          <div class="kon-label"><span class="kon-name">JD U17</span> <span class="n">n=6722</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,3&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 815 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U17 entspricht, haben 307 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;37,7&nbsp;%</span>
           </div>
@@ -1017,7 +1018,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">MD U17 <span class="n">n=4996</span>
+          <div class="kon-label"><span class="kon-name">MD U17</span> <span class="n">n=4996</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,4&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 607 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U17 entspricht, haben 241 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,7&nbsp;%</span>
           </div>
@@ -1049,7 +1050,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">XD U17 <span class="n">n=7760</span>
+          <div class="kon-label"><span class="kon-name">XD U17</span> <span class="n">n=7760</span>
             <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;92,8&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 868 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U17 entspricht, haben 344 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,6&nbsp;%</span>
           </div>
@@ -1081,7 +1082,7 @@
           </div>
         </div><div class="ak-row">Altersklasse U19</div>
         <div class="kon-row">
-          <div class="kon-label">JE U19 <span class="n">n=5201</span>
+          <div class="kon-label"><span class="kon-name">JE U19</span> <span class="n">n=5201</span>
             <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,8&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 865 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U19 entspricht, haben 79 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;9,1&nbsp;%</span>
           </div>
@@ -1113,7 +1114,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">ME U19 <span class="n">n=2871</span>
+          <div class="kon-label"><span class="kon-name">ME U19</span> <span class="n">n=2871</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,8&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 552 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U19 entspricht, haben 11 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;2,0&nbsp;%</span>
           </div>
@@ -1145,7 +1146,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">JD U19 <span class="n">n=5807</span>
+          <div class="kon-label"><span class="kon-name">JD U19</span> <span class="n">n=5807</span>
             <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;93,8&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 631 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U19 entspricht, haben 106 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;16,8&nbsp;%</span>
           </div>
@@ -1177,7 +1178,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">MD U19 <span class="n">n=4300</span>
+          <div class="kon-label"><span class="kon-name">MD U19</span> <span class="n">n=4300</span>
             <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,0&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 523 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U19 entspricht, haben 70 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;13,4&nbsp;%</span>
           </div>
@@ -1209,7 +1210,7 @@
           </div>
         </div>
         <div class="kon-row">
-          <div class="kon-label">XD U19 <span class="n">n=7132</span>
+          <div class="kon-label"><span class="kon-name">XD U19</span> <span class="n">n=7132</span>
             <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,2&nbsp;%</span>
             <span class="hochspielen" title="Hochspielen-Anteil: von 798 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U19 entspricht, haben 130 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;16,3&nbsp;%</span>
           </div>
