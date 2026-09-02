@@ -71,6 +71,45 @@ function hoeherBadgeHtml(row) {
   }
 }
 
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+// Match-Detailpanel (User-Vorgabe 2026-09-02): eigene-ak's Turnier-Matchliste auf diese Variante
+// erweitert -- nur Runde/Gegner/Ergebnis, kein Sieg-/Gegnerstaerke-Nachweis (siehe hoeherspiel.
+// classify_hochspielen). Gezeigt fuer jedes Turnier mit row.Matches, unabhaengig von
+// row.Hoehergespielt (analog eigene-ak: alle Turniere, nicht nur hochgespielte).
+function renderMatchPanel(row) {
+  const details = document.createElement("details");
+  details.className = "hoch-panel";
+  const summary = document.createElement("summary");
+  summary.innerHTML = `
+    <span class="sum-turnier">${escapeHtml(row.RankingTournamentName)}</span>
+    <span class="sum-meta">${escapeHtml(row.Konkurrenz)} · Platz ${row.Platz ?? "?"} · KW ${weekLabel(row.Jahr, row.KW)}</span>
+    <span class="sum-spacer"></span>
+    ${hoeherBadgeHtml(row)}`;
+  details.appendChild(summary);
+
+  const body = document.createElement("div");
+  body.className = "panel-body";
+  const table = document.createElement("table");
+  table.className = "match-table";
+  table.innerHTML = `<thead><tr><th>Runde</th><th>Gegner</th><th>Ergebnis</th></tr></thead>`;
+  const tbody = document.createElement("tbody");
+  for (const m of row.Matches) {
+    const tr = document.createElement("tr");
+    tr.classList.add(m.Ergebnis === "Sieg" ? "win" : "loss");
+    tr.innerHTML = `<td>${m.Runde ?? ""}</td><td>${escapeHtml((m.Gegner || []).join(" / "))}</td><td>${m.Ergebnis}</td>`;
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  body.appendChild(table);
+  details.appendChild(body);
+  return details;
+}
+
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const spielerId = params.get("id");
@@ -124,6 +163,7 @@ async function init() {
       </tr></thead>`;
     const tbody = document.createElement("tbody");
     let top5Sum = 0;
+    const matchRows = [];
     for (const row of rows) {
       const tr = document.createElement("tr");
       if (row.IstTop5) { tr.classList.add("top5"); top5Sum += row.Punkte || 0; }
@@ -134,6 +174,7 @@ async function init() {
       const turnierCell = row.TurnierURL
         ? `<a href="${row.TurnierURL}" target="_blank" rel="noopener">${name}</a>`
         : name;
+      if (row.Matches && row.Matches.length) matchRows.push(row);
       tr.innerHTML = `
         <td class="col-turnier" title="${nameAttr}">${turnierCell}</td>
         <td>${row.Konkurrenz ?? ""}</td>
@@ -150,6 +191,8 @@ async function init() {
     total.className = "dis-total";
     total.textContent = `Summe (beste 5, ★ markiert): ${top5Sum} Punkte`;
     block.appendChild(total);
+
+    for (const row of matchRows) { block.appendChild(renderMatchPanel(row)); }
 
     container.appendChild(block);
   }

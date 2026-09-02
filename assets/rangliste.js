@@ -537,6 +537,19 @@ function escapeHtmlLocal(s) {
   }[c]));
 }
 
+// Seit 2026-09-02 (User-Vorgabe): das H2H-Popup zeigt je Richtung die 5 rangnaechsten Spieler MIT
+// echten H2H-Matchdaten, nicht mehr starr die 5 Ranglistenplaetze -- eine leere Richtung kann
+// jetzt auch bei einem Spieler MITTEN in der Rangliste vorkommen (schlicht keine echten Gegner in
+// dieser Richtung), nicht nur an den Rand-Plaetzen. Die alte Rand-Meldung bleibt nur, wenn der
+// Spieler tatsaechlich an Rang 1 bzw. dem letzten Rang seiner DIS steht.
+function noNeighborText(row, richtung) {
+  const atEdge = richtung === "oben"
+    ? row.Ranglistenplatz === 1
+    : row.Ranglistenplatz === state.maxRankByDis.get(row.DIS);
+  if (atEdge) return richtung === "oben" ? "keine (bereits Rang 1)" : "keine (bereits letzter Rang)";
+  return "keine H2H-Vergleiche in dieser Richtung gefunden";
+}
+
 function showH2hTooltip(evt, row) {
   clearH2hHideTimeout();
   const el = ensureH2hTooltip();
@@ -544,9 +557,9 @@ function showH2hTooltip(evt, row) {
   const unten = (row.H2H || []).filter(e => e.Richtung === "unten");
   el.innerHTML = `
     <div class="h2h-section-title">▲ Nachbarn oberhalb</div>
-    ${oben.length ? oben.map(h2hEntryHtml).join("") : '<div class="h2h-match h2h-none">keine (bereits Rang 1)</div>'}
+    ${oben.length ? oben.map(h2hEntryHtml).join("") : `<div class="h2h-match h2h-none">${noNeighborText(row, "oben")}</div>`}
     <div class="h2h-section-title">▼ Nachbarn unterhalb</div>
-    ${unten.length ? unten.map(h2hEntryHtml).join("") : '<div class="h2h-match h2h-none">keine (bereits letzter Rang)</div>'}`;
+    ${unten.length ? unten.map(h2hEntryHtml).join("") : `<div class="h2h-match h2h-none">${noNeighborText(row, "unten")}</div>`}`;
   el.hidden = false;
   const cellRect = evt.currentTarget.getBoundingClientRect();
   const viewportH = document.documentElement.clientHeight;
@@ -596,6 +609,14 @@ async function loadWeek(week) {
   const rawRows = await fetchJson(week.ranking_file);
   state.rows = rawRows.filter(r => VALID_SPIELER_ID_RE.test(r.SpielerID || ""));
   renumberRanglistenplatz(state.rows);
+  // Fuer noNeighborText() (siehe showH2hTooltip()) -- hoechster Ranglistenplatz je DIS, um zu
+  // erkennen, ob ein Spieler wirklich am Rand steht (kein Nachbar existiert) oder ob es dort
+  // schlicht keine echten H2H-Gegner gibt (seit 2026-09-02 kann Letzteres ueberall vorkommen,
+  // nicht nur an Rang 1/letzter Rang).
+  state.maxRankByDis = new Map();
+  for (const r of state.rows) {
+    if ((state.maxRankByDis.get(r.DIS) || 0) < r.Ranglistenplatz) state.maxRankByDis.set(r.DIS, r.Ranglistenplatz);
+  }
   await mergeH2hData(week);
   populateFilterOptions(state.rows);
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;

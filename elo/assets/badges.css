@@ -1,9 +1,11 @@
-/* Minimale Badge-Styles fuer die Hoeherspielen-Kennzeichnung auf der Spieler-Detailseite dieser
-   Variante (seit 2026-09-02) -- Auszug aus eigene-ak/assets/hoeherspiel.css (dort zusaetzlich
-   Panels/Stat-Strip/Match-Tabelle, die diese Variante nicht braucht). Werte hartkodiert statt aus
-   rangliste.css-Tokens abgeleitet, damit diese Datei unabhaengig von der Ladereihenfolge
-   funktioniert -- identisch in allen 4 Nicht-eigene-ak-Variantenordnern (assets/, eigene-ak-ohne-
-   bonus/assets/, u13-u15-1-9/assets/, elo/assets/). */
+/* Minimale Badge-/Match-Panel-Styles fuer die Hoeherspielen-Kennzeichnung auf der Spieler-
+   Detailseite dieser Variante (seit 2026-09-02) -- Auszug aus eigene-ak/assets/hoeherspiel.css
+   (dort zusaetzlich Stat-Strip/O19-spezifische Tabellenspalten, die diese Variante nicht braucht,
+   da sie keinen Hoeherspielen-Bonus fuehrt). Werte hartkodiert statt aus rangliste.css-Tokens
+   abgeleitet, damit diese Datei unabhaengig von der Ladereihenfolge funktioniert -- identisch in
+   allen 4 Nicht-eigene-ak-Variantenordnern (assets/, eigene-ak-ohne-bonus/assets/, u13-u15-1-9/
+   assets/, elo/assets/ -- Elo nutzt nur .badge/.badge-hoch, die Panel-/Tabellen-Klassen bleiben
+   dort ungenutzt, Datei trotzdem byte-identisch gehalten). */
 
 .badge {
   display: inline-flex;
@@ -20,3 +22,42 @@
 .badge-hoch { background: #f4ecd8; color: #8a6410; border: 1px solid #e2d2a6; }
 .badge-gap  { background: #fbeed9; color: #9a5b00; border: 1px solid #edd6a3; }
 .badge-o19  { background: #e8f0f8; color: #2a5a8a; border: 1px solid #c3d7ec; }
+
+details.hoch-panel {
+  margin: 0 0 16px;
+  border: 1px solid #e2d2a6;
+  border-left: 4px solid #8a6410;
+  border-radius: 0 4px 4px 0;
+  background: #fffdf8;
+}
+details.hoch-panel summary {
+  cursor: pointer;
+  padding: 9px 14px;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  list-style: none;
+}
+details.hoch-panel summary::-webkit-details-marker { display: none; }
+details.hoch-panel summary::before {
+  content: "▸";
+  color: #8a6410;
+  transition: transform 0.15s ease;
+  flex: none;
+}
+details.hoch-panel[open] summary::before { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) {
+  details.hoch-panel summary::before { transition: none; }
+}
+.hoch-panel .sum-turnier { font-weight: bold; }
+.hoch-panel .sum-meta { color: #666; font-size: 0.83rem; }
+.hoch-panel .sum-spacer { flex: 1; }
+.hoch-panel .panel-body { padding: 2px 14px 14px; }
+
+.match-table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+.match-table th, .match-table td { border-bottom: 1px solid #ddd; padding: 6px 9px; text-align: left; }
+.match-table th { background: #f0f0f0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.02em; color: #666; }
+.match-table tr.win td:first-child { border-left: 3px solid #2a7a2a; }
+.match-table tr.loss td:first-child { border-left: 3px solid #a12a2a; }
