@@ -50,6 +50,27 @@ function applyTurnierColumnWidth() {
     `overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`;
 }
 
+// Höherspielen-Badge (seit 2026-09-02, User-Vorgabe): zeigt bei row.Hoehergespielt die exakte
+// Alters-Transition (z.B. "Höher U15 > U17"), plus je nach row.HoeherspielLabel ein
+// Zusatz-Badge, wenn keine lokalen Matchdaten vorlagen -- rein informativ (kein Bonuspunkte-
+// Anspruch wie bei der eigene-ak-Variante, siehe deren eigenes assets/spieler.js). Badge-Klassen
+// aus badges.css (identisch in allen 4 Nicht-eigene-ak-Variantenordnern).
+function hoeherBadgeHtml(row) {
+  if (!row.Hoehergespielt) return "";
+  const hoch = `<span class="badge badge-hoch">Höher ${row.EigeneAK ?? ""} &gt; ${row.KonkurrenzAKL ?? ""}</span>`;
+  switch (row.HoeherspielLabel) {
+    case "hoeher_bwf_bec":
+      return `${hoch} <span class="badge badge-gap">BWF/BEC-Punkte</span>`;
+    case "hoeher_o19":
+      return `${hoch} <span class="badge badge-o19">O19 RLT/Mst</span>`;
+    case "hoeher_datenluecke":
+      return `${hoch} <span class="badge badge-gap">Datenlücke</span>`;
+    default:
+      // "hoeher_matches" -- lokale Matchdaten vorhanden, kein Gap-Badge noetig.
+      return hoch;
+  }
+}
+
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const spielerId = params.get("id");
@@ -99,7 +120,7 @@ async function init() {
     const table = document.createElement("table");
     table.className = "results-table";
     table.innerHTML = `<thead><tr>
-        <th class="col-turnier">Turnier</th><th>Konkurrenz</th><th>Woche</th><th>Platz</th><th>Punkte</th>
+        <th class="col-turnier">Turnier</th><th>Konkurrenz</th><th>Woche</th><th>Platz</th><th></th><th>Punkte</th>
       </tr></thead>`;
     const tbody = document.createElement("tbody");
     let top5Sum = 0;
@@ -118,6 +139,7 @@ async function init() {
         <td>${row.Konkurrenz ?? ""}</td>
         <td>${weekLabel(row.Jahr, row.KW)}</td>
         <td>${row.Platz ?? ""}</td>
+        <td>${hoeherBadgeHtml(row)}</td>
         <td>${row.Punkte ?? ""}</td>`;
       tbody.appendChild(tr);
     }

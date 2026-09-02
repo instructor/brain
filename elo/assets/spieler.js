@@ -26,6 +26,19 @@ function renumberRanglistenplatz(rows) {
   }
 }
 
+// Portierung von hoeherspiel._is_hochspielen (Python) fuers "Höher Ux>Uy"-Badge (seit
+// 2026-09-02) -- O19 ist immer "höher" als jede Jugend-AK. Anders als bei den punktebasierten
+// Varianten gibt es fuer Elo KEIN BWF/BEC-/O19-Datenluecke-Badge: Elo sieht strukturell nur
+// Matches, fuer die bereits lokale Daten existieren, es gibt also keinen "Turnier ohne lokale
+// Matchdaten"-Fall, den man kennzeichnen könnte.
+function isHoeherAk(own, konkurrenz) {
+  if (!own || !konkurrenz) return false;
+  if (konkurrenz === "O19") return true;
+  const on = parseInt(own.slice(1), 10);
+  const kn = parseInt(konkurrenz.slice(1), 10);
+  return !Number.isNaN(on) && !Number.isNaN(kn) && kn > on;
+}
+
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const spielerId = params.get("id");
@@ -113,6 +126,14 @@ async function init() {
       }
       if (partnerName) {
         sub.append(` — Partner: ${partnerName}`);
+      }
+      // "Höher Ux>Uy"-Badge, wenn irgendein Match dieses Turniers hochgespielt war (User-Vorgabe
+      // 2026-09-02) -- EigeneAK/KonkurrenzAKL kommen aus elo_engine._log_team, koennen bei alten,
+      // vor diesem Feature gebauten Wochen fehlen (dann kein Badge, kein Fehler).
+      const hoeherMatch = matches.find(m => isHoeherAk(m.EigeneAK, m.KonkurrenzAKL));
+      if (hoeherMatch) {
+        sub.insertAdjacentHTML("beforeend",
+          ` <span class="badge badge-hoch">Höher ${hoeherMatch.EigeneAK} &gt; ${hoeherMatch.KonkurrenzAKL}</span>`);
       }
       block.appendChild(sub);
 

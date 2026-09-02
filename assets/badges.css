@@ -1,0 +1,22 @@
+/* Minimale Badge-Styles fuer die Hoeherspielen-Kennzeichnung auf der Spieler-Detailseite dieser
+   Variante (seit 2026-09-02) -- Auszug aus eigene-ak/assets/hoeherspiel.css (dort zusaetzlich
+   Panels/Stat-Strip/Match-Tabelle, die diese Variante nicht braucht). Werte hartkodiert statt aus
+   rangliste.css-Tokens abgeleitet, damit diese Datei unabhaengig von der Ladereihenfolge
+   funktioniert -- identisch in allen 4 Nicht-eigene-ak-Variantenordnern (assets/, eigene-ak-ohne-
+   bonus/assets/, u13-u15-1-9/assets/, elo/assets/). */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.badge-hoch { background: #f4ecd8; color: #8a6410; border: 1px solid #e2d2a6; }
+.badge-gap  { background: #fbeed9; color: #9a5b00; border: 1px solid #edd6a3; }
+.badge-o19  { background: #e8f0f8; color: #2a5a8a; border: 1px solid #c3d7ec; }

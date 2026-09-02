@@ -75,26 +75,34 @@ function applyTurnierColumnWidth() {
     `overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`;
 }
 
+function hoeherLabel(row) {
+  // Statt des generischen "höhergespielt"-Texts die exakte Alters-Transition (User-Vorgabe
+  // 2026-09-02, z.B. "Höher U15 > U17") -- EigeneAK/KonkurrenzAKL sind fuer jede hochgespielte
+  // Zeile dieser Variante bereits gesetzt (siehe hoeherspiel.compute_row_points). .badge hat
+  // text-transform:uppercase, das JS liefert also bewusst gemischte Schreibweise.
+  return `Höher ${escapeHtml(row.EigeneAK)} &gt; ${escapeHtml(row.KonkurrenzAKL)}`;
+}
+
 function bonusBadgeHtml(row) {
   switch (row.BonusStatus) {
     case "bonus_angewendet":
-      return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-bonus">Bonus ${fmtSigned(row.Bonus)}</span>`;
+      return `<span class="badge badge-hoch">${hoeherLabel(row)}</span> <span class="badge badge-bonus">Bonus ${fmtSigned(row.Bonus)}</span>`;
     case "kein_bonus":
-      return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-nobonus">kein Bonus</span>`;
+      return `<span class="badge badge-hoch">${hoeherLabel(row)}</span> <span class="badge badge-nobonus">kein Bonus</span>`;
     case "bwf_bec_punkte":
-      return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-gap">BWF/BEC-Punkte</span>`;
+      return `<span class="badge badge-hoch">${hoeherLabel(row)}</span> <span class="badge badge-gap">BWF/BEC-Punkte</span>`;
     case "datenluecke":
-      return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-gap">Datenlücke</span>`;
+      return `<span class="badge badge-hoch">${hoeherLabel(row)}</span> <span class="badge badge-gap">Datenlücke</span>`;
     case "o19_ohne_matchdaten":
-      return `<span class="badge badge-hoch">höhergespielt</span> <span class="badge badge-o19">O19 RLT/Mst</span>`;
+      return `<span class="badge badge-hoch">${hoeherLabel(row)}</span> <span class="badge badge-o19">O19 RLT/Mst</span>`;
     case "normal_matches":
     case "normal_bwf_bec":
     case "normal_datenluecke":
-      // Kein Hochspielen -- kein Badge in der Turnierliste, damit "höhergespielt" weiterhin nur
+      // Kein Hochspielen -- kein Badge in der Turnierliste, damit das Höher-Badge weiterhin nur
       // dort erscheint, wo tatsaechlich hochgespielt wurde.
       return "";
     default:
-      return `<span class="badge badge-hoch">höhergespielt</span>`;
+      return `<span class="badge badge-hoch">${hoeherLabel(row)}</span>`;
   }
 }
 
