@@ -14,7 +14,8 @@ const COLUMNS = [
   { key: "GJahr", label: "GJahr", numeric: true },
   { key: "AKL1", label: "AKL1" },
   { key: "AKL2", label: "AKL2" },
-  { key: "Points", label: "Punkte", numeric: true },
+  { key: "Points", label: "Punkte (*)", numeric: true,
+    tooltip: "In Klammern: Punkte desselben Spielers in der Original-Rangliste (zum Vergleich)." },
   // H2H-Vergleich mit den 5 naechsten Ranglisten-Nachbarn oben/unten (Zaehlung + Prozent,
   // User-Vorgabe 2026-08-31, echte Ergebnisdaten bislang nur fuer KW30/2026 vorhanden -- fuer
   // jede andere Woche zeigen die Zellen "-"), siehe renderH2hCell()/renderH2hPercentCell() weiter
@@ -342,6 +343,15 @@ function buildRowFragment(rows) {
         tr.appendChild(td);
         continue;
       }
+      if (col.key === "Points") {
+        // Eigene Punkte plus Original-RL-Punkte in Klammern (analog Ranglistenplatz oben) --
+        // row.OriginalPunkte kommt aus derselben H2H-Anreicherung, siehe mergeH2hData().
+        td.textContent = row.OriginalPunkte != null
+          ? `${row.Points} (${row.OriginalPunkte})` : String(row.Points ?? "");
+        td.title = "Punkte (Original-RL zum Vergleich)";
+        tr.appendChild(td);
+        continue;
+      }
       if (col.key === "H2H") {
         renderH2hCell(td, row);
         tr.appendChild(td);
@@ -518,6 +528,7 @@ async function mergeH2hData(week) {
     const e = byKey.get(`${r.SpielerID}|${r.DIS}`);
     if (e) {
       r.OriginalRang = e.OriginalRang;
+      r.OriginalPunkte = e.OriginalPunkte;
       r.H2H = e.H2H;
     }
   }
