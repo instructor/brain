@@ -18,12 +18,12 @@ const COLUMNS = [
   // buildRowFragment() rendert diese Spalten gesondert.
   { key: "H2H", label: "H2H (*)", sortable: false,
     tooltip: "Kopf-an-Kopf-Bilanz gegen die 5 nächsten Ranglisten-Nachbarn oberhalb und unterhalb "
-      + "(anhand echter Turnierergebnisse): ✓ = Rangfolge bestätigt, ✗ = widerspricht ihr. "
-      + "Zum Überfahren: Details je Nachbar." },
+      + "INNERHALB DER AKTUELLEN FILTERAUSWAHL (anhand echter Turnierergebnisse): ✓ = Rangfolge "
+      + "bestätigt, ✗ = widerspricht ihr. Zum Überfahren: Details je Nachbar." },
   { key: "H2HPct", label: "H2H in% (*)", sortable: false,
     tooltip: "Anteil ✓ an allen entschiedenen Vergleichen (✓+✗) mit den 5 nächsten Ranglisten-"
-      + "Nachbarn oberhalb und unterhalb — je höher, desto mehr bestätigen echte Ergebnisse diesen "
-      + "Rangbereich. Zum Überfahren: Details je Nachbar." },
+      + "Nachbarn oberhalb und unterhalb innerhalb der aktuellen Filterauswahl — je höher, desto "
+      + "mehr bestätigen echte Ergebnisse diesen Rangbereich. Zum Überfahren: Details je Nachbar." },
   { key: "Turniere", label: "#Turniere", numeric: true },
   { key: "Verein", label: "Verein" },
   { key: "Bezirk", label: "Bezirk" },
@@ -319,6 +319,86 @@ function renderHead() {
   applyColumnWidths();
 }
 
+// FRang-bewusster H2H-Vergleich (User-Vorgabe 2026-09-06): die Nachbarsuche lief bis dahin gegen
+// den global vorausberechneten Ranglistenplatz (data/kw/<stem>_h2h_test.json, offline in Python
+// erzeugt) und reagierte deshalb nicht auf Web-Filter. Jetzt laeuft die Nachbarsuche LIVE im
+// Browser gegen die AKTUELL GEFILTERTE Teilmenge (state.h2hIndex, in render() aus `filtered`
+// gebaut) -- ein Filter (AKL, Bezirk, Name, ...) grenzt damit auch die H2H-Nachbarn ein. Die
+// Nachbar-Reihenfolge bleibt dabei bewusst IMMER die Ranglistenplatz-Reihenfolge innerhalb der
+// gefilterten Menge, unabhaengig davon, nach welcher Spalte die Tabelle gerade angezeigt/sortiert
+// wird (User-Bestaetigung 2026-09-06) -- sonst waeren bei einer Sortierung z.B. nach Nachname
+// alphabetische statt Rang-Nachbarn verglichen worden. Nachbarn bleiben wie bisher auf dieselbe
+// Disziplin (DIS) beschraenkt. Die rohen Gegner-/Matchdaten je Spieler (row._opponents) kommen
+// weiterhin aus derselben JSON-Datei, siehe mergeH2hData() und tools/debug_build_h2h_hover_test_data.py.
+const N_NEIGHBORS = 5;        // je Richtung (oben/unten)
+const H2H_SEARCH_LIMIT = 500; // Performance-Deckel: maximale Scan-Distanz je Richtung
+
+// Baut je DIS eine nach Ranglistenplatz aufsteigend sortierte Kopie der aktuell gefilterten Zeilen
+// plus einen Positions-Index (SpielerID -> Index in dieser Kopie) -- einmal pro render()-Aufruf
+// aus den gefilterten (aber noch nicht nach der UI-Sortierspalte sortierten!) Zeilen gebaut, dann
+// von computeH2hNeighbors() fuer jede sichtbare Zeile wiederverwendet.
+function buildH2hIndex(filteredRows) {
+  const byDis = new Map();
+  for (const r of filteredRows) {
+    if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
+    byDis.get(r.DIS).push(r);
+  }
+  const index = new Map();
+  for (const [dis, rows] of byDis) {
+    const order = rows.slice().sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
+    const posBySpielerID = new Map(order.map((r, i) => [r.SpielerID, i]));
+    index.set(dis, { order, posBySpielerID });
+  }
+  return index;
+}
+
+// Ersetzt die frueher vorausgeladene row.H2H-Liste: sucht live je Richtung die N_NEIGHBORS
+// naechsten Spieler IN DER GEFILTERTEN MENGE (state.h2hIndex), gegen die der Spieler laut
+// row._opponents tatsaechlich mindestens ein Match hat. Bis zu H2H_SEARCH_LIMIT Kandidaten je
+// Richtung werden durchsucht, danach wird abgebrochen (Absicherung bei sehr grossen DIS-Gruppen
+// ohne nahe Gegner). atTop/atBottom ersetzen das fruehere state.maxRankByDis fuer noNeighborText().
+function computeH2hNeighbors(row) {
+  const empty = { entries: [], atTop: false, atBottom: false };
+  if (!row._opponents || !state.h2hIndex) return empty;
+  const group = state.h2hIndex.get(row.DIS);
+  if (!group) return empty;
+  const { order, posBySpielerID } = group;
+  const i = posBySpielerID.get(row.SpielerID);
+  if (i === undefined) return empty;
+
+  const entries = [];
+  const directions = [
+    { richtung: "oben", step: -1, maxScan: i },
+    { richtung: "unten", step: 1, maxScan: order.length - 1 - i },
+  ];
+  for (const { richtung, step, maxScan } of directions) {
+    let found = 0, scanned = 0, pos = i;
+    const limit = Math.min(maxScan, H2H_SEARCH_LIMIT);
+    while (found < N_NEIGHBORS && scanned < limit) {
+      pos += step;
+      scanned++;
+      const cand = order[pos];
+      const matches = row._opponents.get(cand.SpielerID);
+      if (!matches) continue;
+      found++;
+      const wins = matches.filter(m => m.Ergebnis === "Sieg").length;
+      const losses = matches.length - wins;
+      const playerBetter = Number(row.Ranglistenplatz) < Number(cand.Ranglistenplatz);
+      let konkordanz;
+      if (!matches.length || wins === losses) konkordanz = "neutral";
+      else if ((playerBetter && wins > losses) || (!playerBetter && wins < losses)) konkordanz = "gruen";
+      else konkordanz = "rot";
+      entries.push({
+        SpielerID: cand.SpielerID,
+        Name: `${cand.Vorname || ""} ${cand.Nachname || ""}`.trim(),
+        Rang: cand.Ranglistenplatz, Richtung: richtung,
+        Matches: matches, Konkordanz: konkordanz,
+      });
+    }
+  }
+  return { entries, atTop: i === 0, atBottom: i === order.length - 1 };
+}
+
 // Baut ein DocumentFragment mit <tr>-Zeilen fuer die uebergebenen (bereits gefilterten/
 // sortierten und ggf. schon geslicten) Zeilen. Getrennt von renderBody()/loadMore(), damit
 // beide dieselbe Zeilenerzeugung nutzen -- renderBody() ersetzt den gesamten tbody-Inhalt,
@@ -327,6 +407,10 @@ function buildRowFragment(rows) {
   const frag = document.createDocumentFragment();
   for (const row of rows) {
     const tr = document.createElement("tr");
+    const h2h = computeH2hNeighbors(row);
+    row.H2H = h2h.entries;
+    row._h2hAtTop = h2h.atTop;
+    row._h2hAtBottom = h2h.atBottom;
     for (const col of COLUMNS) {
       const td = document.createElement("td");
       td.dataset.key = col.key;
@@ -466,24 +550,39 @@ function applyFilterChange() {
   if (!SEARCH_REQUIRES_SUBMIT) render();
 }
 
-// H2H-Anreicherung (User-Vorgabe 2026-08-31): laedt <stem>_h2h_test.json (siehe
-// tools/debug_build_h2h_hover_test_data.py) und mischt H2H in state.rows -- echte
-// Ergebnisdaten liegen bislang nur fuer die live gepushten Referenzwochen vor, fuer jede
-// andere Woche existiert diese Datei nicht, dann bleibt das Feld schlicht undefined
-// (H2H-Spalte zeigt "-").
+// H2H-Anreicherung (User-Vorgabe 2026-08-31, Rohdaten-Format seit 2026-09-06): laedt
+// <stem>_h2h_test.json (siehe tools/debug_build_h2h_hover_test_data.py) und mischt die rohen
+// Gegner-/Matchdaten in state.rows -- echte Ergebnisdaten liegen bislang nur fuer die live
+// gepushten Referenzwochen vor, fuer jede andere Woche existiert diese Datei nicht, dann bleibt
+// row._opponents schlicht undefined (H2H-Spalte zeigt "-"). Die eigentliche Nachbarauswahl
+// (5 naechste je Richtung, filterbewusst) passiert seit 2026-09-06 nicht mehr hier, sondern live
+// pro Render in computeH2hNeighbors().
+//
+// Dateiformat seit dem Groessen-Fix (2026-09-06, siehe Python-Docstring): kein flaches Array
+// mehr, sondern {"Turniere": [...], "Rows": [...]} -- "Turniere" ist eine einmalige Namensliste,
+// "Opponents" je Zeile referenziert sie nur per Index statt den vollen Turniernamen bei jedem
+// Match zu wiederholen ([[GegnerSpielerID, [[TurnierIndex, Sieg(1/0)], ...]], ...]). Wird hier
+// beim Laden zurueck in die vertraute {Turnier, Ergebnis}-Form dekodiert, damit
+// computeH2hNeighbors()/h2hEntryHtml() unveraendert bleiben koennen.
 async function mergeH2hData(week) {
   const stem = `${week.year}_KW${String(week.kw).padStart(2, "0")}`;
-  let enrichment;
+  let payload;
   try {
-    enrichment = await fetchJson(`data/kw/${stem}_h2h_test.json`);
+    payload = await fetchJson(`data/kw/${stem}_h2h_test.json`);
   } catch {
     return; // keine Testdaten fuer diese Woche -- kein Fehler, nur keine Anreicherung
   }
-  const byKey = new Map(enrichment.map(e => [`${e.SpielerID}|${e.DIS}`, e]));
+  const turniere = payload.Turniere || [];
+  const byKey = new Map(payload.Rows.map(e => [`${e.SpielerID}|${e.DIS}`, e]));
   for (const r of state.rows) {
     const e = byKey.get(`${r.SpielerID}|${r.DIS}`);
     if (e) {
-      r.H2H = e.H2H;
+      r._opponents = (e.Opponents && e.Opponents.length)
+        ? new Map(e.Opponents.map(([oppId, matches]) => [
+            oppId,
+            matches.map(([tIdx, sieg]) => ({ Turnier: turniere[tIdx], Ergebnis: sieg ? "Sieg" : "Niederlage" })),
+          ]))
+        : null;
     }
   }
 }
@@ -541,11 +640,11 @@ function escapeHtmlLocal(s) {
 // echten H2H-Matchdaten, nicht mehr starr die 5 Ranglistenplaetze -- eine leere Richtung kann
 // jetzt auch bei einem Spieler MITTEN in der Rangliste vorkommen (schlicht keine echten Gegner in
 // dieser Richtung), nicht nur an den Rand-Plaetzen. Die alte Rand-Meldung bleibt nur, wenn der
-// Spieler tatsaechlich an Rang 1 bzw. dem letzten Rang seiner DIS steht.
+// Spieler tatsaechlich an Rang 1 bzw. dem letzten Rang der AKTUELL GEFILTERTEN Menge steht (seit
+// 2026-09-06 ueber row._h2hAtTop/_h2hAtBottom aus computeH2hNeighbors() statt dem frueheren,
+// global berechneten state.maxRankByDis).
 function noNeighborText(row, richtung) {
-  const atEdge = richtung === "oben"
-    ? row.Ranglistenplatz === 1
-    : row.Ranglistenplatz === state.maxRankByDis.get(row.DIS);
+  const atEdge = richtung === "oben" ? row._h2hAtTop : row._h2hAtBottom;
   if (atEdge) return richtung === "oben" ? "keine (bereits Rang 1)" : "keine (bereits letzter Rang)";
   return "keine H2H-Vergleiche in dieser Richtung gefunden";
 }
@@ -590,6 +689,10 @@ function render() {
     requestAnimationFrame(() => {
       renderHead();
       const filtered = applyFilters(state.rows);
+      // Basis fuer den FRang-bewussten H2H-Vergleich (siehe computeH2hNeighbors()) -- bewusst aus
+      // `filtered` (nicht `sorted`), damit die Nachbarsuche unabhaengig von der aktuell gewaehlten
+      // UI-Sortierspalte immer die Ranglistenplatz-Reihenfolge der gefilterten Menge verwendet.
+      state.h2hIndex = buildH2hIndex(filtered);
       const sorted = sortRows(filtered);
       sorted.forEach((r, i) => { r.FRang = i + 1; });
       state.sortedRows = sorted;
@@ -609,14 +712,6 @@ async function loadWeek(week) {
   const rawRows = await fetchJson(week.ranking_file);
   state.rows = rawRows.filter(r => VALID_SPIELER_ID_RE.test(r.SpielerID || ""));
   renumberRanglistenplatz(state.rows);
-  // Fuer noNeighborText() (siehe showH2hTooltip()) -- hoechster Ranglistenplatz je DIS, um zu
-  // erkennen, ob ein Spieler wirklich am Rand steht (kein Nachbar existiert) oder ob es dort
-  // schlicht keine echten H2H-Gegner gibt (seit 2026-09-02 kann Letzteres ueberall vorkommen,
-  // nicht nur an Rang 1/letzter Rang).
-  state.maxRankByDis = new Map();
-  for (const r of state.rows) {
-    if ((state.maxRankByDis.get(r.DIS) || 0) < r.Ranglistenplatz) state.maxRankByDis.set(r.DIS, r.Ranglistenplatz);
-  }
   await mergeH2hData(week);
   populateFilterOptions(state.rows);
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;

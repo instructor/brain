@@ -260,11 +260,13 @@ async function init() {
 
   // OriginalRang: Rang desselben Spielers in der Original-Rangliste, zum Vergleich in Klammern
   // (Datenquelle: data/kw/<stem>_h2h_test.json -- fehlt sie fuer eine Woche, bleibt OriginalRang
-  // schlicht undefined, kein Fehler).
+  // schlicht undefined, kein Fehler). Dateiformat seit 2026-09-06 {"Turniere":[...],"Rows":[...]}
+  // statt einem flachen Array (siehe assets/rangliste.js mergeH2hData()) -- hier interessiert nur
+  // "Rows", "Turniere" wird auf dieser Seite nicht gebraucht.
   let originalRangByKey = new Map();
   try {
-    const enrichment = await fetchJson(`data/kw/${stem}_h2h_test.json`);
-    originalRangByKey = new Map(enrichment.map(e => [`${e.SpielerID}|${e.DIS}`, e.OriginalRang]));
+    const payload = await fetchJson(`data/kw/${stem}_h2h_test.json`);
+    originalRangByKey = new Map(payload.Rows.map(e => [`${e.SpielerID}|${e.DIS}`, e.OriginalRang]));
   } catch { /* keine Anreicherungsdaten fuer diese Woche */ }
 
   const myRanking = ranking.filter(r => String(r.SpielerID) === spielerId);
