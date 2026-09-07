@@ -39,6 +39,20 @@ const COLUMNS = [
 
 const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
 
+// URL-Parameter fuer vorbelegte Filter beim Aufruf, z.B. "?dis=DE&akl=U13,U15" oeffnet die Seite
+// direkt mit Disziplin=Dameneinzel und Altersklasse U13+U15 vorgewaehlt. Ohne URL-Parameter
+// (blanker Linkaufruf) greifen dieselben Vorgaben als Default.
+const DEFAULT_FILTERS = { dis: "DE", akl: ["U13", "U15"] };
+function parseUrlFilters() {
+  const params = new URLSearchParams(location.search);
+  const aklParam = (params.get("akl") || "").split(",").map(s => s.trim()).filter(Boolean);
+  return {
+    dis: params.get("dis") || DEFAULT_FILTERS.dis,
+    akl: aklParam.length ? aklParam : DEFAULT_FILTERS.akl,
+  };
+}
+const initialUrlFilters = parseUrlFilters();
+
 // Nur Spieler mit regulaerer DBV-SpielerID anzeigen (2 Ziffern + Bindestrich + weitere
 // Zeichen, z.B. "07-047769") -- das Format auslaendischer Teilnehmer ohne DBV-Mitgliedschaft
 // ("LAND-Name", z.B. "CZE-SoucekCyril") faellt bewusst durch, siehe CLAUDE.md "Rein
@@ -731,6 +745,8 @@ function hideH2hTooltip() {
   if (h2hTooltipEl) h2hTooltipEl.hidden = true;
 }
 
+let urlFiltersApplied = false;
+
 async function loadWeek(week) {
   document.getElementById("loading-indicator").style.display = "inline";
   state.currentWeek = week;
@@ -739,6 +755,13 @@ async function loadWeek(week) {
   renumberRanglistenplatz(state.rows);
   await mergeH2hData(week);
   populateFilterOptions(state.rows);
+  if (!urlFiltersApplied) {
+    urlFiltersApplied = true;
+    const disSelect = document.getElementById("f-dis");
+    if (initialUrlFilters.dis && [...disSelect.options].some(o => o.value === initialUrlFilters.dis)) {
+      disSelect.value = initialUrlFilters.dis;
+    }
+  }
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;
   document.getElementById("updated-at").textContent = `zuletzt aktualisiert: ${week.updated_at}`;
   render();
@@ -942,6 +965,7 @@ function setupBezirkWidget() {
 }
 
 function setupFilterListeners() {
+  for (const v of initialUrlFilters.akl) state.aklSelected.add(v);
   const ids = ["f-dis", "f-gs", "f-gruppe", "f-lv", "f-vorname", "f-nachname", "f-verein"];
   for (const id of ids) {
     const el = document.getElementById(id);
