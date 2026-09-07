@@ -45,8 +45,9 @@ const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
 // siehe applyInitialUrlFilters(). "akl"-Werte muessen den AKL2-Werten entsprechen (z.B. "U13",
 // nicht "U13-1"). Ohne URL-Parameter (blanker Linkaufruf) greifen dieselben Vorgaben als Default
 // (User-Vorgabe 2026-09-07) -- ein Aufruf ganz ohne "?..." soll die Seite genauso vorgefiltert
-// zeigen wie der explizite Link.
-const DEFAULT_FILTERS = { dis: "HE", akl: ["U19"] };
+// zeigen wie der explizite Link. Kein Default-Wert fuer "akl" (User-Vorgabe 2026-09-07): ohne
+// akl-Parameter bleibt die Altersklasse unbeschraenkt, es werden alle AKs gezeigt.
+const DEFAULT_FILTERS = { dis: "HE", akl: [] };
 function parseUrlFilters() {
   const params = new URLSearchParams(location.search);
   const aklParam = (params.get("akl") || "").split(",").map(s => s.trim()).filter(Boolean);
