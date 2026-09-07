@@ -43,11 +43,17 @@ const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
 // "?dis=DE&akl=U13,U15" oeffnet die Seite direkt mit Disziplin=Dameneinzel und Altersklasse
 // U13+U15 vorgewaehlt. Nur einmal beim allerersten Laden angewendet (nicht bei jedem
 // Wochenwechsel), siehe applyInitialUrlFilters(). "akl"-Werte muessen den AKL2-Werten
-// entsprechen (z.B. "U13", nicht "U13-1").
+// entsprechen (z.B. "U13", nicht "U13-1"). Ohne URL-Parameter (blanker Linkaufruf) greifen
+// dieselben Vorgaben als Default (User-Vorgabe 2026-09-07) -- ein Aufruf ganz ohne "?..." soll
+// die Seite genauso vorgefiltert zeigen wie der explizite Link.
+const DEFAULT_FILTERS = { dis: "DE", akl: ["U13", "U15"] };
 function parseUrlFilters() {
   const params = new URLSearchParams(location.search);
-  const akl = (params.get("akl") || "").split(",").map(s => s.trim()).filter(Boolean);
-  return { dis: params.get("dis") || "", akl };
+  const aklParam = (params.get("akl") || "").split(",").map(s => s.trim()).filter(Boolean);
+  return {
+    dis: params.get("dis") || DEFAULT_FILTERS.dis,
+    akl: aklParam.length ? aklParam : DEFAULT_FILTERS.akl,
+  };
 }
 const initialUrlFilters = parseUrlFilters();
 
