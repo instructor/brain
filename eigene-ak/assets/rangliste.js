@@ -39,6 +39,18 @@ const COLUMNS = [
 
 const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
 
+// URL-Parameter fuer vorbelegte Filter beim Aufruf (User-Vorgabe 2026-09-07), z.B.
+// "?dis=DE&akl=U13,U15" oeffnet die Seite direkt mit Disziplin=Dameneinzel und Altersklasse
+// U13+U15 vorgewaehlt. Nur einmal beim allerersten Laden angewendet (nicht bei jedem
+// Wochenwechsel), siehe applyInitialUrlFilters(). "akl"-Werte muessen den AKL2-Werten
+// entsprechen (z.B. "U13", nicht "U13-1").
+function parseUrlFilters() {
+  const params = new URLSearchParams(location.search);
+  const akl = (params.get("akl") || "").split(",").map(s => s.trim()).filter(Boolean);
+  return { dis: params.get("dis") || "", akl };
+}
+const initialUrlFilters = parseUrlFilters();
+
 // Nur Spieler mit regulaerer DBV-SpielerID anzeigen (2 Ziffern + Bindestrich + weitere
 // Zeichen, z.B. "07-047769") -- das Format auslaendischer Teilnehmer ohne DBV-Mitgliedschaft
 // ("LAND-Name", z.B. "CZE-SoucekCyril") faellt bewusst durch, siehe CLAUDE.md "Rein
@@ -731,6 +743,8 @@ function hideH2hTooltip() {
   if (h2hTooltipEl) h2hTooltipEl.hidden = true;
 }
 
+let urlFiltersApplied = false;
+
 async function loadWeek(week) {
   document.getElementById("loading-indicator").style.display = "inline";
   state.currentWeek = week;
@@ -739,6 +753,13 @@ async function loadWeek(week) {
   renumberRanglistenplatz(state.rows);
   await mergeH2hData(week);
   populateFilterOptions(state.rows);
+  if (!urlFiltersApplied) {
+    urlFiltersApplied = true;
+    const disSelect = document.getElementById("f-dis");
+    if (initialUrlFilters.dis && [...disSelect.options].some(o => o.value === initialUrlFilters.dis)) {
+      disSelect.value = initialUrlFilters.dis;
+    }
+  }
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;
   document.getElementById("updated-at").textContent = `zuletzt aktualisiert: ${week.updated_at}`;
   render();
@@ -942,6 +963,10 @@ function setupBezirkWidget() {
 }
 
 function setupFilterListeners() {
+  // Vorbelegung aus der URL, bevor das Widget seine Chips erstmalig rendert (renderChips()
+  // haengt nur an state.aklSelected, nicht an state.aklOptions -- funktioniert also bereits
+  // vor dem ersten Wochen-Laden).
+  for (const v of initialUrlFilters.akl) state.aklSelected.add(v);
   const ids = ["f-dis", "f-gs", "f-gruppe", "f-lv", "f-vorname", "f-nachname", "f-verein"];
   for (const id of ids) {
     const el = document.getElementById(id);
