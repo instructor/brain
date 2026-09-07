@@ -40,13 +40,13 @@ const COLUMNS = [
 const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
 
 // URL-Parameter fuer vorbelegte Filter beim Aufruf (User-Vorgabe 2026-09-07), z.B.
-// "?dis=DE&akl=U13,U15" oeffnet die Seite direkt mit Disziplin=Dameneinzel und Altersklasse
-// U13+U15 vorgewaehlt. Nur einmal beim allerersten Laden angewendet (nicht bei jedem
-// Wochenwechsel), siehe applyInitialUrlFilters(). "akl"-Werte muessen den AKL2-Werten
-// entsprechen (z.B. "U13", nicht "U13-1"). Ohne URL-Parameter (blanker Linkaufruf) greifen
-// dieselben Vorgaben als Default (User-Vorgabe 2026-09-07) -- ein Aufruf ganz ohne "?..." soll
-// die Seite genauso vorgefiltert zeigen wie der explizite Link.
-const DEFAULT_FILTERS = { dis: "DE", akl: ["U13", "U15"] };
+// "?dis=HE&akl=U19" oeffnet die Seite direkt mit Disziplin=Herreneinzel und Altersklasse U19
+// vorgewaehlt. Nur einmal beim allerersten Laden angewendet (nicht bei jedem Wochenwechsel),
+// siehe applyInitialUrlFilters(). "akl"-Werte muessen den AKL2-Werten entsprechen (z.B. "U13",
+// nicht "U13-1"). Ohne URL-Parameter (blanker Linkaufruf) greifen dieselben Vorgaben als Default
+// (User-Vorgabe 2026-09-07) -- ein Aufruf ganz ohne "?..." soll die Seite genauso vorgefiltert
+// zeigen wie der explizite Link.
+const DEFAULT_FILTERS = { dis: "HE", akl: ["U19"] };
 function parseUrlFilters() {
   const params = new URLSearchParams(location.search);
   const aklParam = (params.get("akl") || "").split(",").map(s => s.trim()).filter(Boolean);
