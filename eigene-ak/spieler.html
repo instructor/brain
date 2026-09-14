@@ -7,6 +7,18 @@
 <link rel="stylesheet" href="assets/rangliste.css">
 <link rel="stylesheet" href="assets/hoeherspiel.css">
 <link rel="stylesheet" href="assets/h2h.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ]
+    });">
+</script>
+
 </head>
 <body>
 <div class="page">
@@ -28,11 +40,29 @@
   <div class="legend hoeherspiel-legend">
     <h3>Legende: Bonus-Status</h3>
     <p class="hoeherspiel-formula">
-      <strong>Berechnung:</strong> a = eigene Punkte, b = Punkte der gespielten (höheren) Altersklasse,
-      n = Anzahl der Matches in dieser Konkurrenz bei diesem Turnier. Pro gewonnenem Match gegen einen
-      nativen und stärkeren Gegner (bzw. bei O19: gegen einen nachweislich erwachsenen Gegner) werden
-      (b − a) / n Punkte Bonus vergeben. Beispiel: werden 1 von 3 Spielen gewonnen und erfüllt dieser
-      Sieg die Bonus-Bedingung, werden (b − a) / 3 Punkte vergeben.
+      <strong>Berechnung:</strong> 
+	  <br>a = Punkte der eigenen AK für die erreichte Platzierung, 
+	  <br>b = Punkte der gespielten (höheren) Altersklasse,
+      <br>n = Anzahl der gespielten Matches in dieser Konkurrenz bei diesem Turnier. 
+	  <br>Pro gewonnenem Match gegen einen Gegner der höheren AK werden
+	  abhängig von der Spielstärke (=Ranglistenpunkte) des Gegners maximal
+      (b − a) / n Bonuspunkte vergeben:	  
+<br>
+  \[
+  \text{Bonuspunkte} = \min\left(1, \frac{\text{Gegnerpunkte}}{\text{eigene Punkte}}\right) \cdot \frac{(b - a)}{n}
+  \]
+<br>	  
+	  
+	  
+<!--	  <br>Bonuspunkte = min(1, Gegnerpunkte / eigene Punkte) * (b - a) / n Punkte
+-->
+	  Beispiel: werden 1 von 3 Spielen gewonnen und der Gegner der höheren AK
+	  hat in der Vorwoche des Turniers mehr Ranglistenpunkte als der betrachtete 
+	  Spieler, dann werden die maximalen (b-a) / n Bonuspunkte vergeben.
+	  Hat der Gegner weniger Ranglistenpunkte, z.B. 20000 Punkte,
+	  und der betrachtete Spieler 25000 Punkte, dann werden nur 80% der maximal
+	  möglichen Punkte vergeben. Rechnung:
+	  min(1, 20000 / 25000) * (b − a) / 3, also 0,8 * (b - a) / 3.
     </p>
     <dl>
       <dt><span class="badge badge-hoch">höhergespielt</span></dt>

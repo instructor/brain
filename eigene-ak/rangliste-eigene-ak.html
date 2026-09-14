@@ -12,10 +12,21 @@
   <h1>JWS U19 Rangliste &mdash; Variante &bdquo;eigene AK + Höherspielen-Bonus&ldquo;</h1>
 
   <p class="variant-note">
-	Jeder Spieler erhält bei Teilnahme in höherer AK die Punkte seiner eigenen Altersklasse
-	anstatt der Punkte der tatsächlich gespielten Altersklasse.
-	Zusätzlich gibt es einen &bdquo;Bonus&ldquo; für Siege gegen stärkere Gegner der höheren Altersklasse.
+	Jeder Spieler erhält bei Teilnahme in einer höheren AK die Punkte seiner eigenen Altersklasse 
+	statt der Punkte der tatsächlich gespielten Altersklasse. 
+	Zusätzlich gibt es einen &bdquo;Bonus&ldquo; 
+	für Siege gegen Gegner der höheren AK
 	&mdash; sichtbar in der Spieler-Detailansicht.
+	Die Bonushöhe ist von der relativen Stärke des Gegners 
+	abhängig: voller Bonus nur, wenn der Gegner mindestens gleich stark ist, 
+	ansonsten anteiliger Bonus mit Faktor min(1, Gegnerpunkte / eigene Punkte).
+	Der maximale Bonus ist durch die Differenz der Punkte der höheren AK und der eigenen AK
+	für die erzielte Platzierung begrenzt.
+	<br>Sonderfall 1: bei O19-Turnieren gibt es immer vollen Bonus bei einem Sieg 
+	gegen einen Gegner der höheren AK (O19), da die relative Spielstärke bei O19 Spielern
+	nicht bekannt ist.
+	<br>Sonderfall 2: Für Turniere mit BWF/BEC-Grading werden die vollen Punkte der 
+	gespielten AK vergeben, da i.d.R. keine Matchdaten vorliegen.
 	<br>(*) Spalten &bdquo;Rang&ldquo; und &bdquo;Punkte&ldquo; zeigen in Klammern den Rang 
 	desselben Spielers in der Original-Rangliste; 
 	<br>(*) Spalten &bdquo;H2H&ldquo; und &bdquo;H2H in%&ldquo; zeigen beim Überfahren die
