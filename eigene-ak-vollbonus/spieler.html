@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spielerdetails - BRAIN Rangliste (eigene AK + Höherspielen-Vollbonus)</title>
+<link rel="stylesheet" href="assets/rangliste.css">
+<link rel="stylesheet" href="assets/hoeherspiel.css">
+<link rel="stylesheet" href="assets/h2h.css">
+</head>
+<body>
+<div class="page">
+  <a class="back-link" href="rangliste-eigene-ak-vollbonus.html">&larr; zurück zur Rangliste (eigene AK + Höherspielen-Vollbonus)</a>
+  <span id="loading-indicator" class="loading-indicator">wird geladen …</span>
+
+  <div class="player-header">
+    <h1 id="player-name">Rangliste von ...</h1>
+    <span class="spieler-id" id="player-id"></span>
+  </div>
+
+  <table class="summary-table" id="summary-table">
+    <thead><tr><th>Disziplin</th><th>Rang (Original-RL zum Vergleich)</th><th>Punkte</th></tr></thead>
+    <tbody id="summary-body"></tbody>
+  </table>
+
+  <div id="dis-blocks"></div>
+
+  <div class="legend hoeherspiel-legend">
+    <h3>Legende: Bonus-Status</h3>
+    <p class="hoeherspiel-formula">
+      <strong>Berechnung (Vollbonus-Variante):</strong>
+	  <br>a = Punkte der eigenen AK für die erreichte Platzierung,
+	  <br>b = Punkte der gespielten (höheren) Altersklasse,
+      <br>n = Anzahl der gespielten Matches in dieser Konkurrenz bei diesem Turnier.
+	  <br>Pro gewonnenem Match gegen einen Gegner der höheren AK werden immer
+      (b − a) / n Bonuspunkte vergeben — <strong>unabhängig von der relativen Stärke
+      des Gegners</strong> (anders als in der Hauptvariante „eigene AK + Höherspielen-Bonus“,
+      die den Bonus je nach Gegnerstärke anteilig kürzt).
+	  Beispiel: werden 1 von 3 Spielen gewonnen und dieser Sieg erfüllt die Bonus-Bedingung
+	  (Gegner gehört der höheren AK an), werden die vollen (b-a) / 3 Punkte vergeben.
+    </p>
+    <dl>
+      <dt><span class="badge badge-hoch">höhergespielt</span></dt>
+      <dd>Turnier in einer Konkurrenz-Altersklasse, die höher liegt als die eigene Spieler-Altersklasse (O19 zählt dabei immer als „höher“ als jede Jugend-AK, auch mehrstufiges Hochspielen z. B. U13→U17 ist u.U. möglich).</dd>
+      <dt><span class="badge badge-bonus">Bonus +X</span></dt>
+      <dd>Mindestens ein Sieg dieses Turniers war gegen einen Gegner aus der höheren AK — es wurde der volle Bonus vergeben.</dd>
+      <dt><span class="badge badge-nobonus">kein Bonus</span></dt>
+      <dd>Hochgespielt, aber kein einziger Sieg erfüllte die Bonus-Bedingung (z. B. nur Niederlagen, oder Gegner nicht aus der höheren AK) — Bonus = 0.</dd>
+      <dt><span class="badge badge-gap">BWF/BEC-Punkte</span></dt>
+      <dd>Bei internationalen BWF/BEC-Turnieren werden die Punkte der gespielten AK vergeben.</dd>
+      <dt><span class="badge badge-o19">O19 RLT/Mst</span></dt>
+      <dd>Ranglistenturnier/Meisterschaft der Aktiven (O19). Bonus wird bei Sieg über O19-Spieler vergeben, unabhängig von der Spielstärke des O19-Spielers (da diese nicht bekannt ist auf Basis der U19-Rangliste).</dd>
+      <dt><span class="badge badge-gap">Datenlücke</span></dt>
+      <dd>Systemfehler, deshalb zunächst Bonus = 0 und bitte Rückmeldung an Systemverwaltung.</dd>
+    </dl>
+  </div>
+</div>
+
+<script src="assets/spieler.js"></script>
+</body>
+</html>

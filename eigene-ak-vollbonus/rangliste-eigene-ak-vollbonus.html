@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JWS U19 Rangliste (eigene AK + Höherspielen-Vollbonus)</title>
+<link rel="stylesheet" href="assets/rangliste.css">
+<link rel="stylesheet" href="assets/h2h.css">
+</head>
+<body>
+<div class="page">
+  <h1>JWS U19 Rangliste &mdash; Variante &bdquo;eigene AK + Höherspielen-Vollbonus&ldquo;</h1>
+
+  <p class="variant-note">
+	<strong>Explorative Vergleichsvariante</strong> (nicht Teil der regulären Rangliste-Auswahl):
+	fast identisch zur Variante &bdquo;eigene AK + Höherspielen-Bonus&ldquo;, mit einem Unterschied
+	&mdash; der Bonus wird bei jedem Sieg gegen einen Gegner der höheren AK immer in voller Höhe
+	vergeben, unabhängig von dessen relativer Stärke (kein Faktor min(1, Gegnerpunkte/eigene
+	Punkte)). Jeder Spieler erhält bei Teilnahme in einer höheren AK weiterhin die Punkte seiner
+	eigenen Altersklasse statt der Punkte der tatsächlich gespielten Altersklasse, zuzüglich dieses
+	vollen Bonus &mdash; sichtbar in der Spieler-Detailansicht.
+	<br>Sonderfall 1: bei O19-Turnieren gibt es immer vollen Bonus bei einem Sieg
+	gegen einen Gegner der höheren AK (O19), da die relative Spielstärke bei O19 Spielern
+	nicht bekannt ist.
+	<br>Sonderfall 2: Für Turniere mit BWF/BEC-Grading werden die vollen Punkte der
+	gespielten AK vergeben, da i.d.R. keine Matchdaten vorliegen.
+	<br>(*) Spalten &bdquo;Rang&ldquo; und &bdquo;Punkte&ldquo; zeigen in Klammern den Rang
+	desselben Spielers in der Original-Rangliste; 
+	<br>(*) Spalten &bdquo;H2H&ldquo; und &bdquo;H2H in%&ldquo; zeigen beim Überfahren die
+	5 nächsten Ranglisten-Nachbarn oberhalb/unterhalb mit echten Kopf-an-Kopf-Ergebnissen (grün =
+	Rangfolge bestätigt, rot = widerspricht der Rangfolge).
+    <br>Zur <a href="../rangliste.html">&rarr; Original-Rangliste</a>
+    <br>Anregungen und Rückmeldungen bitte an edi.klein@badminton.de.
+  </p>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-current" data-tab="current">Rangliste</div>
+    <div class="tab" id="tab-history" data-tab="history">Vergangene Ranglisten</div>
+  </div>
+
+  <div id="history-picker" style="display:none; margin-bottom:14px;">
+    <label for="week-select" style="font-size:0.85rem; color:#666;">Kalenderwoche wählen:</label>
+    <select id="week-select"></select>
+  </div>
+
+  <div class="filters">
+    <div>
+      <label for="f-dis">Disziplin</label>
+      <select id="f-dis"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-gs">Geschlecht</label>
+      <select id="f-gs"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-akl-input">Altersklasse</label>
+      <div class="ms" id="f-akl-ms">
+        <div class="ms-control" id="f-akl-control">
+          <span class="ms-chips" id="f-akl-chips"></span>
+          <input type="text" id="f-akl-input" class="ms-input" autocomplete="off" placeholder="-- alle --">
+          <button type="button" class="ms-clear" id="f-akl-clearall" title="Auswahl löschen" hidden>&times;</button>
+        </div>
+        <ul class="ms-options" id="f-akl-options" role="listbox" hidden></ul>
+      </div>
+    </div>
+    <div>
+      <label for="f-gruppe">Gruppe</label>
+      <select id="f-gruppe"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-lv">Landesverband</label>
+      <select id="f-lv"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-bezirk-input">Bezirk</label>
+      <div class="ms" id="f-bezirk-ms">
+        <div class="ms-control" id="f-bezirk-control">
+          <span class="ms-chips" id="f-bezirk-chips"></span>
+          <input type="text" id="f-bezirk-input" class="ms-input" autocomplete="off" placeholder="-- alle --">
+          <button type="button" class="ms-clear" id="f-bezirk-clearall" title="Auswahl löschen" hidden>&times;</button>
+        </div>
+        <ul class="ms-options" id="f-bezirk-options" role="listbox" hidden></ul>
+      </div>
+    </div>
+    <div>
+      <label for="f-vorname">Vorname</label>
+      <input type="text" id="f-vorname" placeholder="">
+    </div>
+    <div>
+      <label for="f-nachname">Nachname</label>
+      <input type="text" id="f-nachname" placeholder="">
+    </div>
+    <div>
+      <label for="f-verein">Verein</label>
+      <input type="text" id="f-verein" placeholder="">
+    </div>
+  </div>
+
+  <div class="filters-actions">
+    <button id="btn-search" type="button" class="search-btn">&#128269; Suche</button>
+  </div>
+
+  <div class="meta-row">
+    <div>
+      <em>Hinweis: Klick auf Spieler zeigt gespielte Turniere</em>
+      &nbsp;|&nbsp;
+      <button id="reset-filters" type="button">Filter zurücksetzen</button>
+      <span id="loading-indicator" class="loading-indicator" style="display:none;">wird geladen …</span>
+    </div>
+    <div id="updated-at"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="ranking-table">
+      <thead><tr id="table-head"></tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+  <div id="load-more-row" class="load-more-row" style="display:none;">
+    <button id="btn-load-more" type="button">Mehr laden</button>
+    <span id="load-more-info"></span>
+  </div>
+  <p class="row-count" id="row-count"></p>
+</div>
+
+<script src="assets/rangliste.js"></script>
+</body>
+</html>
