@@ -367,6 +367,27 @@ async function init() {
   document.getElementById("loading-indicator").style.display = "none";
 }
 
+// "Zurück zur Rangliste"-Link: ein normaler <a>-Klick loest eine frische Navigation aus, die
+// rangliste.js mit den Default-Filtern (HE) neu initialisiert -- rangliste.js speichert die
+// eingestellten Filter naemlich nicht in der URL/sessionStorage, nur im In-Memory-Zustand der
+// Seite. Der Browser-eigene Zurueck-Button erhaelt diesen Zustand dagegen ueber den bfcache
+// (User-Beobachtung 2026-09-14: "gewuenschtes Verhalten"). Fix: bei vorhandenem History-Eintrag
+// echtes history.back() ausloesen statt der href-Navigation, damit der Link sich identisch zum
+// Browser-Zurueck-Button verhaelt. href bleibt als Fallback (kein JS, Rechtsklick/"in neuem Tab
+// oeffnen", oder Direktaufruf dieser Seite ohne Vorgeschichte -- history.length<=1). Analog zum
+// selben Fix in assets/spieler.js/u13-u15-1-9/assets/spieler.js/eigene-ak-ohne-bonus/assets/
+// spieler.js -- eigene-ak fuehrt eine eigene spieler.js-Kopie (reichhaltigere Bonus-Panels), daher
+// hier separat.
+const backLink = document.querySelector(".back-link");
+if (backLink) {
+  backLink.addEventListener("click", (ev) => {
+    if (window.history.length > 1) {
+      ev.preventDefault();
+      window.history.back();
+    }
+  });
+}
+
 init().catch(err => {
   console.error("Fehler beim Laden der Spielerdetails:", err);
   const loadingEl = document.getElementById("loading-indicator");
