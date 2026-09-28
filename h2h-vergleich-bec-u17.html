@@ -107,7 +107,7 @@
     overflow:hidden;
   }
   .grid-head{
-    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(5, minmax(120px,1fr));
+    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(var(--ncol,5), minmax(110px,1fr));
     border-bottom:1px solid var(--grid); background:var(--surface-alt);
   }
   .grid-head > div{
@@ -120,7 +120,7 @@
     border-bottom:1px solid var(--grid); border-top:1px solid var(--grid);
   }
   .kon-row{
-    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(5, minmax(120px,1fr));
+    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(var(--ncol,5), minmax(110px,1fr));
     border-bottom:1px solid var(--grid);
   }
   .kon-row:last-child{ border-bottom:0; }
@@ -212,9 +212,9 @@
   }
 
   @media (max-width: 620px){
-    .grid-head, .kon-row{ grid-template-columns: minmax(90px,1fr) repeat(5, minmax(90px,1fr)); }
+    .grid-head, .kon-row{ grid-template-columns: minmax(90px,1fr) repeat(var(--ncol,5), minmax(90px,1fr)); }
     .grid{ overflow-x:auto; }
-    .grid-head, .kon-row{ min-width:760px; }
+    .grid-head, .kon-row{ min-width:calc(90px + var(--ncol,5) * 90px); }
   }
 </style>
 
@@ -324,7 +324,7 @@
         </div>
   </div>
 
-  <div class="grid">
+  <div class="grid" style="--ncol:3">
     <div class="grid-head">
       <div>Konkurrenz</div>
       <div>Original</div><div>bec-u17-gestuft</div><div>bec-u17-gestuft-light</div>
