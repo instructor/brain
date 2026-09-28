@@ -199,6 +199,9 @@
   }
   table.detail tbody tr:last-child td{ border-bottom:0; }
 
+  h2.section{ font-size:1rem; font-weight:600; margin:1.75rem 0 .35rem; color:var(--ink); }
+  p.section-note{ font-size:.82rem; color:var(--ink-2); line-height:1.55; margin:0 0 .75rem; max-width:62rem; }
+
   footer.page{
     margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid var(--border);
     font-size:.78rem; color:var(--ink-3); line-height:1.6;
@@ -257,21 +260,66 @@
       n = Anzahl der bewerteten H2H-Paare innerhalb dieses Kreises.</span>
   </div>
 
+  <h2 class="section">Nur betroffene Paare</h2>
+  <p class="section-note">Nur H2H-Paare, in denen mindestens ein Spieler vorkommt, dessen Punkte sich
+    in einer BEC-U17-Variante gegenüber dem Original ändern. Alle anderen Paare stehen in allen Varianten
+    in derselben Reihenfolge und können keinen Unterschied machen. Gepoolt über alle Konkurrenzen
+    (Summe richtig eingeordneter Paare / Summe aller Paare).
+    <br><span data-txt="n=2869 Paare, davon richtig eingeordnet: Original: 2357, bec-u17-gestuft: 2360, bec-u17-gestuft-light: 2369" data-ttxt="n=19212 Paare, davon richtig eingeordnet: Original: 17811, bec-u17-gestuft: 17838, bec-u17-gestuft-light: 17843">n=2869 Paare, davon richtig eingeordnet: Original: 2357, bec-u17-gestuft: 2360, bec-u17-gestuft-light: 2369</span></p>
+  <div class="tiles">
+        <div class="tile" data-u="82.1541" data-w="82.4933" data-tu="92.7077" data-tw="92.5061">
+          <div class="name">Original</div>
+          <div class="val">82,15&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="82.2586" data-w="82.7915" data-tu="92.8482" data-tw="92.6787">
+          <div class="name">bec-u17-gestuft</div>
+          <div class="val">82,26&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="82.5723" data-w="83.0599" data-tu="92.8742" data-tw="92.7041">
+          <div class="name">bec-u17-gestuft-light</div>
+          <div class="val">82,57&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div></div>
+
+  <h2 class="section">Nur Konkurrenzen mit geänderter Rangliste (13 von 30)</h2>
+  <p class="section-note">Mittelwert der Konkordanzraten nur über die Konkurrenzen, deren Rangliste
+    sich in mindestens einer Variante überhaupt ändert (Plätze 1 bis Schnitt wie oben). Die übrigen
+    Konkurrenzen sind in allen Varianten identisch.</p>
+  <div class="tiles">
+        <div class="tile" data-u="76.7308" data-w="77.5615" data-tu="85.6769" data-tw="85.5538">
+          <div class="name">Original</div>
+          <div class="val">76,73&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="76.7615" data-w="77.6000" data-tu="85.7000" data-tw="85.5615">
+          <div class="name">bec-u17-gestuft</div>
+          <div class="val">76,76&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="76.7923" data-w="77.6308" data-tu="85.7000" data-tw="85.5846">
+          <div class="name">bec-u17-gestuft-light</div>
+          <div class="val">76,79&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div></div>
+
+  <h2 class="section">Alle 30 Konkurrenzen</h2>
   <div class="tiles">
     
         <div class="tile" data-u="79.0667" data-w="79.7167" data-tu="86.1267" data-tw="85.9333">
           <div class="name">Original</div>
-          <div class="val">79,1&nbsp;%</div>
+          <div class="val">79,07&nbsp;%</div>
           <span class="badge" style="display:none">&#9679; beste Variante</span>
         </div>
         <div class="tile" data-u="79.0800" data-w="79.7333" data-tu="86.1367" data-tw="85.9367">
           <div class="name">bec-u17-gestuft</div>
-          <div class="val">79,1&nbsp;%</div>
+          <div class="val">79,08&nbsp;%</div>
           <span class="badge" style="display:none">&#9679; beste Variante</span>
         </div>
         <div class="tile leader" data-u="79.0933" data-w="79.7467" data-tu="86.1367" data-tw="85.9467">
           <div class="name">bec-u17-gestuft-light</div>
-          <div class="val">79,1&nbsp;%</div>
+          <div class="val">79,09&nbsp;%</div>
           <span class="badge" style="display:inline-flex">&#9679; beste Variante</span>
         </div>
   </div>
@@ -1035,20 +1083,27 @@
       const v = parseFloat(t.dataset[k]);
       t.querySelector('.val').textContent = v.toFixed(2).replace('.', ',') + '\u00a0%';
     });
-    let bestTileV = -1, bestTile = null;
-    document.querySelectorAll('.tile').forEach(t => {
-      const v = parseFloat(t.dataset[k]);
-      if (v > bestTileV) { bestTileV = v; bestTile = t; }
-    });
-    document.querySelectorAll('.tile').forEach(t => {
-      t.classList.toggle('leader', t === bestTile);
-      const badge = t.querySelector('.badge');
-      if (badge) badge.style.display = (t === bestTile) ? 'inline-flex' : 'none';
+    // "beste Variante" je Kachelgruppe (.tiles), nicht global -- seit 2026-09-28 gibt es mehrere
+    document.querySelectorAll('.tiles').forEach(group => {
+      let bestTileV = -1, bestTile = null;
+      group.querySelectorAll('.tile').forEach(t => {
+        const v = parseFloat(t.dataset[k]);
+        if (v > bestTileV) { bestTileV = v; bestTile = t; }
+      });
+      group.querySelectorAll('.tile').forEach(t => {
+        t.classList.toggle('leader', t === bestTile);
+        const badge = t.querySelector('.badge');
+        if (badge) badge.style.display = (t === bestTile) ? 'inline-flex' : 'none';
+      });
     });
     document.querySelectorAll('[data-n]').forEach(el => {
       el.textContent = 'n=' + (state.gt === 'transitive' ? el.dataset.tn : el.dataset.n);
     });
+    document.querySelectorAll('[data-txt]').forEach(el => {
+      el.textContent = state.gt === 'transitive' ? el.dataset.ttxt : el.dataset.txt;
+    });
   }
+  apply();
   document.querySelectorAll('.toggle').forEach(tg => tg.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
