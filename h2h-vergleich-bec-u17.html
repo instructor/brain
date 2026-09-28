@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H2H-Konkordanzvergleich BEC-U17-Varianten KW35/2026</title>
+
+<style>
+  :root{
+    color-scheme: light;
+    --page-bg:      #f9f9f7;
+    --surface:      #fcfcfb;
+    --surface-alt:  #f1f0eb;
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --ink-3:        #898781;
+    --grid:         #e1e0d9;
+    --border:       rgba(11,11,11,0.10);
+    --bar:          #2a78d6;
+    --bar-track:    #dbe8fa;
+    --good:         #0ca30c;
+    --good-bg:      #e9f7e9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --page-bg:      #0d0d0d;
+      --surface:      #1a1a19;
+      --surface-alt:  #232322;
+      --ink:          #ffffff;
+      --ink-2:        #c3c2b7;
+      --ink-3:        #898781;
+      --grid:         #2c2c2a;
+      --border:       rgba(255,255,255,0.10);
+      --bar:          #3987e5;
+      --bar-track:    #1f2c3d;
+      --good:         #0ca30c;
+      --good-bg:      #10240f;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page-bg:      #0d0d0d;
+    --surface:      #1a1a19;
+    --surface-alt:  #232322;
+    --ink:          #ffffff;
+    --ink-2:        #c3c2b7;
+    --ink-3:        #898781;
+    --grid:         #2c2c2a;
+    --border:       rgba(255,255,255,0.10);
+    --bar:          #3987e5;
+    --bar-track:    #1f2c3d;
+    --good:         #0ca30c;
+    --good-bg:      #10240f;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--page-bg); color:var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap{ max-width:1080px; margin:0 auto; padding:2.5rem 1.25rem 4rem; }
+
+  header.page{ margin-bottom:1.75rem; }
+  .eyebrow{
+    font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-3); font-weight:600; margin:0 0 .4rem;
+  }
+  h1{ font-size:1.6rem; margin:0 0 .3rem; letter-spacing:-.01em; }
+  .subtitle{ color:var(--ink-2); font-size:.9rem; margin:0; line-height:1.5; }
+
+  .toggle-row{
+    display:flex; align-items:center; gap:.75rem; margin:1.5rem 0 1.75rem;
+    flex-wrap:wrap;
+  }
+  .toggle{
+    display:inline-flex; border:1px solid var(--border); border-radius:8px;
+    overflow:hidden; background:var(--surface);
+  }
+  .toggle button{
+    appearance:none; border:0; background:transparent; color:var(--ink-2);
+    font:inherit; font-size:.82rem; font-weight:600; padding:.5rem .9rem;
+    cursor:pointer;
+  }
+  .toggle button.active{ background:var(--bar); color:#fff; }
+  .toggle-hint{ font-size:.78rem; color:var(--ink-3); }
+
+  .tiles{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:.6rem; margin-bottom:2.25rem;
+  }
+  .tile{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:.85rem .95rem;
+  }
+  .tile.leader{ border-color:var(--good); }
+  .tile .name{ font-size:.78rem; color:var(--ink-2); font-weight:600; margin-bottom:.3rem; }
+  .tile .val{ font-size:1.5rem; font-weight:700; letter-spacing:-.01em; }
+  .tile .badge{
+    display:inline-flex; align-items:center; gap:.25rem; margin-top:.35rem;
+    font-size:.72rem; font-weight:600; color:var(--good);
+    background:var(--good-bg); border-radius:5px; padding:.1rem .4rem;
+  }
+
+  .grid{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden;
+  }
+  .grid-head{
+    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(5, minmax(120px,1fr));
+    border-bottom:1px solid var(--grid); background:var(--surface-alt);
+  }
+  .grid-head > div{
+    padding:.6rem .7rem; font-size:.72rem; font-weight:700; color:var(--ink-2);
+    text-transform:uppercase; letter-spacing:.03em;
+  }
+  .ak-row{
+    padding:.4rem .7rem; font-size:.72rem; font-weight:700; letter-spacing:.06em;
+    color:var(--ink-3); background:var(--surface-alt); text-transform:uppercase;
+    border-bottom:1px solid var(--grid); border-top:1px solid var(--grid);
+  }
+  .kon-row{
+    display:grid; grid-template-columns: minmax(120px,1.3fr) repeat(5, minmax(120px,1fr));
+    border-bottom:1px solid var(--grid);
+  }
+  .kon-row:last-child{ border-bottom:0; }
+  .kon-label{
+    padding:.55rem .7rem; font-size:.84rem; font-weight:600; display:flex;
+    align-items:baseline; gap:.4rem; flex-wrap:wrap; row-gap:.3rem;
+  }
+  .kon-label .kon-name{ white-space:nowrap; }
+  .kon-label .n{ font-size:.72rem; font-weight:500; color:var(--ink-3); white-space:nowrap; }
+  .kon-label .ceiling{
+    font-size:.68rem; font-weight:600; color:var(--ink-3);
+    background:var(--surface-alt); border-radius:5px; padding:.05rem .35rem;
+    cursor:help; white-space:nowrap;
+  }
+  .kon-label .ceiling.low{ color:var(--bar); background:var(--bar-track); }
+  .kon-label .hochspielen{
+    font-size:.68rem; font-weight:600; color:#a3540c;
+    background:#fbe9d6; border-radius:5px; padding:.05rem .35rem;
+    cursor:help; white-space:nowrap;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .kon-label .hochspielen{ color:#f0a860; background:#3a2712; }
+  }
+  :root[data-theme="dark"] .kon-label .hochspielen{ color:#f0a860; background:#3a2712; }
+
+  .hoch-summary{
+    display:flex; align-items:baseline; gap:.6rem; margin:0 0 1.5rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:.75rem .95rem;
+  }
+  .hoch-summary .val{ font-size:1.3rem; font-weight:700; color:#a3540c; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .hoch-summary .val{ color:#f0a860; }
+  }
+  :root[data-theme="dark"] .hoch-summary .val{ color:#f0a860; }
+  .hoch-summary .label{ font-size:.82rem; color:var(--ink-2); line-height:1.5; }
+  .cell{
+    padding:.55rem .7rem; display:flex; align-items:center; gap:.5rem;
+    border-left:1px solid var(--grid);
+  }
+  .cell .track{
+    flex:1; height:10px; border-radius:5px; background:var(--bar-track);
+    overflow:hidden; position:relative;
+  }
+  .cell .fill{
+    height:100%; border-radius:0 5px 5px 0; background:var(--bar);
+  }
+  .cell .value{
+    font-size:.8rem; color:var(--ink-2); min-width:2.6rem; text-align:right;
+    font-variant-numeric: tabular-nums;
+  }
+  .cell.winner .value{ color:var(--ink); font-weight:700; }
+  .cell.winner .fill{ background: var(--good); }
+  .cell .mark{
+    color:var(--good); font-size:.85rem; line-height:1; visibility:hidden;
+  }
+  .cell.winner .mark{ visibility:visible; }
+
+  table.detail{
+    width:100%; border-collapse:collapse; margin-top:2.25rem; font-size:.78rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    overflow:hidden;
+  }
+  table.detail caption{
+    text-align:left; padding:.75rem .9rem; font-size:.82rem; font-weight:700;
+    color:var(--ink-2); background:var(--surface-alt); border-bottom:1px solid var(--grid);
+  }
+  table.detail th, table.detail td{
+    padding:.4rem .6rem; text-align:right; border-bottom:1px solid var(--grid);
+    font-variant-numeric: tabular-nums;
+  }
+  table.detail th:first-child, table.detail td:first-child{ text-align:left; }
+  table.detail thead th{
+    color:var(--ink-3); font-size:.68rem; text-transform:uppercase; letter-spacing:.03em;
+    font-weight:700; background:var(--surface-alt);
+  }
+  table.detail tbody tr:last-child td{ border-bottom:0; }
+
+  footer.page{
+    margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid var(--border);
+    font-size:.78rem; color:var(--ink-3); line-height:1.6;
+  }
+  footer.page code{
+    background:var(--surface-alt); padding:.05rem .3rem; border-radius:4px;
+    font-size:.85em;
+  }
+
+  @media (max-width: 620px){
+    .grid-head, .kon-row{ grid-template-columns: minmax(90px,1fr) repeat(5, minmax(90px,1fr)); }
+    .grid{ overflow-x:auto; }
+    .grid-head, .kon-row{ min-width:760px; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <p class="eyebrow"><a href="bec-u17-gestuft/rangliste-bec-u17-gestuft.html" style="color:inherit;">&larr; zurück zur Rangliste</a> &middot; Guete-Vergleich der RL-Varianten</p>
+    <h1>H2H-Konkordanzvergleich BEC-U17-Varianten</h1>
+    <p class="subtitle">
+      KW35/2026 &middot; 30 Konkurrenzen (JE/ME/JD/MD/XD &times; U09&ndash;U19) &middot;
+      "Wie gut bildet eine Rangliste die Realität ab?" &middot; Ein Teil der Antwort liefert die
+      "Konkordanzrate" je Variante gegen die "H2H-Ground-Truth", das sind reale Matchergebnisse der
+      letzten 12 Monate &middot; Erläuterung der Begriffe am Seitenende.
+    </p>
+  </header>
+
+  <div class="toggle-row">
+    <div class="toggle">
+      <button data-mode="unweighted" class="active">Ungewichtet (je Paar)</button>
+      <button data-mode="weighted">Marge-gewichtet</button>
+    </div>
+    <div class="toggle">
+      <button data-gt="direct" class="active">Direkte H2H</button>
+      <button data-gt="transitive">Transitive H2H</button>
+    </div>
+    <span class="toggle-hint">Marge-gewichtet: ein 5:0-Ergebnis zaehlt mehr als ein knappes 3:2.</span>
+  </div>
+
+  <div class="hoch-summary">
+    <span class="val">34,6&nbsp;%</span>
+    <span class="label">aller Spieler haben mindestens 1x in einer höheren Altersklasse
+      derselben Disziplin gespielt
+      (6684&nbsp;von&nbsp;19297&nbsp;Spielern).
+      Je Konkurrenz siehe die "Hochspielen"-Badge unten bzw. die Detailtabelle.</span>
+  </div>
+  <div class="hoch-summary">
+    <span class="val">1&ndash;315</span>
+    <span class="label">Nur Ranglistenplätze 1 bis 315 je Konkurrenz-Teilliste werden verglichen.
+      315 ist der tiefste Platz, auf dem sich irgendeine Variante von der Originalrangliste
+      unterscheidet (Maximum über alle Disziplinen, Altersklassen und Varianten). Darunter sind alle
+      Ranglisten identisch; der verglichene Spielerkreis ist daher für alle Varianten derselbe.
+      n = Anzahl der bewerteten H2H-Paare innerhalb dieses Kreises.</span>
+  </div>
+
+  <div class="tiles">
+    
+        <div class="tile" data-u="79.0667" data-w="79.7167" data-tu="86.1267" data-tw="85.9333">
+          <div class="name">Original</div>
+          <div class="val">79,1&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile" data-u="79.0800" data-w="79.7333" data-tu="86.1367" data-tw="85.9367">
+          <div class="name">bec-u17-gestuft</div>
+          <div class="val">79,1&nbsp;%</div>
+          <span class="badge" style="display:none">&#9679; beste Variante</span>
+        </div>
+        <div class="tile leader" data-u="79.0933" data-w="79.7467" data-tu="86.1367" data-tw="85.9467">
+          <div class="name">bec-u17-gestuft-light</div>
+          <div class="val">79,1&nbsp;%</div>
+          <span class="badge" style="display:inline-flex">&#9679; beste Variante</span>
+        </div>
+  </div>
+
+  <div class="grid">
+    <div class="grid-head">
+      <div>Konkurrenz</div>
+      <div>Original</div><div>bec-u17-gestuft</div><div>bec-u17-gestuft-light</div>
+    </div>
+    <div class="ak-row">Altersklasse U09</div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JE U09</span> <span class="n" data-n="211" data-tn="422">n=211</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;99,1&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 191 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U09 entspricht, haben 115 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;60,2&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="80.6000" data-w="83.0000" data-tu="84.4000" data-tw="85.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.6%"></div></div>
+            <span class="value">80,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.6000" data-w="83.0000" data-tu="84.4000" data-tw="85.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.6%"></div></div>
+            <span class="value">80,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="80.6000" data-w="83.0000" data-tu="84.4000" data-tw="85.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:80.6%"></div></div>
+            <span class="value">80,6&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">ME U09</span> <span class="n" data-n="98" data-tn="190">n=98</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 81 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U09 entspricht, haben 49 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;60,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="84.7000" data-w="87.0000" data-tu="86.8000" data-tw="87.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:84.7%"></div></div>
+            <span class="value">84,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="84.7000" data-w="87.0000" data-tu="86.8000" data-tw="87.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:84.7%"></div></div>
+            <span class="value">84,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="84.7000" data-w="87.0000" data-tu="86.8000" data-tw="87.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:84.7%"></div></div>
+            <span class="value">84,7&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JD U09</span> <span class="n" data-n="43" data-tn="105">n=43</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;80,0&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 30 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U09 entspricht, haben 24 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;80,0&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="81.4000" data-w="77.1000" data-tu="82.9000" data-tw="80.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.4%"></div></div>
+            <span class="value">81,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.4000" data-w="77.1000" data-tu="82.9000" data-tw="80.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.4%"></div></div>
+            <span class="value">81,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.4000" data-w="77.1000" data-tu="82.9000" data-tw="80.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.4%"></div></div>
+            <span class="value">81,4&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">MD U09</span> <span class="n" data-n="48" data-tn="79">n=48</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 26 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U09 entspricht, haben 13 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;50,0&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="83.3000" data-w="79.7000" data-tu="84.8000" data-tw="82.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:83.3%"></div></div>
+            <span class="value">83,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="83.3000" data-w="79.7000" data-tu="84.8000" data-tw="82.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:83.3%"></div></div>
+            <span class="value">83,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="83.3000" data-w="79.7000" data-tu="84.8000" data-tw="82.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:83.3%"></div></div>
+            <span class="value">83,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">XD U09</span> <span class="n" data-n="5" data-tn="10">n=5</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;100,0&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 6 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U09 entspricht, haben 5 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;83,3&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="100.0000" data-w="100.0000" data-tu="100.0000" data-tw="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="100.0000" data-w="100.0000" data-tu="100.0000" data-tw="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="100.0000" data-w="100.0000" data-tu="100.0000" data-tw="100.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:100.0%"></div></div>
+            <span class="value">100,0&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U11</div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JE U11</span> <span class="n" data-n="1397" data-tn="5689">n=1397</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,9&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 912 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U11 entspricht, haben 374 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;41,0&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="75.1000" data-w="76.8000" data-tu="83.5000" data-tw="83.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.1%"></div></div>
+            <span class="value">75,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.1000" data-w="76.8000" data-tu="83.5000" data-tw="83.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.1%"></div></div>
+            <span class="value">75,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.1000" data-w="76.8000" data-tu="83.5000" data-tw="83.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.1%"></div></div>
+            <span class="value">75,1&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">ME U11</span> <span class="n" data-n="1059" data-tn="3591">n=1059</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,3&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 519 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U11 entspricht, haben 217 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;41,8&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.5000" data-w="79.4000" data-tu="86.0000" data-tw="85.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.5%"></div></div>
+            <span class="value">78,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.5000" data-w="79.4000" data-tu="86.0000" data-tw="85.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.5%"></div></div>
+            <span class="value">78,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.5000" data-w="79.4000" data-tu="86.0000" data-tw="85.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.5%"></div></div>
+            <span class="value">78,5&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JD U11</span> <span class="n" data-n="1207" data-tn="3709">n=1207</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,4&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 501 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U11 entspricht, haben 214 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;42,7&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="71.3000" data-w="72.2000" data-tu="77.3000" data-tw="77.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:71.3%"></div></div>
+            <span class="value">71,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="71.3000" data-w="72.2000" data-tu="77.3000" data-tw="77.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:71.3%"></div></div>
+            <span class="value">71,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="71.3000" data-w="72.2000" data-tu="77.3000" data-tw="77.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:71.3%"></div></div>
+            <span class="value">71,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">MD U11</span> <span class="n" data-n="490" data-tn="1313">n=490</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,3&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 270 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U11 entspricht, haben 121 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;44,8&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="81.6000" data-w="82.8000" data-tu="83.5000" data-tw="83.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.6%"></div></div>
+            <span class="value">81,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.6000" data-w="82.8000" data-tu="83.5000" data-tw="83.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.6%"></div></div>
+            <span class="value">81,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.6000" data-w="82.8000" data-tu="83.5000" data-tw="83.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.6%"></div></div>
+            <span class="value">81,6&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">XD U11</span> <span class="n" data-n="213" data-tn="488">n=213</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,0&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 200 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U11 entspricht, haben 71 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;35,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="85.9000" data-w="86.7000" data-tu="88.3000" data-tw="88.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:85.9%"></div></div>
+            <span class="value">85,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="85.9000" data-w="86.7000" data-tu="88.3000" data-tw="88.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:85.9%"></div></div>
+            <span class="value">85,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="85.9000" data-w="86.7000" data-tu="88.3000" data-tw="88.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:85.9%"></div></div>
+            <span class="value">85,9&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U13</div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JE U13</span> <span class="n" data-n="1889" data-tn="10081">n=1889</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,0&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 1235 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U13 entspricht, haben 462 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;37,4&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.9000" data-w="80.1000" data-tu="88.4000" data-tw="88.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.9%"></div></div>
+            <span class="value">78,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.9000" data-w="80.1000" data-tu="88.4000" data-tw="88.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.9%"></div></div>
+            <span class="value">78,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.9000" data-w="80.1000" data-tu="88.4000" data-tw="88.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.9%"></div></div>
+            <span class="value">78,9&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">ME U13</span> <span class="n" data-n="1497" data-tn="7233">n=1497</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,7&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 807 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U13 entspricht, haben 313 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;38,8&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="79.5000" data-w="80.0000" data-tu="89.1000" data-tw="88.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.5%"></div></div>
+            <span class="value">79,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.5000" data-w="80.0000" data-tu="89.1000" data-tw="88.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.5%"></div></div>
+            <span class="value">79,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.5000" data-w="80.0000" data-tu="89.1000" data-tw="88.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.5%"></div></div>
+            <span class="value">79,5&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JD U13</span> <span class="n" data-n="2187" data-tn="9465">n=2187</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,3&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 720 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U13 entspricht, haben 283 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,3&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="81.4000" data-w="82.6000" data-tu="87.2000" data-tw="87.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.4%"></div></div>
+            <span class="value">81,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.4000" data-w="82.6000" data-tu="87.2000" data-tw="87.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.4%"></div></div>
+            <span class="value">81,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="81.4000" data-w="82.6000" data-tu="87.2000" data-tw="87.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:81.4%"></div></div>
+            <span class="value">81,4&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">MD U13</span> <span class="n" data-n="1622" data-tn="6983">n=1622</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,6&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 513 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U13 entspricht, haben 235 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;45,8&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="76.7000" data-w="77.9000" data-tu="86.2000" data-tw="86.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.7%"></div></div>
+            <span class="value">76,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.7000" data-w="77.9000" data-tu="86.2000" data-tw="86.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.7%"></div></div>
+            <span class="value">76,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.7000" data-w="77.9000" data-tu="86.2000" data-tw="86.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.7%"></div></div>
+            <span class="value">76,7&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">XD U13</span> <span class="n" data-n="1718" data-tn="7988">n=1718</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;93,6&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 968 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U13 entspricht, haben 392 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;40,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.9000" data-w="79.5000" data-tu="87.1000" data-tw="86.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.9%"></div></div>
+            <span class="value">78,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.9000" data-w="79.5000" data-tu="87.1000" data-tw="86.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.9%"></div></div>
+            <span class="value">78,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.9000" data-w="79.5000" data-tu="87.1000" data-tw="86.9000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.9%"></div></div>
+            <span class="value">78,9&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U15</div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JE U15</span> <span class="n" data-n="1748" data-tn="10483">n=1748</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,1&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 1313 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U15 entspricht, haben 441 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;33,6&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.1000" data-w="78.9000" data-tu="87.5000" data-tw="87.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.1%"></div></div>
+            <span class="value">78,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.1000" data-w="78.9000" data-tu="87.5000" data-tw="87.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.1%"></div></div>
+            <span class="value">78,1&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.1000" data-w="78.9000" data-tu="87.5000" data-tw="87.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.1%"></div></div>
+            <span class="value">78,1&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">ME U15</span> <span class="n" data-n="1493" data-tn="7642">n=1493</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,8&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 879 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U15 entspricht, haben 333 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;37,9&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.2000" data-w="79.2000" data-tu="87.7000" data-tw="87.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.2%"></div></div>
+            <span class="value">78,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.2000" data-w="79.2000" data-tu="87.7000" data-tw="87.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.2%"></div></div>
+            <span class="value">78,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.2000" data-w="79.2000" data-tu="87.7000" data-tw="87.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.2%"></div></div>
+            <span class="value">78,2&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JD U15</span> <span class="n" data-n="2303" data-tn="11328">n=2303</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,6&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 846 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U15 entspricht, haben 331 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="77.8000" data-w="80.0000" data-tu="86.5000" data-tw="86.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.8%"></div></div>
+            <span class="value">77,8&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="77.9000" data-w="80.2000" data-tu="86.5000" data-tw="86.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.9%"></div></div>
+            <span class="value">77,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.9000" data-w="80.1000" data-tu="86.5000" data-tw="86.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.9%"></div></div>
+            <span class="value">77,9&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">MD U15</span> <span class="n" data-n="1784" data-tn="7951">n=1784</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,9&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 605 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U15 entspricht, haben 257 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;42,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.8000" data-w="80.2000" data-tu="88.2000" data-tw="88.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.8%"></div></div>
+            <span class="value">78,8&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.8000" data-w="80.2000" data-tu="88.2000" data-tw="88.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.8%"></div></div>
+            <span class="value">78,8&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.8000" data-w="80.2000" data-tu="88.2000" data-tw="88.1000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.8%"></div></div>
+            <span class="value">78,8&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">XD U15</span> <span class="n" data-n="1853" data-tn="9706">n=1853</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,2&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 899 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U15 entspricht, haben 400 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;44,5&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="78.5000" data-w="79.2000" data-tu="86.8000" data-tw="86.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.5%"></div></div>
+            <span class="value">78,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.5000" data-w="79.2000" data-tu="86.8000" data-tw="86.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.5%"></div></div>
+            <span class="value">78,5&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.5000" data-w="79.2000" data-tu="86.8000" data-tw="86.7000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.5%"></div></div>
+            <span class="value">78,5&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U17</div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JE U17</span> <span class="n" data-n="1441" data-tn="8063">n=1441</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,3&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 1223 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U17 entspricht, haben 432 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;35,3&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="78.1000" data-w="78.8000" data-tu="87.7000" data-tw="87.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.1%"></div></div>
+            <span class="value">78,1&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="78.3000" data-w="79.0000" data-tu="87.7000" data-tw="87.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.3%"></div></div>
+            <span class="value">78,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="78.3000" data-w="79.0000" data-tu="87.7000" data-tw="87.6000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:78.3%"></div></div>
+            <span class="value">78,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">ME U17</span> <span class="n" data-n="1291" data-tn="6491">n=1291</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,4&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 813 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U17 entspricht, haben 281 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;34,6&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="76.9000" data-w="77.9000" data-tu="86.3000" data-tw="86.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.9%"></div></div>
+            <span class="value">76,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="76.9000" data-w="77.9000" data-tu="86.3000" data-tw="86.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:76.9%"></div></div>
+            <span class="value">76,9&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="77.0000" data-w="78.0000" data-tu="86.3000" data-tw="86.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.0%"></div></div>
+            <span class="value">77,0&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JD U17</span> <span class="n" data-n="1997" data-tn="10041">n=1997</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,3&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 818 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U17 entspricht, haben 304 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;37,2&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="79.7000" data-w="80.7000" data-tu="88.1000" data-tw="88.0000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.7%"></div></div>
+            <span class="value">79,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="79.6000" data-w="80.6000" data-tu="88.4000" data-tw="88.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.6%"></div></div>
+            <span class="value">79,6&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="79.8000" data-w="80.9000" data-tu="88.3000" data-tw="88.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:79.8%"></div></div>
+            <span class="value">79,8&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">MD U17</span> <span class="n" data-n="1723" data-tn="8263">n=1723</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;94,9&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 614 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U17 entspricht, haben 242 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,4&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="77.8000" data-w="78.5000" data-tu="87.0000" data-tw="86.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.8%"></div></div>
+            <span class="value">77,8&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="77.9000" data-w="78.6000" data-tu="87.0000" data-tw="86.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.9%"></div></div>
+            <span class="value">77,9&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="77.9000" data-w="78.6000" data-tu="87.0000" data-tw="86.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:77.9%"></div></div>
+            <span class="value">77,9&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">XD U17</span> <span class="n" data-n="1773" data-tn="9847">n=1773</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;93,2&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 888 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U17 entspricht, haben 347 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;39,1&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="75.6000" data-w="76.1000" data-tu="84.5000" data-tw="84.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.6%"></div></div>
+            <span class="value">75,6&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="75.7000" data-w="76.2000" data-tu="84.5000" data-tw="84.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.7%"></div></div>
+            <span class="value">75,7&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.7000" data-w="76.2000" data-tu="84.5000" data-tw="84.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.7%"></div></div>
+            <span class="value">75,7&nbsp;%</span>
+          </div>
+        </div><div class="ak-row">Altersklasse U19</div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JE U19</span> <span class="n" data-n="1264" data-tn="6141">n=1264</span>
+            <span class="ceiling low" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;93,9&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 847 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JE U19 entspricht, haben 91 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;10,7&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="75.4000" data-w="76.5000" data-tu="84.5000" data-tw="84.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.4%"></div></div>
+            <span class="value">75,4&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.2000" data-w="76.3000" data-tu="84.4000" data-tw="84.3000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.2%"></div></div>
+            <span class="value">75,2&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.2000" data-w="76.4000" data-tu="84.5000" data-tw="84.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.2%"></div></div>
+            <span class="value">75,2&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">ME U19</span> <span class="n" data-n="788" data-tn="3246">n=788</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;97,6&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 555 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK ME U19 entspricht, haben 29 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;5,2&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="75.1000" data-w="74.5000" data-tu="84.0000" data-tw="83.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.1%"></div></div>
+            <span class="value">75,1&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="75.3000" data-w="74.6000" data-tu="84.0000" data-tw="83.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.3%"></div></div>
+            <span class="value">75,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.3000" data-w="74.6000" data-tu="84.0000" data-tw="83.5000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.3%"></div></div>
+            <span class="value">75,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">JD U19</span> <span class="n" data-n="1539" data-tn="7317">n=1539</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;95,4&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 652 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK JD U19 entspricht, haben 111 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;17,0&nbsp;%</span>
+          </div>
+          
+          <div class="cell" data-u="75.3000" data-w="75.6000" data-tu="85.4000" data-tw="85.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.3%"></div></div>
+            <span class="value">75,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="75.3000" data-w="75.7000" data-tu="85.4000" data-tw="85.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.3%"></div></div>
+            <span class="value">75,3&nbsp;%</span>
+          </div>
+          <div class="cell winner" data-u="75.4000" data-w="75.7000" data-tu="85.4000" data-tw="85.2000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:75.4%"></div></div>
+            <span class="value">75,4&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">MD U19</span> <span class="n" data-n="1171" data-tn="5341">n=1171</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,1&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 538 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK MD U19 entspricht, haben 68 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;12,6&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="74.3000" data-w="75.2000" data-tu="81.4000" data-tw="81.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.3%"></div></div>
+            <span class="value">74,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.3000" data-w="75.2000" data-tu="81.4000" data-tw="81.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.3%"></div></div>
+            <span class="value">74,3&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.3000" data-w="75.2000" data-tu="81.4000" data-tw="81.4000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.3%"></div></div>
+            <span class="value">74,3&nbsp;%</span>
+          </div>
+        </div>
+        <div class="kon-row">
+          <div class="kon-label"><span class="kon-name">XD U19</span> <span class="n" data-n="1297" data-tn="6226">n=1297</span>
+            <span class="ceiling" title="Ceiling-Referenz (Heuristik): Anteil intransitiver Dreiecke im H2H-Graph begrenzt, wie hoch die Konkordanzrate JEDER Rangliste ueberhaupt sein kann -- keine bewiesene scharfe Schranke, nur ein Faustregel-Referenzwert.">Ceiling&nbsp;96,0&nbsp;%</span>
+            <span class="hochspielen" title="Hochspielen-Anteil: von 828 Spieler(n), deren aus den Matchdaten abgeleitete eigene AK XD U19 entspricht, haben 129 im 12-Monats-Fenster mindestens 1x in einer hoeheren Altersklasse gespielt.">Hochspielen&nbsp;15,6&nbsp;%</span>
+          </div>
+          
+          <div class="cell winner" data-u="74.6000" data-w="75.4000" data-tu="82.7000" data-tw="82.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.6%"></div></div>
+            <span class="value">74,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.6000" data-w="75.4000" data-tu="82.8000" data-tw="82.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.6%"></div></div>
+            <span class="value">74,6&nbsp;%</span>
+          </div>
+          <div class="cell" data-u="74.6000" data-w="75.4000" data-tu="82.8000" data-tw="82.8000">
+            <span class="mark">&#9679;</span>
+            <div class="track"><div class="fill" style="width:74.6%"></div></div>
+            <span class="value">74,6&nbsp;%</span>
+          </div>
+        </div>
+  </div>
+
+  <table class="detail">
+    <caption>Alle Werte (unw. = ungewichtet, gew. = marge-gewichtet), je Konkurrenz</caption>
+    <thead>
+      <tr><th rowspan="2">Konkurrenz</th><th rowspan="2">n</th><th rowspan="2">Ceiling&nbsp;%</th>
+        <th rowspan="2">Hochspielen&nbsp;%</th><th rowspan="2">n&nbsp;nativ</th><th colspan="4">Original</th><th colspan="4">bec-u17-gestuft</th><th colspan="4">bec-u17-gestuft-light</th></tr>
+      <tr><th>unw.</th><th>gew.</th><th>trans. unw.</th><th>trans. gew.</th><th>unw.</th><th>gew.</th><th>trans. unw.</th><th>trans. gew.</th><th>unw.</th><th>gew.</th><th>trans. unw.</th><th>trans. gew.</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>JE U09</td><td>211</td><td>99,1</td><td>60,2</td><td>191</td><td>80,6</td><td>83,0</td><td>84,4</td><td>85,3</td><td>80,6</td><td>83,0</td><td>84,4</td><td>85,3</td><td>80,6</td><td>83,0</td><td>84,4</td><td>85,3</td></tr><tr><td>ME U09</td><td>98</td><td>100,0</td><td>60,5</td><td>81</td><td>84,7</td><td>87,0</td><td>86,8</td><td>87,8</td><td>84,7</td><td>87,0</td><td>86,8</td><td>87,8</td><td>84,7</td><td>87,0</td><td>86,8</td><td>87,8</td></tr><tr><td>JD U09</td><td>43</td><td>80,0</td><td>80,0</td><td>30</td><td>81,4</td><td>77,1</td><td>82,9</td><td>80,9</td><td>81,4</td><td>77,1</td><td>82,9</td><td>80,9</td><td>81,4</td><td>77,1</td><td>82,9</td><td>80,9</td></tr><tr><td>MD U09</td><td>48</td><td>100,0</td><td>50,0</td><td>26</td><td>83,3</td><td>79,7</td><td>84,8</td><td>82,2</td><td>83,3</td><td>79,7</td><td>84,8</td><td>82,2</td><td>83,3</td><td>79,7</td><td>84,8</td><td>82,2</td></tr><tr><td>XD U09</td><td>5</td><td>100,0</td><td>83,3</td><td>6</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td><td>100,0</td></tr><tr><td>JE U11</td><td>1397</td><td>96,9</td><td>41,0</td><td>912</td><td>75,1</td><td>76,8</td><td>83,5</td><td>83,4</td><td>75,1</td><td>76,8</td><td>83,5</td><td>83,4</td><td>75,1</td><td>76,8</td><td>83,5</td><td>83,4</td></tr><tr><td>ME U11</td><td>1059</td><td>97,3</td><td>41,8</td><td>519</td><td>78,5</td><td>79,4</td><td>86,0</td><td>85,5</td><td>78,5</td><td>79,4</td><td>86,0</td><td>85,5</td><td>78,5</td><td>79,4</td><td>86,0</td><td>85,5</td></tr><tr><td>JD U11</td><td>1207</td><td>97,4</td><td>42,7</td><td>501</td><td>71,3</td><td>72,2</td><td>77,3</td><td>77,1</td><td>71,3</td><td>72,2</td><td>77,3</td><td>77,1</td><td>71,3</td><td>72,2</td><td>77,3</td><td>77,1</td></tr><tr><td>MD U11</td><td>490</td><td>96,3</td><td>44,8</td><td>270</td><td>81,6</td><td>82,8</td><td>83,5</td><td>83,8</td><td>81,6</td><td>82,8</td><td>83,5</td><td>83,8</td><td>81,6</td><td>82,8</td><td>83,5</td><td>83,8</td></tr><tr><td>XD U11</td><td>213</td><td>97,0</td><td>35,5</td><td>200</td><td>85,9</td><td>86,7</td><td>88,3</td><td>88,6</td><td>85,9</td><td>86,7</td><td>88,3</td><td>88,6</td><td>85,9</td><td>86,7</td><td>88,3</td><td>88,6</td></tr><tr><td>JE U13</td><td>1889</td><td>95,0</td><td>37,4</td><td>1235</td><td>78,9</td><td>80,1</td><td>88,4</td><td>88,3</td><td>78,9</td><td>80,1</td><td>88,4</td><td>88,3</td><td>78,9</td><td>80,1</td><td>88,4</td><td>88,3</td></tr><tr><td>ME U13</td><td>1497</td><td>96,7</td><td>38,8</td><td>807</td><td>79,5</td><td>80,0</td><td>89,1</td><td>88,6</td><td>79,5</td><td>80,0</td><td>89,1</td><td>88,6</td><td>79,5</td><td>80,0</td><td>89,1</td><td>88,6</td></tr><tr><td>JD U13</td><td>2187</td><td>95,3</td><td>39,3</td><td>720</td><td>81,4</td><td>82,6</td><td>87,2</td><td>87,2</td><td>81,4</td><td>82,6</td><td>87,2</td><td>87,2</td><td>81,4</td><td>82,6</td><td>87,2</td><td>87,2</td></tr><tr><td>MD U13</td><td>1622</td><td>95,6</td><td>45,8</td><td>513</td><td>76,7</td><td>77,9</td><td>86,2</td><td>86,0</td><td>76,7</td><td>77,9</td><td>86,2</td><td>86,0</td><td>76,7</td><td>77,9</td><td>86,2</td><td>86,0</td></tr><tr><td>XD U13</td><td>1718</td><td>93,6</td><td>40,5</td><td>968</td><td>78,9</td><td>79,5</td><td>87,1</td><td>86,9</td><td>78,9</td><td>79,5</td><td>87,1</td><td>86,9</td><td>78,9</td><td>79,5</td><td>87,1</td><td>86,9</td></tr><tr><td>JE U15</td><td>1748</td><td>95,1</td><td>33,6</td><td>1313</td><td>78,1</td><td>78,9</td><td>87,5</td><td>87,3</td><td>78,1</td><td>78,9</td><td>87,5</td><td>87,3</td><td>78,1</td><td>78,9</td><td>87,5</td><td>87,3</td></tr><tr><td>ME U15</td><td>1493</td><td>95,8</td><td>37,9</td><td>879</td><td>78,2</td><td>79,2</td><td>87,7</td><td>87,5</td><td>78,2</td><td>79,2</td><td>87,7</td><td>87,5</td><td>78,2</td><td>79,2</td><td>87,7</td><td>87,5</td></tr><tr><td>JD U15</td><td>2303</td><td>95,6</td><td>39,1</td><td>846</td><td>77,8</td><td>80,0</td><td>86,5</td><td>86,6</td><td>77,9</td><td>80,2</td><td>86,5</td><td>86,6</td><td>77,9</td><td>80,1</td><td>86,5</td><td>86,6</td></tr><tr><td>MD U15</td><td>1784</td><td>94,9</td><td>42,5</td><td>605</td><td>78,8</td><td>80,2</td><td>88,2</td><td>88,1</td><td>78,8</td><td>80,2</td><td>88,2</td><td>88,1</td><td>78,8</td><td>80,2</td><td>88,2</td><td>88,1</td></tr><tr><td>XD U15</td><td>1853</td><td>94,2</td><td>44,5</td><td>899</td><td>78,5</td><td>79,2</td><td>86,8</td><td>86,7</td><td>78,5</td><td>79,2</td><td>86,8</td><td>86,7</td><td>78,5</td><td>79,2</td><td>86,8</td><td>86,7</td></tr><tr><td>JE U17</td><td>1441</td><td>95,3</td><td>35,3</td><td>1223</td><td>78,1</td><td>78,8</td><td>87,7</td><td>87,5</td><td>78,3</td><td>79,0</td><td>87,7</td><td>87,5</td><td>78,3</td><td>79,0</td><td>87,7</td><td>87,6</td></tr><tr><td>ME U17</td><td>1291</td><td>94,4</td><td>34,6</td><td>813</td><td>76,9</td><td>77,9</td><td>86,3</td><td>86,2</td><td>76,9</td><td>77,9</td><td>86,3</td><td>86,2</td><td>77,0</td><td>78,0</td><td>86,3</td><td>86,2</td></tr><tr><td>JD U17</td><td>1997</td><td>95,3</td><td>37,2</td><td>818</td><td>79,7</td><td>80,7</td><td>88,1</td><td>88,0</td><td>79,6</td><td>80,6</td><td>88,4</td><td>88,3</td><td>79,8</td><td>80,9</td><td>88,3</td><td>88,3</td></tr><tr><td>MD U17</td><td>1723</td><td>94,9</td><td>39,4</td><td>614</td><td>77,8</td><td>78,5</td><td>87,0</td><td>86,8</td><td>77,9</td><td>78,6</td><td>87,0</td><td>86,8</td><td>77,9</td><td>78,6</td><td>87,0</td><td>86,8</td></tr><tr><td>XD U17</td><td>1773</td><td>93,2</td><td>39,1</td><td>888</td><td>75,6</td><td>76,1</td><td>84,5</td><td>84,4</td><td>75,7</td><td>76,2</td><td>84,5</td><td>84,3</td><td>75,7</td><td>76,2</td><td>84,5</td><td>84,4</td></tr><tr><td>JE U19</td><td>1264</td><td>93,9</td><td>10,7</td><td>847</td><td>75,4</td><td>76,5</td><td>84,5</td><td>84,4</td><td>75,2</td><td>76,3</td><td>84,4</td><td>84,3</td><td>75,2</td><td>76,4</td><td>84,5</td><td>84,4</td></tr><tr><td>ME U19</td><td>788</td><td>97,6</td><td>5,2</td><td>555</td><td>75,1</td><td>74,5</td><td>84,0</td><td>83,5</td><td>75,3</td><td>74,6</td><td>84,0</td><td>83,5</td><td>75,3</td><td>74,6</td><td>84,0</td><td>83,5</td></tr><tr><td>JD U19</td><td>1539</td><td>95,4</td><td>17,0</td><td>652</td><td>75,3</td><td>75,6</td><td>85,4</td><td>85,2</td><td>75,3</td><td>75,7</td><td>85,4</td><td>85,2</td><td>75,4</td><td>75,7</td><td>85,4</td><td>85,2</td></tr><tr><td>MD U19</td><td>1171</td><td>96,1</td><td>12,6</td><td>538</td><td>74,3</td><td>75,2</td><td>81,4</td><td>81,4</td><td>74,3</td><td>75,2</td><td>81,4</td><td>81,4</td><td>74,3</td><td>75,2</td><td>81,4</td><td>81,4</td></tr><tr><td>XD U19</td><td>1297</td><td>96,0</td><td>15,6</td><td>828</td><td>74,6</td><td>75,4</td><td>82,7</td><td>82,8</td><td>74,6</td><td>75,4</td><td>82,8</td><td>82,8</td><td>74,6</td><td>75,4</td><td>82,8</td><td>82,8</td></tr>
+    </tbody>
+  </table>
+
+  <footer class="page">
+    <p>
+      <strong>Transitive H2H:</strong> zusätzlich zu den direkten Begegnungen zählt ein Paar A/B,
+      das nie gegeneinander gespielt hat, als entschieden, wenn A einen gemeinsamen Gegner Z
+      geschlagen hat und Z seinerseits B (&laquo;A vor B&raquo;, Gewicht 1). Direkte Ergebnisse haben
+      immer Vorrang; widersprüchliche Ketten über verschiedene Z werden verworfen. Streng getrennt
+      nach Disziplin, aber über alle Altersklassen hinweg: stehen A und B beide in der JE-U17-Liste,
+      zählt ein Sieg von A über B bei einem U19-Turnier ebenso wie eine Kette A&nbsp;&gt;&nbsp;Z&nbsp;&gt;&nbsp;B
+      über einen U19-Gegner Z (auch O19-Turniere zählen, z.&nbsp;B. HE als JE). Das gilt auch für die
+      direkten Paare. Als Brücke Z zählen auch ausländische Spieler, die selbst in keiner Rangliste
+      stehen. n zeigt die Paarzahl der jeweils gewählten Ground Truth.
+    </p>
+    <p>
+      <strong>Datenquellen der H2H-Ergebnisse:</strong> Inlandsturniere (BTP-Exporte von dbv.turnier.de) und internationale Turniere (BEC-U17-Circuit, Junior-/U19-Turniere, internationale U15-Turniere). Internationale Spieler werden über den Namen einer DBV-SpielerID zugeordnet (93–94&nbsp;% der deutschen Teilnehmer eindeutig); Walkover/Aufgaben und Matches ohne Datum sind ausgeschlossen.
+    </p>
+    <p>
+      <strong>Ground Truth:</strong> Sieg-Verhältnis je Spielerpaar (= Spieler/Einzelpersonen, die
+      sich in einem Match gegenüberstehen, im Einzel/Doppel/Mixed), 12-Monats-Fenster relativ zu
+      betrachteten KW. Konkordanzrate = Anteil der entschiedenen Paare (= zwei H2H Einzelpersonen),
+      bei denen die jeweilige Rangliste dieselbe Reihenfolge zeigt wie die Ground Truth. &laquo;beste
+      Variante&raquo; markiert je Konkurrenz/Kachel die höchste Rate bei aktuell gewählter
+      Gewichtung &mdash; keine Aussage über statistische Signifikanz bei geringer Beleglage (n).
+      n bzw. N ist die Anzahl H2H-Paaren je Konkurrenz.
+    </p>
+    <p>
+      <strong>Ceiling-Referenz:</strong> Anteil intransitiver Dreiecke im H2H-Graph je Konkurrenz
+      (Spieler a schlägt b, b schlägt c, c schlägt a) subtrahiert von 100&nbsp;% &mdash; ein
+      intransitives Dreieck kann von KEINER Rangliste (einer strikten Totalordnung) in allen drei
+      Paarvergleichen gleichzeitig richtig abgebildet werden, die Ceiling markiert also eine
+      strukturelle Obergrenze der Konkordanzrate. <strong>Heuristik, keine bewiesene scharfe
+      Schranke</strong> (die exakte maximal erreichbare Rate zu bestimmen ist das NP-harte
+      "Minimum Feedback Arc Set"-Problem) &mdash; gedacht als Faustregel, bevor einzelne
+      Konkordanzraten bewertet werden.
+    </p>
+    <p>
+      <strong>Hochspielen-Anteil:</strong> je Konkurrenz der Anteil "nativer" Spieler (deren
+      niedrigste im 12-Monats-Fenster tatsächlich gespielte Altersklasse dieser Konkurrenz-AK
+      entspricht &mdash; höherspielen ist erlaubt, tiefer als die eigene AK spielen nicht, daher
+      ist die niedrigste beobachtete AK zuverlässig die eigene), die mindestens 1x in einer
+      höheren Altersklasse derselben Disziplin gespielt haben (auch Turniere der Aktiven/O19 bzw.
+      U22 zählen als "höher"). Rein evidenzbasiert aus den Matchdaten selbst abgeleitet, nicht aus
+      Geburtsjahren.
+    </p>
+    <p>
+      Quelle: <code>compare_rankings_h2h.py</code> &middot;
+      <code>h2h_konkordanz_2026_KW35_cut.json</code> &middot;
+      erzeugt von <code>export_h2h_konkordanz_html.py</code> (by help of claude code).
+    </p>
+  </footer>
+</div>
+
+<script>
+  // Zwei unabhaengige Umschalter (2026-09-27): Gewichtung (ungewichtet/marge-gewichtet) und
+  // Ground Truth (direkt/transitiv, nur wenn die Seite transitive Werte enthaelt). Datenattribute:
+  // data-u/data-w (direkt), data-tu/data-tw (transitiv), data-n/data-tn (Paarzahl).
+  const state = { mode: 'unweighted', gt: 'direct' };
+  const key = () => (state.gt === 'transitive' ? 't' : '') + (state.mode === 'weighted' ? 'w' : 'u');
+  function apply() {
+    const k = key();
+    document.querySelectorAll('[data-u]').forEach(el => {
+      const v = parseFloat(el.dataset[k]);
+      const fill = el.querySelector('.fill');
+      const value = el.querySelector('.value');
+      if (fill) fill.style.width = v + '%';
+      if (value) value.textContent = v.toFixed(1).replace('.', ',') + '\u00a0%';
+    });
+    document.querySelectorAll('.kon-row').forEach(row => {
+      const cells = [...row.querySelectorAll('.cell')];
+      let bestI = -1, bestV = -1;
+      cells.forEach((c, i) => {
+        const v = parseFloat(c.dataset[k]);
+        if (v > bestV) { bestV = v; bestI = i; }
+      });
+      cells.forEach((c, i) => c.classList.toggle('winner', i === bestI));
+    });
+    document.querySelectorAll('.tile').forEach(t => {
+      const v = parseFloat(t.dataset[k]);
+      t.querySelector('.val').textContent = v.toFixed(2).replace('.', ',') + '\u00a0%';
+    });
+    let bestTileV = -1, bestTile = null;
+    document.querySelectorAll('.tile').forEach(t => {
+      const v = parseFloat(t.dataset[k]);
+      if (v > bestTileV) { bestTileV = v; bestTile = t; }
+    });
+    document.querySelectorAll('.tile').forEach(t => {
+      t.classList.toggle('leader', t === bestTile);
+      const badge = t.querySelector('.badge');
+      if (badge) badge.style.display = (t === bestTile) ? 'inline-flex' : 'none';
+    });
+    document.querySelectorAll('[data-n]').forEach(el => {
+      el.textContent = 'n=' + (state.gt === 'transitive' ? el.dataset.tn : el.dataset.n);
+    });
+  }
+  document.querySelectorAll('.toggle').forEach(tg => tg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.dataset.mode) state.mode = btn.dataset.mode;
+    if (btn.dataset.gt) state.gt = btn.dataset.gt;
+    tg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+    document.body.dataset.weighting = state.mode;
+    apply();
+  }));
+</script>
+
+</body>
+</html>
