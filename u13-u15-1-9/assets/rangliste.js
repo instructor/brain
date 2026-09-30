@@ -85,9 +85,14 @@ function renumberRanglistenplatz(rows) {
     if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
     byDis.get(r.DIS).push(r);
   }
+  // Punktgleiche Spieler teilen sich den Rang (1, 2, 2, 4 ...) -- wie die offizielle DBV-RL
+  // (User-Vorgabe 2026-09-30); vorher fortlaufend i + 1. FRang bleibt fortlaufend (offiziell auch).
   for (const group of byDis.values()) {
     group.sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
-    group.forEach((r, i) => { r.Ranglistenplatz = i + 1; });
+    group.forEach((r, i) => {
+      const prev = group[i - 1];
+      r.Ranglistenplatz = prev && Number(prev.Points) === Number(r.Points) ? prev.Ranglistenplatz : i + 1;
+    });
   }
 }
 
@@ -403,7 +408,8 @@ function computeH2hNeighbors(row) {
       const losses = matches.length - wins;
       const playerBetter = Number(row.Ranglistenplatz) < Number(cand.Ranglistenplatz);
       let konkordanz;
-      if (!matches.length || wins === losses) konkordanz = "neutral";
+      const gleicherRang = Number(row.Ranglistenplatz) === Number(cand.Ranglistenplatz);
+      if (!matches.length || wins === losses || gleicherRang) konkordanz = "neutral";
       else if ((playerBetter && wins > losses) || (!playerBetter && wins < losses)) konkordanz = "gruen";
       else konkordanz = "rot";
       entries.push({
