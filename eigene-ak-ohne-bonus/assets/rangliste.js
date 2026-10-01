@@ -3,14 +3,31 @@
 
 const COLUMNS = [
   { key: "DIS", label: "DIS" },
-  { key: "Ranglistenplatz", label: "Rang", numeric: true },
+  // "(*)" + Kopfzeilen-Hover erklaeren die Klammerzahl (User-Vorgabe 2026-08-31), da "Original-RL
+  // zum Vergleich" als volles Label in der schmalen Tabellenspalte zu lang waere -- die Spieler-
+  // Detailseite (spieler.js) behaelt das ausgeschriebene Label, dort ist genug Platz.
+  { key: "Ranglistenplatz", label: "Rang (*)", numeric: true,
+    tooltip: "In Klammern: Rang desselben Spielers in der Original-Rangliste (zum Vergleich)." },
   { key: "FRang", label: "FRang", numeric: true },
   { key: "Nachname", label: "Nachname" },
   { key: "Vorname", label: "Vorname" },
   { key: "GJahr", label: "GJahr", numeric: true },
   { key: "AKL1", label: "AKL1" },
   { key: "AKL2", label: "AKL2" },
-  { key: "Points", label: "Punkte", numeric: true },
+  { key: "Points", label: "Punkte (*)", numeric: true,
+    tooltip: "In Klammern: Punkte desselben Spielers in der Original-Rangliste (zum Vergleich)." },
+  // H2H-Vergleich mit den 5 naechsten Ranglisten-Nachbarn oben/unten (Zaehlung + Prozent,
+  // User-Vorgabe 2026-08-31, echte Ergebnisdaten bislang nur fuer KW30/2026 vorhanden -- fuer
+  // jede andere Woche zeigen die Zellen "-"), siehe renderH2hCell()/renderH2hPercentCell() weiter
+  // unten. Kein echtes Datenfeld -- buildRowFragment() rendert diese Spalten gesondert.
+  { key: "H2H", label: "H2H (*)", sortable: false,
+    tooltip: "Kopf-an-Kopf-Bilanz gegen die 5 nächsten Ranglisten-Nachbarn oberhalb und unterhalb "
+      + "INNERHALB DER AKTUELLEN FILTERAUSWAHL (anhand echter Turnierergebnisse): ✓ = Rangfolge "
+      + "bestätigt, ✗ = widerspricht ihr. Zum Überfahren: Details je Nachbar." },
+  { key: "H2HPct", label: "H2H in% (*)", sortable: false,
+    tooltip: "Anteil ✓ an allen entschiedenen Vergleichen (✓+✗) mit den 5 nächsten Ranglisten-"
+      + "Nachbarn oberhalb und unterhalb innerhalb der aktuellen Filterauswahl — je höher, desto "
+      + "mehr bestätigen echte Ergebnisse diesen Rangbereich. Zum Überfahren: Details je Nachbar." },
   { key: "Turniere", label: "#Turniere", numeric: true },
   { key: "Verein", label: "Verein" },
   { key: "Bezirk", label: "Bezirk" },
@@ -21,6 +38,25 @@ const COLUMNS = [
 ];
 
 const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
+
+// URL-Parameter fuer vorbelegte Filter beim Aufruf (User-Vorgabe 2026-09-07), z.B.
+// "?dis=HE&akl=U19" oeffnet die Seite direkt mit Disziplin=Herreneinzel und Altersklasse U19
+// vorgewaehlt. Nur einmal beim allerersten Laden angewendet (nicht bei jedem Wochenwechsel),
+// siehe applyInitialUrlFilters(). "akl"-Werte muessen den AKL2-Werten entsprechen (z.B. "U13",
+// nicht "U13-1"). Ohne URL-Parameter (blanker Linkaufruf) greifen dieselben Vorgaben als Default
+// (User-Vorgabe 2026-09-07) -- ein Aufruf ganz ohne "?..." soll die Seite genauso vorgefiltert
+// zeigen wie der explizite Link. Kein Default-Wert fuer "akl" (User-Vorgabe 2026-09-07): ohne
+// akl-Parameter bleibt die Altersklasse unbeschraenkt, es werden alle AKs gezeigt.
+const DEFAULT_FILTERS = { dis: "HE", akl: [] };
+function parseUrlFilters() {
+  const params = new URLSearchParams(location.search);
+  const aklParam = (params.get("akl") || "").split(",").map(s => s.trim()).filter(Boolean);
+  return {
+    dis: params.get("dis") || DEFAULT_FILTERS.dis,
+    akl: aklParam.length ? aklParam : DEFAULT_FILTERS.akl,
+  };
+}
+const initialUrlFilters = parseUrlFilters();
 
 // Nur Spieler mit regulaerer DBV-SpielerID anzeigen (2 Ziffern + Bindestrich + weitere
 // Zeichen, z.B. "07-047769") -- das Format auslaendischer Teilnehmer ohne DBV-Mitgliedschaft
@@ -280,10 +316,12 @@ function renderHead() {
     const th = document.createElement("th");
     th.textContent = col.label;
     th.dataset.key = col.key;
+    if (col.tooltip) th.title = col.tooltip;
     if (state.sortKey === col.key) {
       th.classList.add(state.sortDir === "asc" ? "sorted-asc" : "sorted-desc");
     }
     th.addEventListener("click", () => {
+      if (col.sortable === false) return;
       if (state.sortKey === col.key) {
         state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
       } else {
@@ -309,6 +347,87 @@ function renderHead() {
   applyColumnWidths();
 }
 
+// FRang-bewusster H2H-Vergleich (User-Vorgabe 2026-09-06): die Nachbarsuche lief bis dahin gegen
+// den global vorausberechneten Ranglistenplatz (data/kw/<stem>_h2h_test.json, offline in Python
+// erzeugt) und reagierte deshalb nicht auf Web-Filter. Jetzt laeuft die Nachbarsuche LIVE im
+// Browser gegen die AKTUELL GEFILTERTE Teilmenge (state.h2hIndex, in render() aus `filtered`
+// gebaut) -- ein Filter (AKL, Bezirk, Name, ...) grenzt damit auch die H2H-Nachbarn ein. Die
+// Nachbar-Reihenfolge bleibt dabei bewusst IMMER die Ranglistenplatz-Reihenfolge innerhalb der
+// gefilterten Menge, unabhaengig davon, nach welcher Spalte die Tabelle gerade angezeigt/sortiert
+// wird (User-Bestaetigung 2026-09-06) -- sonst waeren bei einer Sortierung z.B. nach Nachname
+// alphabetische statt Rang-Nachbarn verglichen worden. Nachbarn bleiben wie bisher auf dieselbe
+// Disziplin (DIS) beschraenkt. Die rohen Gegner-/Matchdaten je Spieler (row._opponents) kommen
+// weiterhin aus derselben JSON-Datei, siehe mergeH2hData() und tools/debug_build_h2h_hover_test_data.py.
+const N_NEIGHBORS = 5;        // je Richtung (oben/unten)
+const H2H_SEARCH_LIMIT = 500; // Performance-Deckel: maximale Scan-Distanz je Richtung
+
+// Baut je DIS eine nach Ranglistenplatz aufsteigend sortierte Kopie der aktuell gefilterten Zeilen
+// plus einen Positions-Index (SpielerID -> Index in dieser Kopie) -- einmal pro render()-Aufruf
+// aus den gefilterten (aber noch nicht nach der UI-Sortierspalte sortierten!) Zeilen gebaut, dann
+// von computeH2hNeighbors() fuer jede sichtbare Zeile wiederverwendet.
+function buildH2hIndex(filteredRows) {
+  const byDis = new Map();
+  for (const r of filteredRows) {
+    if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
+    byDis.get(r.DIS).push(r);
+  }
+  const index = new Map();
+  for (const [dis, rows] of byDis) {
+    const order = rows.slice().sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
+    const posBySpielerID = new Map(order.map((r, i) => [r.SpielerID, i]));
+    index.set(dis, { order, posBySpielerID });
+  }
+  return index;
+}
+
+// Ersetzt die frueher vorausgeladene row.H2H-Liste: sucht live je Richtung die N_NEIGHBORS
+// naechsten Spieler IN DER GEFILTERTEN MENGE (state.h2hIndex), gegen die der Spieler laut
+// row._opponents tatsaechlich mindestens ein Match hat. Bis zu H2H_SEARCH_LIMIT Kandidaten je
+// Richtung werden durchsucht, danach wird abgebrochen (Absicherung bei sehr grossen DIS-Gruppen
+// ohne nahe Gegner). atTop/atBottom ersetzen das fruehere state.maxRankByDis fuer noNeighborText().
+function computeH2hNeighbors(row) {
+  const empty = { entries: [], atTop: false, atBottom: false };
+  if (!row._opponents || !state.h2hIndex) return empty;
+  const group = state.h2hIndex.get(row.DIS);
+  if (!group) return empty;
+  const { order, posBySpielerID } = group;
+  const i = posBySpielerID.get(row.SpielerID);
+  if (i === undefined) return empty;
+
+  const entries = [];
+  const directions = [
+    { richtung: "oben", step: -1, maxScan: i },
+    { richtung: "unten", step: 1, maxScan: order.length - 1 - i },
+  ];
+  for (const { richtung, step, maxScan } of directions) {
+    let found = 0, scanned = 0, pos = i;
+    const limit = Math.min(maxScan, H2H_SEARCH_LIMIT);
+    while (found < N_NEIGHBORS && scanned < limit) {
+      pos += step;
+      scanned++;
+      const cand = order[pos];
+      const matches = row._opponents.get(cand.SpielerID);
+      if (!matches) continue;
+      found++;
+      const wins = matches.filter(m => m.Ergebnis === "Sieg").length;
+      const losses = matches.length - wins;
+      const playerBetter = Number(row.Ranglistenplatz) < Number(cand.Ranglistenplatz);
+      let konkordanz;
+      const gleicherRang = Number(row.Ranglistenplatz) === Number(cand.Ranglistenplatz);
+      if (!matches.length || wins === losses || gleicherRang) konkordanz = "neutral";
+      else if ((playerBetter && wins > losses) || (!playerBetter && wins < losses)) konkordanz = "gruen";
+      else konkordanz = "rot";
+      entries.push({
+        SpielerID: cand.SpielerID,
+        Name: `${cand.Vorname || ""} ${cand.Nachname || ""}`.trim(),
+        Rang: cand.Ranglistenplatz, Richtung: richtung,
+        Matches: matches, Konkordanz: konkordanz,
+      });
+    }
+  }
+  return { entries, atTop: i === 0, atBottom: i === order.length - 1 };
+}
+
 // Baut ein DocumentFragment mit <tr>-Zeilen fuer die uebergebenen (bereits gefilterten/
 // sortierten und ggf. schon geslicten) Zeilen. Getrennt von renderBody()/loadMore(), damit
 // beide dieselbe Zeilenerzeugung nutzen -- renderBody() ersetzt den gesamten tbody-Inhalt,
@@ -317,9 +436,41 @@ function buildRowFragment(rows) {
   const frag = document.createDocumentFragment();
   for (const row of rows) {
     const tr = document.createElement("tr");
+    const h2h = computeH2hNeighbors(row);
+    row.H2H = h2h.entries;
+    row._h2hAtTop = h2h.atTop;
+    row._h2hAtBottom = h2h.atBottom;
     for (const col of COLUMNS) {
       const td = document.createElement("td");
       td.dataset.key = col.key;
+      if (col.key === "Ranglistenplatz") {
+        // Eigenen Rang plus Original-RL-Rang in Klammern (User-Vorgabe 2026-08-31), z.B. "5 (3)"
+        // -- row.OriginalRang kommt aus der H2H-Anreicherung, siehe loadWeek()/mergeH2hData().
+        td.textContent = row.OriginalRang != null
+          ? `${row.Ranglistenplatz} (${row.OriginalRang})` : String(row.Ranglistenplatz ?? "");
+        td.title = "Rang (Original-RL zum Vergleich)";
+        tr.appendChild(td);
+        continue;
+      }
+      if (col.key === "Points") {
+        // Eigene Punkte plus Original-RL-Punkte in Klammern (analog Ranglistenplatz oben) --
+        // row.OriginalPunkte kommt aus derselben H2H-Anreicherung, siehe mergeH2hData().
+        td.textContent = row.OriginalPunkte != null
+          ? `${row.Points} (${row.OriginalPunkte})` : String(row.Points ?? "");
+        td.title = "Punkte (Original-RL zum Vergleich)";
+        tr.appendChild(td);
+        continue;
+      }
+      if (col.key === "H2H") {
+        renderH2hCell(td, row);
+        tr.appendChild(td);
+        continue;
+      }
+      if (col.key === "H2HPct") {
+        renderH2hPercentCell(td, row);
+        tr.appendChild(td);
+        continue;
+      }
       const raw = row[col.key];
       let display = (raw === null || raw === undefined) ? "" : raw;
       // "DBV-Gruppe X" -> "X" bzw. LVName auf die ersten 3 Zeichen (= LV-Kuerzel, z.B.
@@ -347,6 +498,47 @@ function buildRowFragment(rows) {
     frag.appendChild(tr);
   }
   return frag;
+}
+
+// Spalte "H2H" (User-Vorgabe 2026-08-31): Zelleninhalt ist eine kompakte gruen/rot-Zaehlung statt
+// des reinen Worts "H2H" -- informativer auf einen Blick (wie viele der 10 Ranglisten-Nachbarn
+// bestaetigen die Rangfolge vs. widersprechen ihr), das volle Detail (Turnier+Ergebnis je Nachbar)
+// erscheint im Hover-Kasten (siehe showH2hTooltip()).
+function renderH2hCell(td, row) {
+  const entries = row.H2H || [];
+  if (entries.length === 0) {
+    td.textContent = "–";
+    td.className = "h2h-cell h2h-empty";
+    return;
+  }
+  const gruen = entries.filter(e => e.Konkordanz === "gruen").length;
+  const rot = entries.filter(e => e.Konkordanz === "rot").length;
+  td.className = "h2h-cell";
+  td.innerHTML = `<span class="h2h-gruen">${gruen}✓</span> <span class="h2h-rot">${rot}✗</span>`;
+  td.addEventListener("mouseenter", (evt) => showH2hTooltip(evt, row));
+  td.addEventListener("mouseleave", scheduleHideH2hTooltip);
+}
+
+// Spalte "H2H in%" (User-Vorgabe 2026-08-31): dieselbe gruen/rot-Bilanz wie "H2H", als
+// Prozentsatz statt Zaehlung -- Anteil bestaetigter (gruen) an allen entschiedenen (gruen+rot)
+// Vergleichen, "neutral" (kein/unentschiedenes Ergebnis) zaehlt nicht mit, analog der
+// Konkordanzrate in compare_rankings_h2h.py. Derselbe Hover-Kasten wie bei "H2H".
+function renderH2hPercentCell(td, row) {
+  const entries = row.H2H || [];
+  const gruen = entries.filter(e => e.Konkordanz === "gruen").length;
+  const rot = entries.filter(e => e.Konkordanz === "rot").length;
+  const entschieden = gruen + rot;
+  if (entschieden === 0) {
+    td.textContent = "–";
+    td.className = "h2h-cell h2h-empty";
+    return;
+  }
+  const pct = Math.round((gruen / entschieden) * 100);
+  const cls = pct >= 50 ? "h2h-gruen" : "h2h-rot";
+  td.className = "h2h-cell";
+  td.innerHTML = `<span class="${cls}">${pct}%</span>`;
+  td.addEventListener("mouseenter", (evt) => showH2hTooltip(evt, row));
+  td.addEventListener("mouseleave", scheduleHideH2hTooltip);
 }
 
 function renderBody(rows) {
@@ -414,6 +606,10 @@ function render() {
     requestAnimationFrame(() => {
       renderHead();
       const filtered = applyFilters(state.rows);
+      // Basis fuer den FRang-bewussten H2H-Vergleich (siehe computeH2hNeighbors()) -- bewusst aus
+      // `filtered` (nicht `sorted`), damit die Nachbarsuche unabhaengig von der aktuell gewaehlten
+      // UI-Sortierspalte immer die Ranglistenplatz-Reihenfolge der gefilterten Menge verwendet.
+      state.h2hIndex = buildH2hIndex(filtered);
       const sorted = sortRows(filtered);
       sorted.forEach((r, i) => { r.FRang = i + 1; });
       state.sortedRows = sorted;
@@ -427,13 +623,156 @@ function render() {
   });
 }
 
+// H2H-Anreicherung (User-Vorgabe 2026-08-31, Rohdaten-Format seit 2026-09-06): laedt
+// <stem>_h2h_test.json (siehe tools/debug_build_h2h_hover_test_data.py) und mischt
+// OriginalRang/OriginalPunkte sowie die rohen Gegner-/Matchdaten in state.rows -- echte
+// Ergebnisdaten liegen bislang nur fuer die live gepushten Referenzwochen vor, fuer jede andere
+// Woche existiert diese Datei nicht, dann bleiben die Felder schlicht undefined (Rang-Spalte
+// zeigt nur den eigenen Rang, H2H-Spalte zeigt "-"). Die eigentliche Nachbarauswahl (5 naechste
+// je Richtung, filterbewusst) passiert seit 2026-09-06 nicht mehr hier, sondern live pro Render
+// in computeH2hNeighbors().
+//
+// Dateiformat seit dem Groessen-Fix (2026-09-06, siehe Python-Docstring): kein flaches Array
+// mehr, sondern {"Turniere": [...], "Rows": [...]} -- "Turniere" ist eine einmalige Namensliste,
+// "Opponents" je Zeile referenziert sie nur per Index statt den vollen Turniernamen bei jedem
+// Match zu wiederholen ([[GegnerSpielerID, [[TurnierIndex, Sieg(1/0)], ...]], ...]). Wird hier
+// beim Laden zurueck in die vertraute {Turnier, Ergebnis}-Form dekodiert, damit
+// computeH2hNeighbors()/h2hEntryHtml() unveraendert bleiben koennen.
+async function mergeH2hData(week) {
+  const stem = `${week.year}_KW${String(week.kw).padStart(2, "0")}`;
+  let payload;
+  try {
+    payload = await fetchJson(`data/kw/${stem}_h2h_test.json`);
+  } catch {
+    return; // keine Testdaten fuer diese Woche -- kein Fehler, nur keine Anreicherung
+  }
+  const turniere = payload.Turniere || [];
+  const byKey = new Map(payload.Rows.map(e => [`${e.SpielerID}|${e.DIS}`, e]));
+  for (const r of state.rows) {
+    const e = byKey.get(`${r.SpielerID}|${r.DIS}`);
+    if (e) {
+      r.OriginalRang = e.OriginalRang;
+      r.OriginalPunkte = e.OriginalPunkte;
+      r._opponents = (e.Opponents && e.Opponents.length)
+        ? new Map(e.Opponents.map(([oppId, matches]) => [
+            oppId,
+            matches.map(([tIdx, sieg]) => ({ Turnier: turniere[tIdx], Ergebnis: sieg ? "Sieg" : "Niederlage" })),
+          ]))
+        : null;
+    }
+  }
+}
+
+let h2hTooltipEl = null;
+let h2hHideTimeout = null;
+
+// Bugfix (2026-09-01): die Box hatte bislang keine eigenen mouseenter/mouseleave-Handler --
+// mouseleave auf der Tabellenzelle schloss sie sofort, sobald die Maus Richtung Box (um dort
+// die bei vielen Nachbarn noetige Scrollbar zu bedienen) bewegt wurde. Ein kurzes Verzoegern des
+// Schliessens (statt sofort) plus eigene Hover-Handler auf der Box selbst laesst sie offen,
+// solange die Maus ueber Zelle ODER Box ist.
+function clearH2hHideTimeout() {
+  if (h2hHideTimeout) {
+    clearTimeout(h2hHideTimeout);
+    h2hHideTimeout = null;
+  }
+}
+
+function scheduleHideH2hTooltip() {
+  clearH2hHideTimeout();
+  h2hHideTimeout = setTimeout(hideH2hTooltip, 150);
+}
+
+function ensureH2hTooltip() {
+  if (!h2hTooltipEl) {
+    h2hTooltipEl = document.createElement("div");
+    h2hTooltipEl.id = "h2h-tooltip";
+    h2hTooltipEl.hidden = true;
+    h2hTooltipEl.addEventListener("mouseenter", clearH2hHideTimeout);
+    h2hTooltipEl.addEventListener("mouseleave", scheduleHideH2hTooltip);
+    document.body.appendChild(h2hTooltipEl);
+  }
+  return h2hTooltipEl;
+}
+
+function h2hEntryHtml(e) {
+  const matchesHtml = e.Matches.length
+    ? e.Matches.map(m => `<div class="h2h-match">${escapeHtmlLocal(m.Turnier)}: <strong>${m.Ergebnis}</strong></div>`).join("")
+    : `<div class="h2h-match h2h-none">kein Vergleich</div>`;
+  return `
+    <div class="h2h-entry h2h-${e.Konkordanz}">
+      <div class="h2h-entry-head">Rang ${e.Rang} &middot; ${escapeHtmlLocal(e.Name)}</div>
+      ${matchesHtml}
+    </div>`;
+}
+
+function escapeHtmlLocal(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+// Seit 2026-09-02 (User-Vorgabe): das H2H-Popup zeigt je Richtung die 5 rangnaechsten Spieler MIT
+// echten H2H-Matchdaten, nicht mehr starr die 5 Ranglistenplaetze -- eine leere Richtung kann
+// jetzt auch bei einem Spieler MITTEN in der Rangliste vorkommen (schlicht keine echten Gegner in
+// dieser Richtung), nicht nur an den Rand-Plaetzen. Die alte Rand-Meldung bleibt nur, wenn der
+// Spieler tatsaechlich an Rang 1 bzw. dem letzten Rang der AKTUELL GEFILTERTEN Menge steht (seit
+// 2026-09-06 ueber row._h2hAtTop/_h2hAtBottom aus computeH2hNeighbors() statt dem frueheren,
+// global berechneten state.maxRankByDis).
+function noNeighborText(row, richtung) {
+  const atEdge = richtung === "oben" ? row._h2hAtTop : row._h2hAtBottom;
+  if (atEdge) return richtung === "oben" ? "keine (bereits Rang 1)" : "keine (bereits letzter Rang)";
+  return "keine H2H-Vergleiche in dieser Richtung gefunden";
+}
+
+function showH2hTooltip(evt, row) {
+  clearH2hHideTimeout();
+  const el = ensureH2hTooltip();
+  const oben = (row.H2H || []).filter(e => e.Richtung === "oben").slice().reverse();
+  const unten = (row.H2H || []).filter(e => e.Richtung === "unten");
+  el.innerHTML = `
+    <div class="h2h-section-title">▲ Nachbarn oberhalb</div>
+    ${oben.length ? oben.map(h2hEntryHtml).join("") : `<div class="h2h-match h2h-none">${noNeighborText(row, "oben")}</div>`}
+    <div class="h2h-section-title">▼ Nachbarn unterhalb</div>
+    ${unten.length ? unten.map(h2hEntryHtml).join("") : `<div class="h2h-match h2h-none">${noNeighborText(row, "unten")}</div>`}`;
+  el.hidden = false;
+  const cellRect = evt.currentTarget.getBoundingClientRect();
+  const viewportH = document.documentElement.clientHeight;
+  // Unter der Zelle platzieren, ausser es ist nicht genug Platz bis zum unteren Fensterrand --
+  // dann oberhalb der Zelle (sonst waere der Kasten bei Zeilen nahe am unteren Bildschirmrand
+  // teilweise/ganz unsichtbar).
+  const spaceBelow = viewportH - cellRect.bottom;
+  const top = spaceBelow >= el.offsetHeight + 8
+    ? window.scrollY + cellRect.bottom + 4
+    : window.scrollY + cellRect.top - el.offsetHeight - 4;
+  let left = window.scrollX + cellRect.left;
+  const maxLeft = window.scrollX + document.documentElement.clientWidth - el.offsetWidth - 8;
+  if (left > maxLeft) left = Math.max(8, maxLeft);
+  el.style.top = `${Math.max(window.scrollY + 4, top)}px`;
+  el.style.left = `${left}px`;
+}
+
+function hideH2hTooltip() {
+  if (h2hTooltipEl) h2hTooltipEl.hidden = true;
+}
+
+let urlFiltersApplied = false;
+
 async function loadWeek(week) {
   document.getElementById("loading-indicator").style.display = "inline";
   state.currentWeek = week;
   const rawRows = await fetchJson(week.ranking_file);
   state.rows = rawRows.filter(r => VALID_SPIELER_ID_RE.test(r.SpielerID || ""));
   renumberRanglistenplatz(state.rows);
+  await mergeH2hData(week);
   populateFilterOptions(state.rows);
+  if (!urlFiltersApplied) {
+    urlFiltersApplied = true;
+    const disSelect = document.getElementById("f-dis");
+    if (initialUrlFilters.dis && [...disSelect.options].some(o => o.value === initialUrlFilters.dis)) {
+      disSelect.value = initialUrlFilters.dis;
+    }
+  }
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;
   document.getElementById("updated-at").textContent = `zuletzt aktualisiert: ${week.updated_at}`;
   render();
@@ -637,6 +976,10 @@ function setupBezirkWidget() {
 }
 
 function setupFilterListeners() {
+  // Vorbelegung aus der URL, bevor das Widget seine Chips erstmalig rendert (renderChips()
+  // haengt nur an state.aklSelected, nicht an state.aklOptions -- funktioniert also bereits
+  // vor dem ersten Wochen-Laden).
+  for (const v of initialUrlFilters.akl) state.aklSelected.add(v);
   const ids = ["f-dis", "f-gs", "f-gruppe", "f-lv", "f-vorname", "f-nachname", "f-verein"];
   for (const id of ids) {
     const el = document.getElementById(id);
