@@ -46,16 +46,29 @@ const PAGE_SIZE = 1000;
 // Nach dem Filtern muss der je DIS global durchnummerierte Ranglistenplatz luecken-frei neu
 // vergeben werden (sonst blieben entfernte Spieler als Zahlensprung sichtbar) -- Reihenfolge
 // bleibt die urspruengliche (Ranglistenplatz aufsteigend).
+// Wertung "best of N" (User-Vorgabe 2026-10-02, Auswahl 1..5, Standard 3): jede Zeile traegt
+// Points1..Points5 (Summe der besten N Turnierergebnisse, export_u15_int_web.py) -- Points und der
+// Rang werden daraus bei jedem Wechsel neu bestimmt, die Detailseite bekommt N per URL (?bestof=).
+const BEST_OF_DEFAULT = 3;
+function bestOf() {
+  const el = document.getElementById("f-bestof");
+  return Number(el && el.value) || BEST_OF_DEFAULT;
+}
+
 function renumberRanglistenplatz(rows) {
+  const n = bestOf();
   const byDis = new Map();
   for (const r of rows) {
+    r.Points = r[`Points${n}`] ?? r.Points;
     if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
     byDis.get(r.DIS).push(r);
   }
-  // Punktgleiche Spieler teilen sich den Rang (1, 2, 2, 4 ...) -- wie die offizielle DBV-RL
-  // (User-Vorgabe 2026-09-30); vorher fortlaufend i + 1. FRang bleibt fortlaufend (offiziell auch).
+  // Punktgleiche Spieler teilen sich den Rang (1, 2, 2, 4 ...) wie bei den anderen Ranglisten;
+  // Reihenfolge nach Punkten, bei Gleichstand nach Name (wie der Export).
   for (const group of byDis.values()) {
-    group.sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
+    group.sort((a, b) => Number(b.Points) - Number(a.Points)
+      || String(a.Nachname || "").localeCompare(String(b.Nachname || ""), "de")
+      || String(a.Vorname || "").localeCompare(String(b.Vorname || ""), "de"));
     group.forEach((r, i) => {
       const prev = group[i - 1];
       r.Ranglistenplatz = prev && Number(prev.Points) === Number(r.Points) ? prev.Ranglistenplatz : i + 1;
@@ -435,7 +448,7 @@ function buildRowFragment(rows) {
     tr.addEventListener("click", () => {
       const params = new URLSearchParams({
         id: row.SpielerID, year: state.currentWeek.year, kw: state.currentWeek.kw,
-        name: `${row.Vorname || ""} ${row.Nachname || ""}`.trim(),
+        name: `${row.Vorname || ""} ${row.Nachname || ""}`.trim(), bestof: bestOf(),
       });
       window.location.href = `spieler.html?${params.toString()}`;
     });
@@ -948,6 +961,11 @@ async function init() {
   setupWeekSelect();
   setupFilterListeners();
   setupLoadMoreObserver();
+  // Wertung wirkt sofort (wie ein Wochen-/Jahreswechsel), nicht erst ueber den Suche-Button
+  document.getElementById("f-bestof").addEventListener("change", () => {
+    renumberRanglistenplatz(state.rows);
+    render();
+  });
   await loadWeek(state.index.latest);
 }
 

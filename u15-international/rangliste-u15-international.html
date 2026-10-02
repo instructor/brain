@@ -14,7 +14,8 @@
     Jahresrangliste aus den Platzierungen <b>aller internationalen U15-Turniere</b> eines Kalenderjahres
     (Setzplatzturniere der DBV-Liste, weitere internationale U15-Turniere und die U15-EM), alle Nationen.
     Bepunktung nach der DBV-Punktetabelle, Spalte &bdquo;IS U15&ldquo;; es zählen die
-    <b>besten 3 Ergebnisse</b> je Disziplin. Plätze jenseits von 66 bringen keine Punkte.
+    <b>besten N Ergebnisse</b> je Disziplin (Auswahl &bdquo;Wertung&ldquo;: best of 1 bis 5,
+    Standard best of 3). Plätze jenseits von 66 bringen keine Punkte.
     <br>Platzierungen: offizielle Ergebnislisten (BEC, BTP-Turniere) bzw. aus den KO-Runden der
     Matchdaten abgeleitet. Wer in der Gruppenphase ausscheidet, wird wie in der DBV-Wertung bei
     TSO-Turnieren mit dem Platz der entsprechenden KO-Runde gewertet (z.B. Gruppenzweite bei 32er-KO:
@@ -35,6 +36,16 @@
   </div>
 
   <div class="filters">
+    <div>
+      <label for="f-bestof">Wertung</label>
+      <select id="f-bestof">
+        <option value="1">best of 1</option>
+        <option value="2">best of 2</option>
+        <option value="3" selected>best of 3</option>
+        <option value="4">best of 4</option>
+        <option value="5">best of 5</option>
+      </select>
+    </div>
     <div>
       <label for="f-dis">Disziplin</label>
       <select id="f-dis"><option value="">-- alle --</option></select>

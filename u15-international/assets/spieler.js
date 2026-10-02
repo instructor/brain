@@ -14,16 +14,19 @@ function weekLabel(jahr, kw) {
 // Muss zu rangliste.js' Filter/Renumbering passen, sonst zeigt diese Seite einen anderen
 // Ranglistenplatz als die Tabelle (siehe dort fuer Begruendung).
 const VALID_SPIELER_ID_RE = /^(\d{2}-.+|INT-\d+)$/;   // U15-international: auch "INT-<uid>"
+// Wertung "best of N" (?bestof=, Standard 3) -- gleiche Rangbestimmung wie rangliste.js
+const BEST_OF = Number(new URLSearchParams(window.location.search).get("bestof")) || 3;
 function renumberRanglistenplatz(rows) {
   const byDis = new Map();
   for (const r of rows) {
+    r.Points = r[`Points${BEST_OF}`] ?? r.Points;
     if (!byDis.has(r.DIS)) byDis.set(r.DIS, []);
     byDis.get(r.DIS).push(r);
   }
-  // Punktgleiche Spieler teilen sich den Rang (1, 2, 2, 4 ...) -- wie die offizielle DBV-RL
-  // (User-Vorgabe 2026-09-30); vorher fortlaufend i + 1. FRang bleibt fortlaufend (offiziell auch).
   for (const group of byDis.values()) {
-    group.sort((a, b) => Number(a.Ranglistenplatz) - Number(b.Ranglistenplatz));
+    group.sort((a, b) => Number(b.Points) - Number(a.Points)
+      || String(a.Nachname || "").localeCompare(String(b.Nachname || ""), "de")
+      || String(a.Vorname || "").localeCompare(String(b.Vorname || ""), "de"));
     group.forEach((r, i) => {
       const prev = group[i - 1];
       r.Ranglistenplatz = prev && Number(prev.Points) === Number(r.Points) ? prev.Ranglistenplatz : i + 1;
@@ -169,6 +172,7 @@ async function init() {
     const tbody = document.createElement("tbody");
     let top5Sum = 0;
     const matchRows = [];
+    rows.forEach((row, i) => { row.IstTop5 = i < BEST_OF; });    // rows: nach Punkten absteigend
     for (const row of rows) {
       const tr = document.createElement("tr");
       if (row.IstTop5) { tr.classList.add("top5"); top5Sum += row.Punkte || 0; }
@@ -194,7 +198,7 @@ async function init() {
 
     const total = document.createElement("p");
     total.className = "dis-total";
-    total.textContent = `Summe (beste 3, ★ markiert): ${top5Sum} Punkte`;
+    total.textContent = `Summe (best of ${BEST_OF}, ★ markiert): ${top5Sum} Punkte`;
     block.appendChild(total);
 
     for (const row of matchRows) { block.appendChild(renderMatchPanel(row)); }
