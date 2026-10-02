@@ -3,27 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Internationale U15-Rangliste - BRAIN</title>
+<title>U15-Spielstärke international - BRAIN</title>
 <link rel="stylesheet" href="assets/rangliste.css">
 </head>
 <body>
 <div class="page">
-  <h1>Internationale U15-Rangliste (Jahreswertung)</h1>
+  <h1>Internationale U15-Spielstärke (Jahreswertung)</h1>
 
   <p class="variant-note">
-    Jahresrangliste aus den Platzierungen <b>aller internationalen U15-Turniere</b> eines Kalenderjahres
-    (Setzplatzturniere der DBV-Liste, weitere internationale U15-Turniere und die U15-EM), alle Nationen.
-    Bepunktung nach der DBV-Punktetabelle, Spalte &bdquo;IS U15&ldquo;; es zählen die
-    <b>besten N Ergebnisse</b> je Disziplin (Auswahl &bdquo;Wertung&ldquo;: best of 1 bis 5,
-    Standard best of 3). Plätze jenseits von 66 bringen keine Punkte.
-    <br>Platzierungen: offizielle Ergebnislisten (BEC, BTP-Turniere) bzw. aus den KO-Runden der
-    Matchdaten abgeleitet. Wer in der Gruppenphase ausscheidet, wird wie in der DBV-Wertung bei
-    TSO-Turnieren mit dem Platz der entsprechenden KO-Runde gewertet (z.B. Gruppenzweite bei 32er-KO:
-    Platz 33/64). Spieler ohne DBV-SpielerID tragen eine interne Kennung (INT-...); Nation leer =
-    vom Turnier nicht angegeben.
-    <br><a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">&rarr; U15-Spielstärke (aus Matchergebnissen)</a>
-    &nbsp;|&nbsp; <a href="turnierstaerke.html">&rarr; Turnierstärke U15</a>
-    &nbsp;|&nbsp; <a href="../rangliste.html">&larr; zur JWS U19 Rangliste</a>
+    Rangliste nach <b>Spielstärke aus den Matchergebnissen</b> aller internationalen U15-Turniere eines
+    Kalenderjahres (alle Nationen), unabhängig von Platzierungspunkten: Siege gegen starke Gegner zählen mehr,
+    auch über indirekte Vergleiche (A schlägt B, B schlägt C). Bradley-Terry-Modell je Disziplin, alle Matches
+    des Jahres gemeinsam geschätzt (Reihenfolge egal), Doppel über den Mittelwert beider Partner, Walkover zählen nicht.
+    <br><b>Stärke</b> auf Elo-Skala: Durchschnittsspieler = 1500, 200 Punkte Unterschied &asymp; 76 % Gewinnchance.
+    <b>Gewinnchance</b> = Wahrscheinlichkeit, einen durchschnittlichen internationalen U15-Spieler zu schlagen.
+    In der Rangliste steht nur, wer im Jahr <b>mindestens 6 Matches</b> in der Disziplin hat; Spieler mit
+    wenigen Matches werden zur Mitte gezogen. Im Holdout-Test (2025) sagte dieses Modell spätere Matches zu 75,7 %
+    richtig voraus, die Platzierungspunkte zu 71,6 %.
+    <br>Spieler ohne DBV-SpielerID tragen eine interne Kennung (INT-...); Nation leer = vom Turnier nicht angegeben.
+    <br><a href="../u15-international/rangliste-u15-international.html">&rarr; U15-Rangliste (Platzierungen)</a>
+    &nbsp;|&nbsp; <a href="../u15-international/turnierstaerke.html">&rarr; Turnierstärke U15</a>
+    &nbsp;|&nbsp; <a href="../rangliste.html">&larr; JWS U19 Rangliste</a>
     &nbsp;|&nbsp; Anregungen und Rückmeldungen an edi.klein@badminton.de.
   </p>
 
@@ -38,16 +38,6 @@
   </div>
 
   <div class="filters">
-    <div>
-      <label for="f-bestof">Wertung</label>
-      <select id="f-bestof">
-        <option value="1">best of 1</option>
-        <option value="2">best of 2</option>
-        <option value="3" selected>best of 3</option>
-        <option value="4">best of 4</option>
-        <option value="5">best of 5</option>
-      </select>
-    </div>
     <div>
       <label for="f-dis">Disziplin</label>
       <select id="f-dis"><option value="">-- alle --</option></select>

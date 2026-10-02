@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turnierstärke U15 international</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #fbfaf7; --surface-1: #ffffff; --surface-2: #f1efe9; --border: #e2ded3;
+    --text-primary: #17150f; --text-secondary: #5c5a51; --text-muted: #8b887c;
+    --accent: #184f95; --focus: #184f95;
+    --em: #2a78d6; --is: #1baf7a; --we: #eb6834;
+    --em-soft: #e6eefa; --is-soft: #e1f5ec; --we-soft: #fce8de;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-0: #16161a; --surface-1: #1e1e22; --surface-2: #26262b; --border: #37373d;
+      --text-primary: #f3f2ee; --text-secondary: #b8b6ad; --text-muted: #86847c;
+      --accent: #5fa0e8; --focus: #5fa0e8;
+      --em: #3987e5; --is: #199e70; --we: #d95926;
+      --em-soft: #1d2c40; --is-soft: #163227; --we-soft: #3a2418;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #16161a; --surface-1: #1e1e22; --surface-2: #26262b; --border: #37373d;
+    --text-primary: #f3f2ee; --text-secondary: #b8b6ad; --text-muted: #86847c;
+    --accent: #5fa0e8; --focus: #5fa0e8;
+    --em: #3987e5; --is: #199e70; --we: #d95926;
+    --em-soft: #1d2c40; --is-soft: #163227; --we-soft: #3a2418;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--surface-0); color: var(--text-primary);
+    font-family: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums;
+    padding-inline: 16px; padding-block: 20px 48px;
+  }
+  h1, h2 { font-family: "Fraunces", Georgia, serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 920px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+  header.page { display: flex; flex-direction: column; gap: 6px; }
+  header.page h1 { font-size: clamp(24px, 4vw, 34px); margin: 0; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  header.page p { margin: 0; color: var(--text-secondary); font-size: 14px; max-width: 70ch; line-height: 1.55; }
+  header.page .meta { color: var(--text-muted); font-size: 12.5px; }
+  header.page .crosslinks { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; background: var(--surface-2); border-radius: 9px; padding: 4px; }
+  .tabs button { font: inherit; font-size: 13px; font-weight: 600; color: var(--text-secondary); background: transparent;
+    border: none; border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+  .tabs button[aria-pressed="true"] { background: var(--surface-1); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .tabs button:focus-visible, .view-toggle button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-left: auto; }
+  .legend .item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .view-toggle { display: flex; gap: 4px; }
+  .view-toggle button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; cursor: pointer; }
+  .view-toggle button[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .panel-head { padding: 14px 16px 6px; }
+  .panel-head h2 { font-size: 17px; margin: 0 0 2px; font-weight: 600; }
+  .panel-head .sub { font-size: 12.5px; color: var(--text-muted); }
+  .axis-row { padding: 4px 16px 8px; }
+  .axis-row .bar-col { height: 16px; }
+  .axis-row .tick { position: absolute; top: 0; font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
+  ul.rows { list-style: none; margin: 0; padding: 0 16px 14px; display: flex; flex-direction: column; }
+  ul.rows li { padding: 6px 0; border-top: 1px solid var(--border); position: relative; }
+  ul.rows li:first-child { border-top: none; }
+  ul.rows li, .axis-row { display: grid; grid-template-columns: 22px minmax(0, 1.35fr) minmax(90px, 1fr) 56px; align-items: center; column-gap: 12px; }
+  .rank-col { font-size: 12.5px; color: var(--text-muted); text-align: right; }
+  .name-col { min-width: 0; display: flex; align-items: center; gap: 6px; }
+  .name-col .n { font-size: 13.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .name-col .yr { font-size: 11px; color: var(--text-muted); flex: none; }
+  .pill { flex: none; font-size: 10.5px; font-weight: 700; letter-spacing: 0.02em; padding: 2px 6px; border-radius: 999px; line-height: 1.4; }
+  .pill.em { background: var(--em-soft); color: var(--em); }
+  .pill.is { background: var(--is-soft); color: var(--is); }
+  .pill.we { background: var(--we-soft); color: var(--we); }
+  .bar-col { position: relative; height: 18px; min-width: 0; }
+  .bar-col .track { position: absolute; inset: 0; background: var(--surface-2); border-radius: 4px; }
+  .bar-col .fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 4px; min-width: 3px; }
+  .bar-col .fill.em { background: var(--em); } .bar-col .fill.is { background: var(--is); } .bar-col .fill.we { background: var(--we); }
+  .bar-col .grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--border); opacity: .7; }
+  .val-col { text-align: right; font-size: 13px; font-weight: 600; }
+  li:hover .fill, li:focus-within .fill { filter: brightness(1.08); }
+  li .tooltip { display: none; position: absolute; right: 0; top: calc(100% + 4px); z-index: 5; background: var(--text-primary);
+    color: var(--surface-1); font-size: 11.5px; line-height: 1.5; padding: 7px 10px; border-radius: 8px; white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  li:hover .tooltip, li:focus-within .tooltip { display: block; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.data-table caption { text-align: left; padding: 12px 16px 4px; font-size: 12.5px; color: var(--text-muted); }
+  table.data-table th, table.data-table td { padding: 7px 10px; text-align: left; border-top: 1px solid var(--border); white-space: nowrap; }
+  table.data-table th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  table.data-table td.num { text-align: right; }
+  .table-wrap { overflow-x: auto; }
+  footer.note { font-size: 12px; color: var(--text-muted); line-height: 1.6; max-width: 75ch; }
+  footer.note code { background: var(--surface-2); border-radius: 4px; padding: 1px 5px; font-size: 11.5px; }
+  @media (max-width: 640px) { ul.rows li, .axis-row { grid-template-columns: 22px minmax(0, 1fr) 70px 46px; } .name-col .yr { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>Turnierstärke der internationalen U15-Turniere</h1>
+    <p>Ein Turnier ist stark, wenn viele spielstarke Spieler teilgenommen haben. Spielstärke aus den
+      <strong>Matchergebnissen</strong> aller internationalen U15-Turniere des Jahres (Bradley-Terry-Modell, alle Nationen).
+      Je Disziplin zählt der Mittelwert der <strong>16 stärksten Spieler</strong> (Einzel) bzw. der <strong>8 stärksten Paare</strong>
+      (Doppel, Mixed). Angezeigt als <strong>Gewinnwahrscheinlichkeit</strong> dieses Spitzenfelds gegen einen durchschnittlichen
+      internationalen U15-Spieler.</p>
+    <p class="meta" id="meta-line">Lädt…</p>
+    <p class="crosslinks">
+      <a href="rangliste-u15-international.html">→ U15-Rangliste (Platzierungen)</a>
+      <a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">→ U15-Spielstärke-Rangliste</a>
+      <a href="../rangliste.html">→ JWS U19 Rangliste</a>
+    </p>
+  </header>
+
+  <div class="controls">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Disziplin"></div>
+    <div class="tabs" id="jahr-tabs" role="tablist" aria-label="Jahr"></div>
+    <div class="legend">
+      <span class="item"><span class="swatch" style="background:var(--em)"></span>EM – U15-Europameisterschaft</span>
+      <span class="item"><span class="swatch" style="background:var(--is)"></span>IS – DBV-Setzplatzturnier</span>
+      <span class="item"><span class="swatch" style="background:var(--we)"></span>weitere int. U15-Turniere</span>
+    </div>
+    <div class="view-toggle" role="group" aria-label="Ansicht">
+      <button id="btn-chart" aria-pressed="true">Diagramm</button>
+      <button id="btn-table" aria-pressed="false">Tabelle</button>
+    </div>
+  </div>
+
+  <section class="panel" id="chart-panel">
+    <div class="panel-head">
+      <h2 id="panel-title">Gesamt</h2>
+      <div class="sub" id="panel-sub"></div>
+    </div>
+    <div class="axis-row" id="axis-row" aria-hidden="true"></div>
+    <ul class="rows" id="rows"></ul>
+  </section>
+
+  <section class="panel" id="table-panel" hidden>
+    <div class="table-wrap">
+      <table class="data-table">
+        <caption>Gleiche Daten als Tabelle — zum Vergleichen exakter Werte.</caption>
+        <thead><tr id="table-head"></tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="note">
+    Spielstärke je Spieler: Bradley-Terry-Modell je Disziplin und Kalenderjahr aus allen Matches der
+    internationalen U15-Turniere (ohne Walkover), Doppel über den Mittelwert beider Partner, mit Regularisierung
+    (Spieler mit wenigen Matches werden zur Mitte gezogen). Das Modell sagt spätere Matches besser vorher als die
+    Platzierungspunkte (Holdout 2025: 75,7 % vs. 71,6 % Treffer). Felder mit weniger als 16 Spielern bzw.
+    8 Paaren werden mit Durchschnittsspielern aufgefüllt, damit kleine Felder nicht künstlich stark wirken.
+    Gesamt = Mittel über die angebotenen Disziplinen. Werte sind innerhalb eines Jahres vergleichbar,
+    zwischen Jahren nur grob (getrennte Schätzungen). Quelle: <code>export_u15_bt_web.py</code>,
+    Matchdaten aus tournamentsoftware, BTP-Exporten, badnet und dem BEC-Datahub.
+    <br>Analyse vom 02.10.2026; Rückfragen und Anregungen an Edi Klein (edi.klein@badminton.de)
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var DIS_LABELS = { GESAMT: "Gesamt (gemittelt über alle Disziplinen)", JE: "Jungeneinzel (JE)", ME: "Mädcheneinzel (ME)",
+                     JD: "Jungendoppel (JD)", MD: "Mädchendoppel (MD)", XD: "Mixed (XD)" };
+  var DIS_ORDER = ["GESAMT", "JE", "ME", "JD", "MD", "XD"];
+  var TYP_CLASS = { EM: "em", IS: "is", weitere: "we" };
+  var TYP_LABEL = { EM: "EM", IS: "IS", weitere: "weitere" };
+  var AXIS_MIN = 0, AXIS_MAX = 100, AXIS_MID = 50;
+  var state = { disziplin: "GESAMT", jahr: null, view: "chart", data: null, jahre: [] };
+
+  function pct(v) { return (Math.max(AXIS_MIN, Math.min(AXIS_MAX, v)) - AXIS_MIN) / (AXIS_MAX - AXIS_MIN) * 100; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function rankBy(rows) {
+    rows.sort(function (a, b) { return b.staerke - a.staerke; });
+    var rang = 0, last = null;
+    rows.forEach(function (r, i) { if (r.staerke !== last) { rang = i + 1; last = r.staerke; } r.rang = rang; });
+    return rows;
+  }
+
+  function rowsForCurrent() {
+    var src = state.disziplin === "GESAMT" ? state.data.gesamt
+      : state.data.je_disziplin.filter(function (r) { return r.disziplin === state.disziplin; });
+    return rankBy(src.filter(function (r) { return r.jahr === state.jahr; }).map(function (r) { return Object.assign({}, r); }));
+  }
+
+  function tabButtons(el, values, current, label, onClick) {
+    el.innerHTML = "";
+    values.forEach(function (v) {
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = label(v); b.setAttribute("role", "tab");
+      b.setAttribute("aria-pressed", v === current ? "true" : "false");
+      b.addEventListener("click", function () { onClick(v); });
+      el.appendChild(b);
+    });
+  }
+
+  function buildTabs() {
+    tabButtons(document.getElementById("tabs"), DIS_ORDER, state.disziplin,
+      function (d) { return d === "GESAMT" ? "Gesamt" : d; }, function (d) { state.disziplin = d; render(); });
+    tabButtons(document.getElementById("jahr-tabs"), state.jahre, state.jahr,
+      function (j) { return String(j); }, function (j) { state.jahr = j; render(); });
+  }
+
+  function buildAxis() {
+    var html = '<div class="rank-col"></div><div class="name-col"></div><div class="bar-col">';
+    [{ v: AXIS_MIN, a: "left" }, { v: AXIS_MID, a: "center" }, { v: AXIS_MAX, a: "right" }].forEach(function (t) {
+      var style = "left:" + pct(t.v).toFixed(2) + "%;";
+      if (t.a === "center") style += "transform:translateX(-50%);";
+      if (t.a === "right") style += "transform:translateX(-100%);";
+      html += '<span class="tick" style="' + style + '">' + t.v + " %</span>";
+    });
+    document.getElementById("axis-row").innerHTML = html + '</div><div class="val-col"></div>';
+  }
+
+  function render() {
+    buildTabs();
+    var rows = rowsForCurrent();
+    var g = state.disziplin === "GESAMT";
+    document.getElementById("panel-title").textContent = DIS_LABELS[state.disziplin] + " — " + state.jahr;
+    document.getElementById("panel-sub").textContent = rows.length + " Turniere · Gewinnwahrscheinlichkeit des "
+      + (g ? "Spitzenfelds" : (state.disziplin.charAt(1) === "E" ? "Top-16-Mittels" : "Top-8-Mittels"))
+      + " gegen einen durchschnittlichen int. U15-Spieler";
+    buildAxis();
+    document.getElementById("rows").innerHTML = rows.map(function (r) {
+      var cls = TYP_CLASS[r.typ] || "we";
+      var info = g ? (r.teilnehmer_gesamt + " Spieler/Paare · " + r.n_disziplinen + " Disziplinen")
+                   : (r.teilnehmer + " " + (state.disziplin.charAt(1) === "E" ? "Spieler" : "Paare") + " · " + r.gewertet
+                      + " gewertet · Top-Mittel " + r.elo_top + " (Elo-Skala)");
+      return '<li tabindex="0"><span class="rank-col">' + r.rang + "</span>"
+        + '<span class="name-col"><span class="pill ' + cls + '">' + TYP_LABEL[r.typ] + "</span>"
+        + '<span class="n" title="' + esc(r.name) + '">' + esc(r.name) + '</span><span class="yr">KW ' + r.kw + "</span></span>"
+        + '<span class="bar-col"><span class="track"></span><span class="grid" style="left:' + pct(AXIS_MID).toFixed(2) + '%"></span>'
+        + '<span class="fill ' + cls + '" style="width:' + pct(r.staerke).toFixed(2) + '%"></span></span>'
+        + '<span class="val-col">' + r.staerke.toFixed(1) + " %</span>"
+        + '<span class="tooltip">' + esc(r.name) + " · " + r.jahr + " KW " + r.kw + "<br>" + info + "</span></li>";
+    }).join("");
+    renderTable(rows, g);
+  }
+
+  function renderTable(rows, g) {
+    var cols = g ? ["Rang", "Turnier", "KW", "Typ", "Spieler/Paare", "Disziplinen", "Stärke"]
+                 : ["Rang", "Turnier", "KW", "Typ", "Teilnehmer", "Gewertet", "Top-Mittel (Elo)", "Stärke"];
+    document.getElementById("table-head").innerHTML = cols.map(function (c) { return "<th>" + c + "</th>"; }).join("");
+    document.getElementById("table-body").innerHTML = rows.map(function (r) {
+      var cells = g ? [r.rang, esc(r.name), r.kw, TYP_LABEL[r.typ], r.teilnehmer_gesamt, r.n_disziplinen, r.staerke.toFixed(1) + " %"]
+                    : [r.rang, esc(r.name), r.kw, TYP_LABEL[r.typ], r.teilnehmer, r.gewertet, r.elo_top, r.staerke.toFixed(1) + " %"];
+      return "<tr>" + cells.map(function (v, i) {
+        return '<td class="' + (i === 1 || i === 3 ? "" : "num") + '">' + v + "</td>";
+      }).join("") + "</tr>";
+    }).join("");
+  }
+
+  function setView(view) {
+    document.getElementById("btn-chart").setAttribute("aria-pressed", view === "chart" ? "true" : "false");
+    document.getElementById("btn-table").setAttribute("aria-pressed", view === "table" ? "true" : "false");
+    document.getElementById("chart-panel").hidden = view !== "chart";
+    document.getElementById("table-panel").hidden = view !== "table";
+  }
+  document.getElementById("btn-chart").addEventListener("click", function () { setView("chart"); });
+  document.getElementById("btn-table").addEventListener("click", function () { setView("table"); });
+
+  fetch("data/turnier_staerke.json").then(function (r) { return r.json(); }).then(function (json) {
+    state.data = json;
+    state.jahre = Array.from(new Set(json.gesamt.map(function (r) { return r.jahr; }))).sort().reverse();
+    state.jahr = state.jahre[0];
+    document.getElementById("meta-line").textContent = json.gesamt.length + " Turniere · " + state.jahre.slice().reverse().join(", ")
+      + " · Stand " + json.generated_at.slice(0, 10);
+    render();
+  }).catch(function (err) {
+    document.getElementById("meta-line").textContent = "Daten konnten nicht geladen werden.";
+    console.error(err);
+  });
+})();
+</script>
+</body>
+</html>
