@@ -12,9 +12,17 @@ const COLUMNS = [
   { key: "Nation", label: "Nation" },
   { key: "GJahr", label: "GJahr", numeric: true },
   { key: "Points", label: "Punkte", numeric: true },
+  // H2H-Spalten (User-Vorgabe 2026-10-03): Bilanz gegen die 5 naechsten Ranglisten-Nachbarn je Richtung
+  // innerhalb der aktuellen Filterauswahl, Daten aus data/kw/<jahr>_KW00_h2h_test.json (Exporter).
+  { key: "H2H", label: "H2H", sortable: false,
+    tooltip: "Kopf-an-Kopf-Bilanz gegen die 5 nächsten Ranglisten-Nachbarn oberhalb und unterhalb "
+      + "innerhalb der aktuellen Filterauswahl (echte Ergebnisse der internationalen U15-Turniere des Jahres): "
+      + "✓ = Rangfolge bestätigt, ✗ = widerspricht ihr. Zum Überfahren: Details je Nachbar." },
+  { key: "H2HPct", label: "H2H in%", sortable: false,
+    tooltip: "Anteil ✓ an allen entschiedenen Vergleichen (✓+✗) mit den 5 nächsten Ranglisten-Nachbarn "
+      + "oberhalb und unterhalb innerhalb der aktuellen Filterauswahl. Zum Überfahren: Details je Nachbar." },
   { key: "Turniere", label: "#Turniere", numeric: true },
   { key: "Verein", label: "Verein" },
-  { key: "SpielerID", label: "SpielerID" },
 ];
 
 const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
@@ -569,7 +577,6 @@ function applyFilterChange() {
 // beim Laden zurueck in die vertraute {Turnier, Ergebnis}-Form dekodiert, damit
 // computeH2hNeighbors()/h2hEntryHtml() unveraendert bleiben koennen.
 async function mergeH2hData(week) {
-  return;   // U15-international: keine H2H-Daten (Spalten entfernt), kein 404-Abruf
   const stem = `${week.year}_KW${String(week.kw).padStart(2, "0")}`;
   let payload;
   try {
