@@ -5,26 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Internationale U15-Rangliste - BRAIN</title>
 <link rel="stylesheet" href="assets/rangliste.css">
+<style>
+  .subtitle { font-size: 0.95rem; color: var(--text-muted); margin: -8px 0 16px; }
+  .fn { position: relative; font-size: 0.75em; vertical-align: super; line-height: 0; cursor: help; outline: none; }
+  .fn-text { display: none; position: absolute; left: 0; top: 1.6em; z-index: 20; width: min(34em, 85vw);
+             padding: 10px 12px; background: var(--bg); color: var(--text); border: 1px solid var(--border);
+             box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 0.87rem; line-height: 1.5; white-space: normal; }
+  .fn:hover .fn-text, .fn:focus .fn-text { display: block; }
+</style>
 </head>
 <body>
 <div class="page">
-  <h1>Internationale U15-Rangliste (Jahreswertung)</h1>
+  <h1>Rangliste "U15 International nach Turnierergebnis"</h1>
+  <p class="subtitle">DBV Jugend &middot; experimentelle Rangliste
+    <span class="fn" tabindex="0">(*)<span class="fn-text">(*) Dies ist keine offizielle Rangliste des
+      DBV (Deutscher Badminton-Verband). Sie wurde experimentell erstellt und soll Zusammenhänge
+      verdeutlichen, neue Einsichten ermöglichen und dadurch der Weiterentwicklung des JWS
+      (Jugendwettkampfsystem) dienen.<br><br>1. Oktober 2026, Edi Klein (Vorsitzender des DBV
+      Ausschuss für Jugend)<br>Anmerkungen an: edi.klein@badminton.de</span></span></p>
 
   <p class="variant-note">
-    Jahresrangliste aus den Platzierungen <b>aller internationalen U15-Turniere</b> eines Kalenderjahres
-    (Setzplatzturniere der DBV-Liste, weitere internationale U15-Turniere und die U15-EM), alle Nationen.
-    Bepunktung nach der DBV-Punktetabelle, Spalte &bdquo;IS U15&ldquo; (U15-EM: Spalte &bdquo;U15 EM&ldquo;); es zählen die
-    <b>besten N Ergebnisse</b> je Disziplin (Auswahl &bdquo;Wertung&ldquo;: best of 1 bis 5,
-    Standard best of 3). Plätze jenseits von 66 bringen keine Punkte.
-    <br>Platzierungen: offizielle Ergebnislisten (BEC, BTP-Turniere) bzw. aus den KO-Runden der
-    Matchdaten abgeleitet. Wer in der Gruppenphase ausscheidet, wird wie in der DBV-Wertung bei
-    TSO-Turnieren mit dem Platz der entsprechenden KO-Runde gewertet (z.B. Gruppenzweite bei 32er-KO:
-    Platz 33/64). Spieler ohne DBV-SpielerID tragen eine interne Kennung (INT-...); Nation leer =
-    vom Turnier nicht angegeben.
-    <br><a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">&rarr; U15-Spielstärke (aus Matchergebnissen)</a>
-    &nbsp;|&nbsp; <a href="turnierstaerke.html">&rarr; Turnierstärke U15</a>
-    &nbsp;|&nbsp; <a href="../rangliste.html">&larr; zur JWS U19 Rangliste</a>
-    &nbsp;|&nbsp; Anregungen und Rückmeldungen an edi.klein@badminton.de.
+	Diese Jahres(end)rangliste errechnet sich aus den <b>Platzierungen</b> 
+	bei internationalen U15-Turnieren eines Kalenderjahres: 
+	a) alle DBV JWS - Wertungsturniere
+	b) bei badmintoneurope.com ausgeschriebene internationale U15-Turniere
+	c) die U15-EM.
+	Die Bepunktung erfolgt nach der DBV-Punktetabelle U15, 
+	Spalten „IS U15“ und "U15 EM". 
+	Es zählen die besten N Ergebnisse je Disziplin 
+	(Auswahl „Wertung“: best of 1 bis 5; Standard: best of 3).
+	Die Platzierungen sind den Ergebnislisten entnommen soweit sie vorliegen.
+	Andernfalls aus den Matchergebnissen abgeleitet.
+	<br>Diese Rangliste kann nur als grober Anhaltspunkt dienen, 
+	da alle Turniere gleich bewertet sind: 
+	für einen x-ten Platz gibt es ohne Berücksichtigung der Turnierstärke 
+	gleich viele Punkte, obwohl die Turniere manchmal stärker und manchmal 
+	schwächer besetzt sind.
+	<br>Eine
+	<a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">
+	  &rarr; Rangliste "U15 International nach Spielstärke"</a>,
+	die die Platzierungen aus Matchergebnissen ableitet, 
+	bildet die Realität besser ab und ist eine geeignete Grundlage 
+	für die Bewertung der
+	<a href="turnierstaerke.html">&rarr; Turnierstärke der internationalen U15 Turniere</a>. 
+	Dadurch wird auch eine gezielte Auswahl von "IS U15" Wertungsturnieren 
+	für künftige Turnierjahre ermöglicht.
+    <br>Anregungen und Rückmeldungen an edi.klein@badminton.de.
   </p>
 
   <div class="tabs">

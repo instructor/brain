@@ -5,26 +5,89 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>U15-Spielstärke international - BRAIN</title>
 <link rel="stylesheet" href="assets/rangliste.css">
+<style>
+  .subtitle { font-size: 0.95rem; color: var(--text-muted); margin: -8px 0 16px; }
+  .fn { position: relative; font-size: 0.75em; vertical-align: super; line-height: 0; cursor: help; outline: none; }
+  .fn-text { display: none; position: absolute; left: 0; top: 1.6em; z-index: 20; width: min(34em, 85vw);
+             padding: 10px 12px; background: var(--bg); color: var(--text); border: 1px solid var(--border);
+             box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 0.87rem; line-height: 1.5; white-space: normal; }
+  .fn:hover .fn-text, .fn:focus .fn-text { display: block; }
+  /* Hover "Bradley-Terry-Modell": Popup ueber die volle Breite des Infokastens (kein Ueberlauf rechts) */
+  .variant-note { position: relative; }
+  .bt { color: var(--accent); text-decoration: underline dotted; cursor: help; outline: none; }
+  .bt-text { display: none; position: absolute; left: 0; right: 0; margin-top: 6px; z-index: 20;
+             padding: 12px 14px; background: var(--bg); color: var(--text); border: 1px solid var(--border);
+             box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 0.87rem; font-weight: normal; line-height: 1.5; }
+  .bt:hover .bt-text, .bt:focus .bt-text { display: block; }
+  .bt-text .formel { display: block; margin: 0.6em 0; font-family: Consolas, monospace; }
+</style>
 </head>
 <body>
 <div class="page">
-  <h1>Internationale U15-Spielstärke (Jahreswertung)</h1>
+  <h1>Rangliste "U15 International nach Spielstärke"</h1>
+  <p class="subtitle">DBV Jugend &middot; experimentelle Rangliste
+    <span class="fn" tabindex="0">(*)<span class="fn-text">(*) Dies ist keine offizielle Rangliste des
+      DBV (Deutscher Badminton-Verband). Sie wurde experimentell erstellt und soll Zusammenhänge
+      verdeutlichen, neue Einsichten ermöglichen und dadurch der Weiterentwicklung des JWS
+      (Jugendwettkampfsystem) dienen.<br><br>1. Oktober 2026, Edi Klein (Vorsitzender des DBV
+      Ausschuss für Jugend)<br>Anmerkungen an: edi.klein@badminton.de</span></span></p>
 
   <p class="variant-note">
-    Rangliste nach <b>Spielstärke aus den Matchergebnissen</b> aller internationalen U15-Turniere eines
-    Kalenderjahres (alle Nationen), unabhängig von Platzierungspunkten: Siege gegen starke Gegner zählen mehr,
-    auch über indirekte Vergleiche (A schlägt B, B schlägt C). Bradley-Terry-Modell je Disziplin, alle Matches
-    des Jahres gemeinsam geschätzt (Reihenfolge egal), Doppel über den Mittelwert beider Partner, Walkover zählen nicht.
-    <br><b>Stärke</b> auf Elo-Skala: Durchschnittsspieler = 1500, 200 Punkte Unterschied &asymp; 76 % Gewinnchance.
-    <b>Gewinnchance</b> = Wahrscheinlichkeit, einen durchschnittlichen internationalen U15-Spieler zu schlagen.
-    In der Rangliste steht nur, wer im Jahr <b>mindestens 6 Matches</b> in der Disziplin hat; Spieler mit
-    wenigen Matches werden zur Mitte gezogen. Im Holdout-Test (2025) sagte dieses Modell spätere Matches zu 75,7 %
-    richtig voraus, die Platzierungspunkte zu 71,6 %.
-    <br>Spieler ohne DBV-SpielerID tragen eine interne Kennung (INT-...); Nation leer = vom Turnier nicht angegeben.
-    <br><a href="../u15-international/rangliste-u15-international.html">&rarr; U15-Rangliste (Platzierungen)</a>
-    &nbsp;|&nbsp; <a href="../u15-international/turnierstaerke.html">&rarr; Turnierstärke U15</a>
-    &nbsp;|&nbsp; <a href="../rangliste.html">&larr; JWS U19 Rangliste</a>
-    &nbsp;|&nbsp; Anregungen und Rückmeldungen an edi.klein@badminton.de.
+    Diese Jahres(end)rangliste errechnet sich aus den <b>Matchergebnissen</b> 
+	bei internationalen U15-Turnieren eines Kalenderjahres: 
+	a) alle DBV JWS - Wertungsturniere
+	b) bei badmintoneurope.com ausgeschriebene internationale U15-Turniere
+	c) die U15-EM.
+	<br>Es gibt keine Bepunktung nach einer Punktetabelle, 
+	weil dadurch alle Turniere gleich bewertet wären, 
+	unabhängig von der tatsächlichen Turnierstärke.
+	Die Spielstärke eines Spielers bzw. einer Spielerin 
+	(nach dem <span class="bt" tabindex="0">&rarr; Bradley-Terry-Modell<span class="bt-text"><b>Bradley-Terry-Modell einfach erklärt</b><br><br>
+	Die Grundidee: Jeder Spieler hat eine unsichtbare &bdquo;Stärke&ldquo;, eine positive Zahl. Wenn zwei
+	Spieler gegeneinander antreten, hängt die Siegchance nur vom Verhältnis ihrer Stärken ab:
+	<span class="formel">P(A schlägt B) = Stärke_A / (Stärke_A + Stärke_B)</span>
+	Hat A die Stärke 3 und B die Stärke 1, gewinnt A mit 3/(3+1) = 75 %. Sind beide gleich stark,
+	steht es 50:50. Die Rangliste ergibt sich am Ende einfach, indem man die Spieler nach ihrer
+	Stärke sortiert.<br><br>
+	Woher kommen die Stärken? Man kennt sie ja nicht, man kennt nur die Matchergebnisse.
+	Das Modell dreht die Frage deshalb um: Welche Stärkewerte machen die tatsächlich
+	beobachteten Ergebnisse am wahrscheinlichsten? Das nennt man Maximum-Likelihood-Schätzung.
+	Praktisch geht das mit einem einfachen iterativen Verfahren:<br><br>
+	Alle Spieler starten mit Stärke 1.<br>
+	Für jeden Spieler wird neu berechnet: Stärke = (Anzahl seiner Siege) &divide; Summe über alle
+	seine Matches von 1/(eigene Stärke + Gegnerstärke).<br>
+	Die Werte werden normiert (z.&nbsp;B. so, dass der Durchschnitt 1 ist), und das Ganze wird
+	wiederholt, bis sich die Zahlen kaum noch ändern.<br><br>
+	Intuitiv passiert dabei Folgendes: Wer oft gewinnt, wird stärker. Wer aber nur gegen
+	schwache Gegner gewinnt, profitiert weniger, und eine Niederlage gegen einen sehr starken
+	Gegner schadet kaum.<br><br>
+	Ein kleines Beispiel: Anna schlägt Ben, Ben schlägt Clara, Clara schlägt Anna, Anna schlägt
+	Ben erneut. Eine reine Siegzählung ergibt Anna 2, Ben 1, Clara 1. Bradley-Terry
+	berücksichtigt zusätzlich, wen man geschlagen hat. Claras Sieg gegen die starke Anna zählt
+	mehr als Bens Sieg gegen Clara, deshalb landet Clara vor Ben, obwohl beide nur einen Sieg
+	haben.<br><br>
+	Warum das für Badminton-Ranglisten gut passt: Es spielt nie jeder gegen jeden, und das
+	Modell braucht das auch nicht. Wenn A gegen B gewinnt und B gegen C, lässt sich A
+	indirekt mit C vergleichen. Außerdem fließt die Gegnerstärke automatisch ein, man braucht
+	also keine Turnierkategorien und keine Punktetabellen.</span></span>)
+	und damit der Platz in der Jahresrangliste errechnet sich
+	aus den Matchergebnissen aller betrachteten Turniere. 
+	Siege gegen starke Gegner zählen mehr, 
+	auch über indirekte Vergleiche (A schlägt B, B schlägt C).
+	
+	Statt Punkten sind in der Rangliste <b>"Stärke"</b> und <b>"Gewinnchance"</b> 
+	eines Spielers angegeben. 
+	Gewinnchance ist die Wahrscheinlichkeit, 
+	einen durchschnittlichen Spieler dieser Rangliste zu schlagen.
+
+	In der Rangliste steht nur, wer im Jahr mindestens 
+	6 Matches in der Disziplin gespielt hat.
+	<br>Diese Rangliste ist eine geeignete Grundlage für die 
+	<a href="../u15-international/turnierstaerke.html">&rarr; Bewertung der Turnierstärke</a>
+	der internationalen U15 Turniere, 
+	auch weil badmintoneurope.com die U15 Turniere nicht wie 
+	bei höheren Altersklassen in mehrere Kategorien einteilt.
+	<br>Anregungen und Rückmeldungen an edi.klein@badminton.de.
   </p>
 
   <div class="tabs">

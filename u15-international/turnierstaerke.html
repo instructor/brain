@@ -99,6 +99,13 @@
   .table-wrap { overflow-x: auto; }
   footer.note { font-size: 12px; color: var(--text-muted); line-height: 1.6; max-width: 75ch; }
   footer.note code { background: var(--surface-2); border-radius: 4px; padding: 1px 5px; font-size: 11.5px; }
+  header.page p.subtitle { color: var(--text-muted); font-size: 14px; }
+  .fn { position: relative; font-size: 0.75em; vertical-align: super; line-height: 0; cursor: help; outline: none; }
+  .fn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .fn-text { display: none; position: absolute; left: 0; top: 1.6em; z-index: 20; width: min(34em, 85vw);
+    padding: 10px 12px; background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.18); font-size: 13px; line-height: 1.5; white-space: normal; }
+  .fn:hover .fn-text, .fn:focus .fn-text { display: block; }
   @media (max-width: 640px) { ul.rows li, .axis-row { grid-template-columns: 22px minmax(0, 1fr) 70px 46px; } .name-col .yr { display: none; } }
 </style>
 </head>
@@ -106,17 +113,27 @@
 <div class="wrap">
   <header class="page">
     <h1>Turnierstärke der internationalen U15-Turniere</h1>
-    <p>Ein Turnier ist stark, wenn viele spielstarke Spieler teilgenommen haben. Spielstärke aus den
-      <strong>Matchergebnissen</strong> aller internationalen U15-Turniere des Jahres (Bradley-Terry-Modell, alle Nationen).
-      Je Disziplin zählt der Mittelwert der <strong>16 stärksten Spieler</strong> (Einzel) bzw. der <strong>8 stärksten Paare</strong>
-      (Doppel, Mixed). Angezeigt als <strong>Gewinnwahrscheinlichkeit</strong> dieses Spitzenfelds gegen einen durchschnittlichen
-      internationalen U15-Spieler.</p>
+    <p class="subtitle">DBV Jugend &middot; experimentelle Rangliste
+      <span class="fn" tabindex="0">(*)<span class="fn-text">(*) Dies ist keine offizielle Rangliste des
+        DBV (Deutscher Badminton-Verband). Sie wurde experimentell erstellt und soll Zusammenhänge
+        verdeutlichen, neue Einsichten ermöglichen und dadurch der Weiterentwicklung des JWS
+        (Jugendwettkampfsystem) dienen.<br><br>1. Oktober 2026, Edi Klein (Vorsitzender des DBV
+        Ausschuss für Jugend)<br>Anmerkungen an: edi.klein@badminton.de</span></span></p>
+    <p>
+		Ein Turnier ist <b>stark</b>, wenn viele spielstarke Spieler teilgenommen haben, 
+		gerechnet über deutsche und internationale Spieler. 
+		Basis ist die
+		<a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">
+		  &rarr; Rangliste "U15 International nach Spielstärke"</a>,
+		die aus den Matchergebnissen der internationalen U15-Turniere 
+		eines Jahres berechnet wird.
+		
+		Für jedes Turnier zählt pro Disziplin der Mittelwert der 
+		16 stärksten Spieler (Einzel) bzw. der 8 stärksten Paare (Doppel, Mixed). 
+		Das <b>Ranking</b> erfolgt nach <b>Gewinnwahrscheinlichkeit</b> dieses Spitzenfeldes 
+		gegen einen durchschnittlichen internationalen U15-Spieler.
+	</p>
     <p class="meta" id="meta-line">Lädt…</p>
-    <p class="crosslinks">
-      <a href="rangliste-u15-international.html">→ U15-Rangliste (Platzierungen)</a>
-      <a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">→ U15-Spielstärke-Rangliste</a>
-      <a href="../rangliste.html">→ JWS U19 Rangliste</a>
-    </p>
   </header>
 
   <div class="controls">
@@ -124,7 +141,7 @@
     <div class="tabs" id="jahr-tabs" role="tablist" aria-label="Jahr"></div>
     <div class="legend">
       <span class="item"><span class="swatch" style="background:var(--em)"></span>EM – U15-Europameisterschaft</span>
-      <span class="item"><span class="swatch" style="background:var(--is)"></span>IS – DBV-Setzplatzturnier</span>
+      <span class="item"><span class="swatch" style="background:var(--is)"></span>IS – DBV-Wertungsturnier</span>
       <span class="item"><span class="swatch" style="background:var(--we)"></span>weitere int. U15-Turniere</span>
     </div>
     <div class="view-toggle" role="group" aria-label="Ansicht">
