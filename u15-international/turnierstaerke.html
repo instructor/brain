@@ -120,8 +120,10 @@
         (Jugendwettkampfsystem) dienen.<br><br>1. Oktober 2026, Edi Klein (Vorsitzender des DBV
         Ausschuss für Jugend)<br>Anmerkungen an: edi.klein@badminton.de</span></span></p>
     <p>
-		Ein Turnier ist <b>stark</b>, wenn viele spielstarke Spieler teilgenommen haben, 
-		gerechnet über deutsche und internationale Spieler. 
+		Rangfolge der Turnierstärke aller internationalen U15 Turniere, die im
+		<a href="https://badmintoneurope.com/web/corporate/calendar">&rarr; Turnierkalender von badmintoneurope.com</a>
+		aufgeführt sind. Ein Turnier ist <b>stark</b>, wenn viele <b>spielstarke deutsche und internationale Spieler</b> teilgenommen haben.
+
 		Basis ist die
 		<a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">
 		  &rarr; Rangliste "U15 International nach Spielstärke"</a>,
@@ -155,7 +157,6 @@
       <h2 id="panel-title">Gesamt</h2>
       <div class="sub" id="panel-sub"></div>
     </div>
-    <div class="axis-row" id="axis-row" aria-hidden="true"></div>
     <ul class="rows" id="rows"></ul>
   </section>
 
@@ -170,13 +171,7 @@
   </section>
 
   <footer class="note">
-    Spielstärke je Spieler: Bradley-Terry-Modell je Disziplin und Kalenderjahr aus allen Matches der
-    internationalen U15-Turniere (ohne Walkover), Doppel über den Mittelwert beider Partner, mit Regularisierung
-    (Spieler mit wenigen Matches werden zur Mitte gezogen). Das Modell sagt spätere Matches besser vorher als die
-    Platzierungspunkte (Holdout 2025: 75,7 % vs. 71,6 % Treffer). Felder mit weniger als 16 Spielern bzw.
-    8 Paaren werden mit Durchschnittsspielern aufgefüllt, damit kleine Felder nicht künstlich stark wirken.
-    Gesamt = Mittel über die angebotenen Disziplinen. Werte sind innerhalb eines Jahres vergleichbar,
-    zwischen Jahren nur grob (getrennte Schätzungen). Quelle: <code>export_u15_bt_web.py</code>,
+    Quelle: <code>export_u15_bt_web.py</code>,
     Matchdaten aus tournamentsoftware, BTP-Exporten, badnet und dem BEC-Datahub.
     <br>Analyse vom 02.10.2026; Rückfragen und Anregungen an Edi Klein (edi.klein@badminton.de)
   </footer>
@@ -227,17 +222,6 @@
       function (j) { return String(j); }, function (j) { state.jahr = j; render(); });
   }
 
-  function buildAxis() {
-    var html = '<div class="rank-col"></div><div class="name-col"></div><div class="bar-col">';
-    [{ v: AXIS_MIN, a: "left" }, { v: AXIS_MID, a: "center" }, { v: AXIS_MAX, a: "right" }].forEach(function (t) {
-      var style = "left:" + pct(t.v).toFixed(2) + "%;";
-      if (t.a === "center") style += "transform:translateX(-50%);";
-      if (t.a === "right") style += "transform:translateX(-100%);";
-      html += '<span class="tick" style="' + style + '">' + t.v + " %</span>";
-    });
-    document.getElementById("axis-row").innerHTML = html + '</div><div class="val-col"></div>';
-  }
-
   function render() {
     buildTabs();
     var rows = rowsForCurrent();
@@ -246,7 +230,6 @@
     document.getElementById("panel-sub").textContent = rows.length + " Turniere · Gewinnwahrscheinlichkeit des "
       + (g ? "Spitzenfelds" : (state.disziplin.charAt(1) === "E" ? "Top-16-Mittels" : "Top-8-Mittels"))
       + " gegen einen durchschnittlichen int. U15-Spieler";
-    buildAxis();
     document.getElementById("rows").innerHTML = rows.map(function (r) {
       var cls = TYP_CLASS[r.typ] || "we";
       var info = g ? (r.teilnehmer_gesamt + " Spieler/Paare · " + r.n_disziplinen + " Disziplinen")
@@ -289,7 +272,10 @@
     state.data = json;
     state.jahre = Array.from(new Set(json.gesamt.map(function (r) { return r.jahr; }))).sort().reverse();
     state.jahr = state.jahre[0];
-    document.getElementById("meta-line").textContent = json.gesamt.length + " Turniere · " + state.jahre.slice().reverse().join(", ")
+    var jeJahr = {};
+    json.gesamt.forEach(function (r) { jeJahr[r.jahr] = (jeJahr[r.jahr] || 0) + 1; });
+    document.getElementById("meta-line").textContent = json.gesamt.length + " Turniere · "
+      + state.jahre.slice().reverse().map(function (j) { return j + " (" + jeJahr[j] + ")"; }).join(", ")
       + " · Stand " + json.generated_at.slice(0, 10);
     render();
   }).catch(function (err) {
