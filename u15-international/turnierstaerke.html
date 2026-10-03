@@ -75,6 +75,8 @@
   .rank-col { font-size: 12.5px; color: var(--text-muted); text-align: right; }
   .name-col { min-width: 0; display: flex; align-items: center; gap: 6px; }
   .name-col .n { font-size: 13.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .name-col a.n { color: inherit; text-decoration: none; }
+  .name-col a.n:hover, .name-col a.n:focus-visible { color: var(--accent); text-decoration: underline; }
   .name-col .yr { font-size: 11px; color: var(--text-muted); flex: none; }
   .pill { flex: none; font-size: 10.5px; font-weight: 700; letter-spacing: 0.02em; padding: 2px 6px; border-radius: 999px; line-height: 1.4; }
   .pill.em { background: var(--em-soft); color: var(--em); }
@@ -124,7 +126,7 @@
 		<a href="https://badmintoneurope.com/web/corporate/calendar">&rarr; Turnierkalender von badmintoneurope.com</a>
 		aufgeführt sind. Ein Turnier ist <b>stark</b>, wenn viele <b>spielstarke deutsche und internationale Spieler</b> teilgenommen haben.
 
-		Basis ist die
+		Basis ist die Länder-übergreifende
 		<a href="../u15-spielstaerke/rangliste-u15-spielstaerke.html">
 		  &rarr; Rangliste "U15 International nach Spielstärke"</a>,
 		die aus den Matchergebnissen der internationalen U15-Turniere 
@@ -191,6 +193,13 @@
   function pct(v) { return (Math.max(AXIS_MIN, Math.min(AXIS_MAX, v)) - AXIS_MIN) / (AXIS_MAX - AXIS_MIN) * 100; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
+  // Turniername als Link auf die Turnierseite (tournamentsoftware, dbv.turnier.de bzw. badnet), sonst Text
+  function turnierLink(r, cls) {
+    var attr = (cls ? ' class="' + cls + '"' : "") + ' title="' + esc(r.name) + '"';
+    return r.url ? '<a' + attr + ' href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.name) + "</a>"
+                 : "<span" + attr + ">" + esc(r.name) + "</span>";
+  }
+
   function rankBy(rows) {
     rows.sort(function (a, b) { return b.staerke - a.staerke; });
     var rang = 0, last = null;
@@ -237,7 +246,7 @@
                       + " gewertet · Top-Mittel " + r.elo_top + " (Elo-Skala)");
       return '<li tabindex="0"><span class="rank-col">' + r.rang + "</span>"
         + '<span class="name-col"><span class="pill ' + cls + '">' + TYP_LABEL[r.typ] + "</span>"
-        + '<span class="n" title="' + esc(r.name) + '">' + esc(r.name) + '</span><span class="yr">KW ' + r.kw + "</span></span>"
+        + turnierLink(r, "n") + '<span class="yr">KW ' + r.kw + "</span></span>"
         + '<span class="bar-col"><span class="track"></span><span class="grid" style="left:' + pct(AXIS_MID).toFixed(2) + '%"></span>'
         + '<span class="fill ' + cls + '" style="width:' + pct(r.staerke).toFixed(2) + '%"></span></span>'
         + '<span class="val-col">' + r.staerke.toFixed(1) + " %</span>"
@@ -251,8 +260,8 @@
                  : ["Rang", "Turnier", "KW", "Typ", "Teilnehmer", "Gewertet", "Top-Mittel (Elo)", "Stärke"];
     document.getElementById("table-head").innerHTML = cols.map(function (c) { return "<th>" + c + "</th>"; }).join("");
     document.getElementById("table-body").innerHTML = rows.map(function (r) {
-      var cells = g ? [r.rang, esc(r.name), r.kw, TYP_LABEL[r.typ], r.teilnehmer_gesamt, r.n_disziplinen, r.staerke.toFixed(1) + " %"]
-                    : [r.rang, esc(r.name), r.kw, TYP_LABEL[r.typ], r.teilnehmer, r.gewertet, r.elo_top, r.staerke.toFixed(1) + " %"];
+      var cells = g ? [r.rang, turnierLink(r, ""), r.kw, TYP_LABEL[r.typ], r.teilnehmer_gesamt, r.n_disziplinen, r.staerke.toFixed(1) + " %"]
+                    : [r.rang, turnierLink(r, ""), r.kw, TYP_LABEL[r.typ], r.teilnehmer, r.gewertet, r.elo_top, r.staerke.toFixed(1) + " %"];
       return "<tr>" + cells.map(function (v, i) {
         return '<td class="' + (i === 1 || i === 3 ? "" : "num") + '">' + v + "</td>";
       }).join("") + "</tr>";
