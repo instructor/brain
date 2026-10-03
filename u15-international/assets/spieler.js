@@ -13,7 +13,7 @@ function weekLabel(jahr, kw) {
 
 // Muss zu rangliste.js' Filter/Renumbering passen, sonst zeigt diese Seite einen anderen
 // Ranglistenplatz als die Tabelle (siehe dort fuer Begruendung).
-const VALID_SPIELER_ID_RE = /^(\d{2}-.+|INT-\d+)$/;   // U15-international: auch "INT-<uid>"
+const VALID_SPIELER_ID_RE = /^(\d{2}-.+|[A-Z]{3}-\d{5})$/;   // U15-international: auch "<Land>-<uid 5-stellig>"
 // Wertung "best of N" (?bestof=, Standard 3) -- gleiche Rangbestimmung wie rangliste.js
 const BEST_OF = Number(new URLSearchParams(window.location.search).get("bestof")) || 3;
 function renumberRanglistenplatz(rows) {

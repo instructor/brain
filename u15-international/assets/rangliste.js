@@ -24,8 +24,8 @@ const DIS_ORDER = ["HE", "DE", "HD", "DD", "HM", "DM"];
 // ("LAND-Name", z.B. "CZE-SoucekCyril") faellt bewusst durch, siehe CLAUDE.md "Rein
 // deutsch"-Regel. User-Vorgabe 2026-08-22: solche Zeilen streichen und ohne sie
 // durchnummerieren.
-// U15-international: alle Nationen -- auslaendische Spieler tragen die Master-Kennung "INT-<uid>".
-const VALID_SPIELER_ID_RE = /^(\d{2}-.+|INT-\d+)$/;
+// U15-international: alle Nationen -- auslaendische Spieler tragen die Kennung "<Land>-<uid 5-stellig>" (ohne Land "XXX-").
+const VALID_SPIELER_ID_RE = /^(\d{2}-.+|[A-Z]{3}-\d{5})$/;
 
 // Schalter (User-Vorgabe 2026-08-24): true = Filter (Selects, Textfelder, Altersklasse-
 // Mehrfachauswahl) werden erst bei Klick auf den "Suche"-Button bzw. Enter in einem Textfeld
