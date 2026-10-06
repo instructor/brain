@@ -21,13 +21,9 @@ const COLUMNS = [
   // jede andere Woche zeigen die Zellen "-"), siehe renderH2hCell()/renderH2hPercentCell() weiter
   // unten. Kein echtes Datenfeld -- buildRowFragment() rendert diese Spalten gesondert.
   { key: "H2H", label: "H2H (*)", sortable: false,
-    tooltip: "Kopf-an-Kopf-Bilanz gegen die 5 nächsten Ranglisten-Nachbarn oberhalb und unterhalb "
+    tooltip: "In Klammern: Anteil ✓ an allen entschiedenen Vergleichen (✓+✗). Kopf-an-Kopf-Bilanz gegen die 5 nächsten Ranglisten-Nachbarn oberhalb und unterhalb "
       + "INNERHALB DER AKTUELLEN FILTERAUSWAHL (anhand echter Turnierergebnisse): ✓ = Rangfolge "
       + "bestätigt, ✗ = widerspricht ihr. Zum Überfahren: Details je Nachbar." },
-  { key: "H2HPct", label: "H2H in% (*)", sortable: false,
-    tooltip: "Anteil ✓ an allen entschiedenen Vergleichen (✓+✗) mit den 5 nächsten Ranglisten-"
-      + "Nachbarn oberhalb und unterhalb innerhalb der aktuellen Filterauswahl — je höher, desto "
-      + "mehr bestätigen echte Ergebnisse diesen Rangbereich. Zum Überfahren: Details je Nachbar." },
   { key: "Turniere", label: "#Turniere", numeric: true },
   { key: "Verein", label: "Verein" },
   { key: "Bezirk", label: "Bezirk" },
@@ -509,7 +505,13 @@ function renderH2hCell(td, row) {
   const gruen = entries.filter(e => e.Konkordanz === "gruen").length;
   const rot = entries.filter(e => e.Konkordanz === "rot").length;
   td.className = "h2h-cell";
-  td.innerHTML = `<span class="h2h-gruen">${gruen}✓</span> <span class="h2h-rot">${rot}✗</span>`;
+  // Prozentwert (frueher eigene Spalte "H2H in%", User-Vorgabe 2026-10-05 in Klammern hierher):
+  // Anteil gruen an allen entschiedenen Vergleichen, "neutral" zaehlt nicht mit.
+  const entschieden = gruen + rot;
+  const pctHtml = entschieden
+    ? ` <span class="${gruen / entschieden >= 0.5 ? "h2h-gruen" : "h2h-rot"}">(${Math.round((gruen / entschieden) * 100)}%)</span>`
+    : "";
+  td.innerHTML = `<span class="h2h-gruen">${gruen}✓</span> <span class="h2h-rot">${rot}✗</span>${pctHtml}`;
   td.addEventListener("mouseenter", (evt) => showH2hTooltip(evt, row));
   td.addEventListener("mouseleave", scheduleHideH2hTooltip);
 }
