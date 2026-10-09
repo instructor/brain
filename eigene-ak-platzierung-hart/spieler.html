@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spielerdetails - BRAIN Rangliste (eigene AK + Platzierungs-Bonus)</title>
+<link rel="stylesheet" href="assets/rangliste.css">
+<link rel="stylesheet" href="assets/hoeherspiel.css">
+<link rel="stylesheet" href="assets/h2h.css">
+</head>
+<body>
+<div class="page">
+  <a class="back-link" href="rangliste-eigene-ak-platzierung-hart.html">&larr; zurück zur Rangliste (eigene AK + Platzierungs-Bonus)</a>
+  <span id="loading-indicator" class="loading-indicator">wird geladen …</span>
+
+  <div class="player-header">
+    <h1 id="player-name">Rangliste von ...</h1>
+    <span class="spieler-id" id="player-id"></span>
+  </div>
+
+  <table class="summary-table" id="summary-table">
+    <thead><tr><th>Disziplin</th><th>Rang (Original-RL zum Vergleich)</th><th>Punkte</th></tr></thead>
+    <tbody id="summary-body"></tbody>
+  </table>
+
+  <div id="dis-blocks"></div>
+
+  <div class="legend hoeherspiel-legend">
+    <h3>Legende: Bonus-Status</h3>
+    <p class="hoeherspiel-formula">
+      <strong>Berechnung (Platzierungs-Bonus):</strong>
+	  <br>a = Punkte der eigenen AK für die erreichte Platzierung,
+	  <br>b = Punkte der gespielten (höheren) Altersklasse,
+      <br>N = Anzahl Teilnehmer/Paare der Konkurrenz mit mindestens einem gespielten Match (ohne Walkover).
+	  <br>Liegt der Platz in der vorderen Hälfte (Platz × 2 ≤ N, bei Platzbereichen zählt der schlechteste
+	  Platz), zählen die Punkte b, sonst a. Der Bonus ist also b − a oder 0.
+	  Beispiel: Platz 11 bei N = 22 → b; Platz 12 bei N = 22 → a.
+    </p>
+    <dl>
+      <dt><span class="badge badge-hoch">höhergespielt</span></dt>
+      <dd>Turnier in einer Konkurrenz-Altersklasse, die höher liegt als die eigene Spieler-Altersklasse (O19 zählt dabei immer als „höher“ als jede Jugend-AK, auch mehrstufiges Hochspielen z. B. U13→U17 ist u.U. möglich).</dd>
+      <dt><span class="badge badge-bonus">vordere Hälfte p/N</span></dt>
+      <dd>Platz p in der vorderen Hälfte des Feldes mit N Teilnehmern/Paaren — Punkte der gespielten AK.</dd>
+      <dt><span class="badge badge-nobonus">hintere Hälfte p/N</span></dt>
+      <dd>Platz p in der hinteren Hälfte — Punkte der eigenen AK.</dd>
+      <dt><span class="badge badge-nobonus">Feld &lt; 8</span></dt>
+      <dd>Weniger als 8 Teilnehmer/Paare — immer Punkte der eigenen AK.</dd>
+      <dt><span class="badge badge-gap">BWF/BEC-Punkte</span></dt>
+      <dd>Bei internationalen BWF/BEC-Turnieren werden die Punkte der gespielten AK vergeben.</dd>
+      <dt><span class="badge badge-gap">Datenlücke</span></dt>
+      <dd>Keine Teilnehmerzahl ermittelbar (keine Matchdaten) — Punkte der eigenen AK.</dd>
+    </dl>
+  </div>
+</div>
+
+<script src="assets/spieler.js"></script>
+</body>
+</html>
