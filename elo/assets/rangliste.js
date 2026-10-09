@@ -431,6 +431,13 @@ function render() {
   });
 }
 
+// "2026-10-09T23:15:02" -> "09.10.2026, 23:15" (pushed_at = letzter Push, tools/web_set_push_date.py)
+function formatStand(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/.exec(iso || "");
+  if (!m) return iso || "";
+  return `${m[3]}.${m[2]}.${m[1]}` + (m[4] ? `, ${m[4]}:${m[5]}` : "");
+}
+
 async function loadWeek(week) {
   document.getElementById("loading-indicator").style.display = "inline";
   state.currentWeek = week;
@@ -439,7 +446,8 @@ async function loadWeek(week) {
   renumberRanglistenplatz(state.rows);
   populateFilterOptions(state.rows);
   document.getElementById("tab-current").textContent = `Rangliste ${week.label}`;
-  document.getElementById("updated-at").textContent = `zuletzt aktualisiert: ${week.updated_at}`;
+  document.getElementById("updated-at").textContent =
+    `zuletzt aktualisiert: ${formatStand(state.index.pushed_at || week.updated_at)}`;
   render();
 }
 

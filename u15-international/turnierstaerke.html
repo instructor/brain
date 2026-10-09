@@ -277,7 +277,19 @@
   document.getElementById("btn-chart").addEventListener("click", function () { setView("chart"); });
   document.getElementById("btn-table").addEventListener("click", function () { setView("table"); });
 
-  fetch("data/turnier_staerke.json").then(function (r) { return r.json(); }).then(function (json) {
+  // "zuletzt aktualisiert" = letzter Push (pushed_at in data/index.json, tools/web_set_push_date.py),
+  // sonst Erzeugungsdatum der Daten (User-Vorgabe 2026-10-09)
+  function formatStand(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/.exec(iso || "");
+    if (!m) return iso || "";
+    return m[3] + "." + m[2] + "." + m[1] + (m[4] ? ", " + m[4] + ":" + m[5] : "");
+  }
+  Promise.all([
+    fetch("data/turnier_staerke.json").then(function (r) { return r.json(); }),
+    fetch("data/index.json").then(function (r) { return r.json(); }).catch(function () { return {}; })
+  ]).then(function (res) {
+    var json = res[0];
+    state.stand = formatStand(res[1].pushed_at || json.generated_at);
     state.data = json;
     state.jahre = Array.from(new Set(json.gesamt.map(function (r) { return r.jahr; }))).sort().reverse();
     state.jahr = state.jahre[0];
@@ -285,7 +297,7 @@
     json.gesamt.forEach(function (r) { jeJahr[r.jahr] = (jeJahr[r.jahr] || 0) + 1; });
     document.getElementById("meta-line").textContent = json.gesamt.length + " Turniere · "
       + state.jahre.slice().reverse().map(function (j) { return j + " (" + jeJahr[j] + ")"; }).join(", ")
-      + " · Stand " + json.generated_at.slice(0, 10);
+      + " · zuletzt aktualisiert: " + state.stand;
     render();
   }).catch(function (err) {
     document.getElementById("meta-line").textContent = "Daten konnten nicht geladen werden.";

@@ -230,6 +230,7 @@
       "Konkordanzrate" je Variante gegen die "H2H-Ground-Truth", das sind reale Matchergebnisse der
       letzten 12 Monate &middot; Erläuterung der Begriffe am Seitenende.
     </p>
+    <p class="subtitle" id="updated-at"></p>
   </header>
 
   <div class="toggle-row">
@@ -1835,6 +1836,15 @@
     document.body.dataset.weighting = state.mode;
     apply();
   }));
+</script>
+<script>
+  // "zuletzt aktualisiert" = letzter Push (pushed_at in data/index.json der Original-RL, gesetzt von
+  // tools/web_set_push_date.py), wie auf den Ranglistenseiten (User-Vorgabe 2026-10-09).
+  fetch('data/index.json').then(r => r.json()).then(idx => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(idx.pushed_at || '');
+    if (m) document.getElementById('updated-at').textContent =
+      `zuletzt aktualisiert: ${m[3]}.${m[2]}.${m[1]}, ${m[4]}:${m[5]}`;
+  }).catch(() => {});
 </script>
 
 </body>
