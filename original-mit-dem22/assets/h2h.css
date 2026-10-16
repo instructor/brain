@@ -1,0 +1,63 @@
+/* Styles fuer die H2H-Vergleichsspalte (User-Vorgabe 2026-08-31): zeigt beim Ueberfahren die
+   5 naechsten Ranglisten-Nachbarn oberhalb/unterhalb mit echten Kopf-an-Kopf-Ergebnissen. Echte
+   Ergebnisdaten liegen bisher nur fuer KW30/2026 vor (siehe tools/debug_build_h2h_hover_test_
+   data.py) -- fuer jede andere Woche bleiben H2H/OriginalRang schlicht leer, kein Fehler. */
+
+.h2h-cell {
+  cursor: help;
+  white-space: nowrap;
+}
+.h2h-cell.h2h-empty {
+  color: #999;
+  cursor: default;
+}
+.h2h-gruen { color: #1a7f37; font-weight: 600; }
+.h2h-rot { color: #c93838; font-weight: 600; }
+
+#h2h-tooltip {
+  position: absolute;
+  z-index: 50;
+  width: 340px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.h2h-section-title {
+  font-weight: 600;
+  color: #555;
+  margin: 8px 0 4px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.h2h-section-title:first-child { margin-top: 0; }
+
+.h2h-entry {
+  border-left: 3px solid #ccc;
+  padding: 3px 0 3px 8px;
+  margin-bottom: 4px;
+  border-radius: 2px;
+}
+.h2h-entry.h2h-gruen { border-left-color: #1a7f37; background: #f0f9f1; }
+.h2h-entry.h2h-rot { border-left-color: #c93838; background: #fdf1f1; }
+.h2h-entry.h2h-neutral { border-left-color: #bbb; }
+
+.h2h-entry-head {
+  font-weight: 600;
+  color: #222;
+}
+.h2h-match {
+  color: #444;
+  padding-left: 2px;
+}
+.h2h-match.h2h-none {
+  color: #999;
+  font-style: italic;
+}
