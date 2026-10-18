@@ -61,3 +61,20 @@
   color: #999;
   font-style: italic;
 }
+
+
+/* Ein Link je Box ganz oben -> vergleich.html (2026-10-18); bleibt beim Scrollen der Box oben stehen */
+.h2h-warum {
+  position: sticky;
+  top: -8px;
+  margin: -8px -10px 6px;
+  padding: 6px 10px;
+  background: #fff8e1;
+  border-bottom: 1px solid #ead9a6;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+@media (hover: none) {
+  #h2h-tooltip { width: min(340px, calc(100vw - 16px)); box-sizing: border-box; max-height: 70vh; }
+  .h2h-warum a { display: block; padding: 4px 0; }
+}
