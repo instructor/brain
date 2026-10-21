@@ -725,7 +725,7 @@ function h2hWarumLink(row) {
     nachbarn: entries.map(e => e.SpielerID).join(","),
   });
   return `<div class="h2h-warum"><a href="vergleich.html?${params.toString()}" target="_blank" rel="noopener"`
-    + ` title="Warum passt der Rang nicht zu den H2H-Ergebnissen?">Warum rot? &rarr;</a></div>`;
+    + ` title="Unterschied zwischen Rang und H2H-Ergebnissen?">Warum rot? &rarr;</a></div>`;
 }
 
 function h2hEntryHtml(e) {

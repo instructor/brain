@@ -156,7 +156,7 @@ async function init() {
       : `Nach den direkten Begegnungen gehört ${nm(X)} eher ${besteK > aktK ? "tiefer" : "höher"}.`;
   }
   if (zuTief.length && zuHoch.length) {
-    sportlich += ` Der Fehler liegt aber in beide Richtungen: gegen ${aufzaehlen(zuHoch.map(n => nm(n.r)))} steht ${nm(X)} zu hoch.`;
+    sportlich += ` Der Unterschied zeigt sich aber in beide Richtungen: gegenüber ${aufzaehlen(zuHoch.map(n => nm(n.r)))} steht ${nm(X)} höher, als die direkten Begegnungen nahelegen.`;
   }
 
   // --- Warum zu tief: Ursachen deuten statt Ergebnisse aufzaehlen (User-Vorgabe 2026-10-21;
@@ -248,7 +248,7 @@ async function init() {
          hier ${fmtNum(X.Points)}.`;
     const tiefHoch = zuTief.flatMap(n => hoeherTop5(dt(n.r.SpielerID)));
     if (gleich && tiefHoch.length && tiefHoch.every(d => /^vorne\s/.test(d.BonusStatus || ""))) {
-      variante += ` Sie behebt ihn aber auch nicht, weil alle Beteiligten ihre Höherspiel-Plätze in der vorderen Hälfte
+      variante += ` Sie verkleinert ihn aber auch nicht, weil alle Beteiligten ihre Höherspiel-Plätze in der vorderen Hälfte
         erreicht haben. Den Unterschied macht das Niveau der Turniere in der höheren AK; dafür bräuchte es einen
         Abschlag bei Ergebnissen aus der höheren AK.`;
     }
@@ -258,7 +258,7 @@ async function init() {
   const verein = X.Verein ? `${escapeHtml(X.Verein)}, ` : "";
   const pct = nGruen + nRot ? Math.round(100 * nGruen / (nGruen + nRot)) : null;
   document.title = `${`${X.Vorname || ""} ${X.Nachname || ""}`.trim()} – Rang vs. H2H`;
-  document.getElementById("vgl-titel").textContent = `Warum liegt ${`${X.Vorname || ""} ${X.Nachname || ""}`.trim()} beim H2H-Vergleich daneben?`;
+  document.getElementById("vgl-titel").textContent = "Woher kommt der Unterschied zwischen Rang und H2H-Vergleich?";
   document.getElementById("vgl-sub").innerHTML = `${nm(X)} (${verein}Jg. ${X.GJahr ?? ""}) steht in KW${String(kw).padStart(2, "0")}/${year}
     im ${escapeHtml(dis)} ${escapeHtml(akl)} auf Platz ${akPlatz(X)} (gesamt ${X.Ranglistenplatz}, ${fmtNum(X.Points)} Pkt.).
     Gegen die Nachbarn zeigt die H2H-Spalte <span class="vgl-sieg">${nGruen}✓</span> <span class="vgl-niederlage">${nRot}✗</span>${pct != null ? ` (${pct} %)` : ""}.`;
@@ -278,11 +278,11 @@ async function init() {
 
   inhalt.innerHTML = `
     <div class="vgl-box"><h2>H2H gegen die Nachbarn</h2>${tabelle}</div>
-    ${abschnitt(`Warum ${nm(X)} zu tief steht`, tiefPunkte)}
+    ${abschnitt(`Warum ${nm(X)} tiefer steht als im H2H-Vergleich`, tiefPunkte)}
     ${abschnitt(`Die andere Richtung: ${aufzaehlen(zuHoch.map(n => nm(n.r)))}`, hochPunkte)}
     ${abschnitt("Gegenprobe", gegenprobe ? [gegenprobe] : [])}
     ${abschnitt("Bezug zur Variante", variante ? [variante] : [])}
-    ${!nRot ? `<div class="vgl-box"><p>Kein Widerspruch: die Rangliste passt zu allen entschiedenen Begegnungen.</p></div>` : ""}
+    ${!nRot ? `<div class="vgl-box"><p>Kein Unterschied: die Rangliste passt zu allen entschiedenen Begegnungen.</p></div>` : ""}
     <div class="vgl-box"><h2>Ergebnisse im Wertungszeitraum</h2><p class="vgl-sub">grau = zählt nicht (nicht unter den besten 5)</p>${ergebnisse}</div>`;
 }
 
