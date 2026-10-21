@@ -6,6 +6,11 @@
 // per URL aus der Box und passen damit zur jeweiligen Filterauswahl der Tabelle. Die Gruende sind
 // feste Regeln (Hoeherspielen, fruehere AK, Turnierzahl, gemeinsame Turniere, Breite vs. Begegnungen,
 // Gegenprobe mit Punkten der eigenen AK, Vergleich mit Original), keine Einzelfallpruefung.
+// Seit 2026-10-21 in allen Varianten dieselbe Datei; Unterschiede nur ueber window.VGL_CONFIG in
+// vergleich.html: original = true -> kein Abschnitt "Bezug zur Variante"; hoeher = wie Ergebnisse
+// in der hoeheren AK zaehlen ("voll" = Punkte der gespielten AK, "bonus" = eigene AK + Sieg-Bonus,
+// "keine" = nur eigene AK -> Grund "hoehere AK" entfaellt).
+const VGL = Object.assign({ original: false, hoeher: "voll" }, window.VGL_CONFIG || {});
 
 async function fetchJson(path) {
   const res = await fetch(path);
@@ -178,11 +183,16 @@ async function init() {
   }
   if (zuTief.length) {
     const hochX = hoeherTop5(dX);
-    const mitMehrHoch = zuTief.filter(n => summe(hoeherTop5(dt(n.r.SpielerID)).map(d => d.Punkte)) > summe(hochX.map(d => d.Punkte)));
+    const mitMehrHoch = VGL.hoeher === "keine" ? []
+      : zuTief.filter(n => summe(hoeherTop5(dt(n.r.SpielerID)).map(d => d.Punkte)) > summe(hochX.map(d => d.Punkte)));
     if (mitMehrHoch.length) {
-      tiefPunkte.push(`<b>Die gespielte höhere AK zählt voll.</b> ${aufzaehlen(mitMehrHoch.map(n => nm(n.r)))}
-        ${mitMehrHoch.length === 1 ? "holt" : "holen"} einen großen Teil der Punkte in der höheren AK, wo auch Plätze im
-        Mittelfeld viele Punkte bringen. ${nm(X)} nutzt diesen Weg ${hochX.length ? "seltener" : "nicht"}.`);
+      const wer = `${aufzaehlen(mitMehrHoch.map(n => nm(n.r)))} ${mitMehrHoch.length === 1 ? "holt" : "holen"}`;
+      tiefPunkte.push((VGL.hoeher === "bonus"
+        ? `<b>Siege in der höheren AK bringen Bonuspunkte.</b> ${wer} einen großen Teil der Punkte in der höheren AK,
+          wo jeder Sieg zusätzliche Punkte bringt.`
+        : `<b>Die gespielte höhere AK zählt voll.</b> ${wer} einen großen Teil der Punkte in der höheren AK, wo auch
+          Plätze im Mittelfeld viele Punkte bringen.`)
+        + ` ${nm(X)} nutzt diesen Weg ${hochX.length ? "seltener" : "nicht"}.`);
     }
     // Gemeinsame Turniere (gleiches Turnier, gleiche Konkurrenz), in denen X meist besser war
     const imFeldBesser = zuTief.filter(n => {
@@ -263,7 +273,7 @@ async function init() {
 
   // --- Bezug zur Variante: Punkte wie im Original?
   let variante = "";
-  if (hX?.OriginalPunkte != null) {
+  if (!VGL.original && hX?.OriginalPunkte != null) {
     const gleich = Number(hX.OriginalPunkte) === Number(X.Points);
     variante = gleich
       // ohne Rang: OriginalRang ist global ueber alle AK und nicht mit den AK-Plaetzen oben vergleichbar (2026-10-21)

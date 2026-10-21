@@ -1,0 +1,26 @@
+/* H2H-Ausreisser-Erklaerung (vergleich.html, 2026-10-18) */
+.vgl-sub { color: #555; margin: 0 0 16px; }
+.vgl-fuss { margin-top: 28px; font-size: .82rem; color: #888; }
+.vgl-box { border: 1px solid #ddd; border-radius: 6px; padding: 10px 14px; margin: 12px 0; background: #fff; }
+.vgl-box h2 { font-size: 1.02rem; margin: 0 0 8px; }
+.vgl-gruende li { margin-bottom: 8px; line-height: 1.45; }
+.vgl-kopf { display: flex; flex-wrap: wrap; gap: 12px; }
+.vgl-kopf > div { flex: 1 1 260px; }
+.vgl-zahl { font-weight: 600; }
+.vgl-top5 { display: flex; flex-wrap: wrap; gap: 16px; }
+.vgl-top5 > div { flex: 1 1 420px; min-width: 0; overflow-x: auto; }
+.vgl-top5 table, .vgl-tab { border-collapse: collapse; width: 100%; font-size: .85rem; }
+.vgl-top5 th, .vgl-top5 td, .vgl-tab th, .vgl-tab td { border-bottom: 1px solid #eee; padding: 3px 6px; text-align: left; vertical-align: top; }
+.vgl-top5 td.num, .vgl-tab td.num { text-align: right; white-space: nowrap; }
+.vgl-top5 tr.vgl-nicht-top5 td { color: #999; }
+.vgl-tag { display: inline-block; font-size: .72rem; padding: 0 5px; border-radius: 3px; margin-left: 4px; white-space: nowrap; }
+.vgl-tag-hoch { background: #e7effb; color: #1f4e8c; }
+.vgl-tag-alt { background: #f4ecdc; color: #7a5410; }
+.vgl-sieg { color: #1a7f37; font-weight: 600; }
+.vgl-niederlage { color: #c93838; font-weight: 600; }
+.vgl-tab tr.vgl-ich td { background: #fff8e1; }
+.vgl-box details { margin: 6px 0; }
+.vgl-box summary { cursor: pointer; font-weight: 600; padding: 3px 0; }
+.vgl-box p { margin: 6px 0; line-height: 1.5; }
+.vgl-tab tr.vgl-nicht-top5 td { color: #999; }
+.vgl-box { overflow-x: auto; }

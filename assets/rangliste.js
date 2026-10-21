@@ -476,8 +476,7 @@ function renderH2hCell(td, row) {
     ? ` <span class="${gruen / entschieden >= 0.5 ? "h2h-gruen" : "h2h-rot"}">(${Math.round((gruen / entschieden) * 100)}%)</span>`
     : "";
   td.innerHTML = `<span class="h2h-gruen">${gruen}✓</span> <span class="h2h-rot">${rot}✗</span>${pctHtml}`;
-  td.addEventListener("mouseenter", (evt) => showH2hTooltip(evt, row));
-  td.addEventListener("mouseleave", scheduleHideH2hTooltip);
+  bindH2hCell(td, row);
 }
 
 // Spalte "H2H in%" (User-Vorgabe 2026-08-31): dieselbe gruen/rot-Bilanz wie "H2H", als
@@ -498,8 +497,7 @@ function renderH2hPercentCell(td, row) {
   const cls = pct >= 50 ? "h2h-gruen" : "h2h-rot";
   td.className = "h2h-cell";
   td.innerHTML = `<span class="${cls}">${pct}%</span>`;
-  td.addEventListener("mouseenter", (evt) => showH2hTooltip(evt, row));
-  td.addEventListener("mouseleave", scheduleHideH2hTooltip);
+  bindH2hCell(td, row);
 }
 
 function renderBody(rows) {
@@ -615,6 +613,24 @@ function scheduleHideH2hTooltip() {
   h2hHideTimeout = setTimeout(hideH2hTooltip, 150);
 }
 
+// Maus: Box beim Ueberfahren. Touch-Geraete (kein Hover, 2026-10-18): Antippen der Zelle oeffnet
+// die Box, statt ueber den Zeilen-Klick zur Spielerseite zu springen; Tippen ausserhalb schliesst sie.
+const H2H_TOUCH = window.matchMedia("(hover: none)").matches;
+function bindH2hCell(td, row) {
+  td.addEventListener("mouseenter", (evt) => { if (!H2H_TOUCH) showH2hTooltip(evt, row); });
+  td.addEventListener("mouseleave", () => { if (!H2H_TOUCH) scheduleHideH2hTooltip(); });
+  td.addEventListener("click", (evt) => {
+    if (!H2H_TOUCH) return;
+    evt.stopPropagation();
+    showH2hTooltip(evt, row);
+  });
+}
+if (H2H_TOUCH) {
+  document.addEventListener("click", (evt) => {
+    if (h2hTooltipEl && !h2hTooltipEl.hidden && !h2hTooltipEl.contains(evt.target)) hideH2hTooltip();
+  });
+}
+
 function ensureH2hTooltip() {
   if (!h2hTooltipEl) {
     h2hTooltipEl = document.createElement("div");
@@ -625,6 +641,21 @@ function ensureH2hTooltip() {
     document.body.appendChild(h2hTooltipEl);
   }
   return h2hTooltipEl;
+}
+
+// Ein Link je Box, ganz oben (ohne Scrollen sichtbar, User-Vorgabe 2026-10-18), sobald mindestens
+// ein Eintrag rot ist: vergleich.html fasst zusammen, warum der Ranglistenplatz nicht zu den
+// H2H-Ergebnissen gegen die Nachbarn passt. Die Nachbarn der Box gehen per URL mit, damit die
+// Erklaerung genau zur aktuellen Filterauswahl passt; berechnet wird erst beim Oeffnen.
+function h2hWarumLink(row) {
+  const entries = row.H2H || [];
+  if (!state.currentWeek || !entries.some(e => e.Konkordanz === "rot")) return "";
+  const params = new URLSearchParams({
+    id: row.SpielerID, dis: row.DIS, year: state.currentWeek.year, kw: state.currentWeek.kw,
+    nachbarn: entries.map(e => e.SpielerID).join(","),
+  });
+  return `<div class="h2h-warum"><a href="vergleich.html?${params.toString()}" target="_blank" rel="noopener"`
+    + ` title="Unterschied zwischen Rang und H2H-Ergebnissen?">Warum rot? &rarr;</a></div>`;
 }
 
 function h2hEntryHtml(e) {
@@ -662,12 +693,13 @@ function showH2hTooltip(evt, row) {
   const el = ensureH2hTooltip();
   const oben = (row.H2H || []).filter(e => e.Richtung === "oben").slice().reverse();
   const unten = (row.H2H || []).filter(e => e.Richtung === "unten");
-  el.innerHTML = `
+  el.innerHTML = `${h2hWarumLink(row)}
     <div class="h2h-section-title">▲ Nachbarn oberhalb</div>
     ${oben.length ? oben.map(h2hEntryHtml).join("") : `<div class="h2h-match h2h-none">${noNeighborText(row, "oben")}</div>`}
     <div class="h2h-section-title">▼ Nachbarn unterhalb</div>
     ${unten.length ? unten.map(h2hEntryHtml).join("") : `<div class="h2h-match h2h-none">${noNeighborText(row, "unten")}</div>`}`;
   el.hidden = false;
+  el.scrollTop = 0;
   const cellRect = evt.currentTarget.getBoundingClientRect();
   const viewportH = document.documentElement.clientHeight;
   // Unter der Zelle platzieren, ausser es ist nicht genug Platz bis zum unteren Fensterrand --
