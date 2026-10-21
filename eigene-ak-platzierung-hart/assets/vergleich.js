@@ -44,7 +44,6 @@ function renumberRanglistenplatz(rows) {
 const summe = arr => arr.reduce((s, x) => s + Number(x || 0), 0);
 const nm = r => escapeHtml(`${r.Vorname || ""} ${r.Nachname || ""}`.trim());
 const aufzaehlen = arr => arr.length <= 1 ? arr.join("") : `${arr.slice(0, -1).join(", ")} und ${arr[arr.length - 1]}`;
-const feldGroesse = d => { const m = /\s(\d+)\/(\d+)$/.exec(d.BonusStatus || ""); return m ? Number(m[2]) : null; };
 
 // Top 5 aus den Detailzeilen: IstTop5 wie von der Engine markiert, Rueckfall die 5 hoechsten.
 function top5(rows) {
@@ -160,69 +159,54 @@ async function init() {
     sportlich += ` Der Fehler liegt aber in beide Richtungen: gegen ${aufzaehlen(zuHoch.map(n => nm(n.r)))} steht ${nm(X)} zu hoch.`;
   }
 
-  // --- Warum zu tief: die Hoeheren holen ihre Punkte anders
+  // --- Warum zu tief: Ursachen deuten statt Ergebnisse aufzaehlen (User-Vorgabe 2026-10-21;
+  // die Zahlen stehen in der H2H-Tabelle und unter "Ergebnisse im Wertungszeitraum")
   const tiefPunkte = [];
   if (zuTief.length) {
     const hochX = hoeherTop5(dX);
     const mitMehrHoch = zuTief.filter(n => summe(hoeherTop5(dt(n.r.SpielerID)).map(d => d.Punkte)) > summe(hochX.map(d => d.Punkte)));
     if (mitMehrHoch.length) {
-      const teile = mitMehrHoch.map(n => {
-        const h = hoeherTop5(dt(n.r.SpielerID));
-        return `${nm(n.r)} hat ${h.length} der 5 gewerteten Ergebnisse aus einer höheren AK (zusammen ${fmtNum(summe(h.map(d => d.Punkte)))})`;
-      });
-      tiefPunkte.push(`<b>Die gespielte höhere AK zählt voll.</b> Gewertet wird die Summe der besten 5 Ergebnisse.
-        ${aufzaehlen(teile)}; ${nm(X)} ${hochX.length ? `nur ${hochX.length} (${fmtNum(summe(hochX.map(d => d.Punkte)))})` : "keines"}.`);
-      // Beispiel: ein Hoeherspiel-Ergebnis der anderen schlaegt das beste eigene-AK-Ergebnis von X
-      const besteEigeneX = dX.find(d => !d.Hoehergespielt);
-      const bspHoch = mitMehrHoch.flatMap(n => hoeherTop5(dt(n.r.SpielerID))).sort((a, b) => b.Punkte - a.Punkte)[0];
-      if (besteEigeneX && bspHoch && bspHoch.Punkte >= besteEigeneX.Punkte) {
-        const fg = feldGroesse(bspHoch);
-        tiefPunkte.push(`Ein Platz ${bspHoch.Platz} im ${escapeHtml(bspHoch.RankingTournamentName)}${fg ? ` (Feld ${fg})` : ""}
-          bringt ${fmtNum(bspHoch.Punkte)} Punkte, mehr als Platz ${besteEigeneX.Platz} von ${nm(X)} im
-          ${escapeHtml(besteEigeneX.RankingTournamentName)} (${fmtNum(besteEigeneX.Punkte)}).`);
-      }
-      const hochAlleX = dX.filter(d => d.Hoehergespielt);
-      if (hochAlleX.length) {
-        const plaetze = hochAlleX.map(d => { const fg = feldGroesse(d); return `Platz ${d.Platz}${fg ? ` (Feld ${fg})` : ""}`; });
-        tiefPunkte.push(`Die eigenen Starts von ${nm(X)} in der höheren AK brachten ${aufzaehlen(plaetze)}.`);
-      }
+      tiefPunkte.push(`<b>Die gespielte höhere AK zählt voll.</b> ${aufzaehlen(mitMehrHoch.map(n => nm(n.r)))}
+        ${mitMehrHoch.length === 1 ? "holt" : "holen"} einen großen Teil der Punkte in der höheren AK, wo auch Plätze im
+        Mittelfeld viele Punkte bringen. ${nm(X)} nutzt diesen Weg ${hochX.length ? "seltener" : "nicht"}.`);
     }
     // Gemeinsame Turniere (gleiches Turnier, gleiche Konkurrenz), in denen X meist besser war
-    for (const n of zuTief) {
+    const imFeldBesser = zuTief.filter(n => {
       const paare = dX.map(a => [a, dt(n.r.SpielerID).find(b => b.RankingTournamentID === a.RankingTournamentID && b.Konkurrenz === a.Konkurrenz)])
         .filter(([a, b]) => b && a.Platz && b.Platz);
-      if (paare.length >= 2 && paare.filter(([a, b]) => a.Platz < b.Platz).length > paare.length / 2) {
-        tiefPunkte.push(`Bei den gemeinsamen Turnieren ist ${nm(X)} klar besser als ${nm(n.r)}: Plätze
-          ${paare.map(([a]) => a.Platz).join(", ")} gegenüber ${paare.map(([, b]) => b.Platz).join(", ")}.`);
-      }
+      return paare.length >= 2 && paare.filter(([a, b]) => a.Platz < b.Platz).length > paare.length / 2;
+    });
+    if (imFeldBesser.length) {
+      tiefPunkte.push(`Wo ${nm(X)} und ${aufzaehlen(imFeldBesser.map(n => nm(n.r)))} im selben Feld standen, lag ${nm(X)}
+        meist vorn. Der Rückstand kommt also nicht aus der Leistung, sondern aus der Auswahl der Turniere.`);
     }
     // Fruehere (juengere) AK und Turnierzahl
     const altX = dX.filter(d => !d.Hoehergespielt && d.EigeneAK && d.EigeneAK !== akl && d.Platz <= 8);
     if (altX.length) {
-      tiefPunkte.push(`${nm(X)} war im Wertungszeitraum noch ${escapeHtml(altX[0].EigeneAK)}; diese Ergebnisse zählen nach
-        der Punktetabelle der jüngeren AK, z. B. Platz ${altX[0].Platz} ${escapeHtml(altX[0].RankingTournamentName)}
-        mit nur ${fmtNum(altX[0].Punkte)} Punkten.`);
+      tiefPunkte.push(`Ein Teil der Erfolge von ${nm(X)} stammt noch aus der ${escapeHtml(altX[0].EigeneAK)} und zählt nach
+        deren niedrigerer Punktetabelle.`);
     }
     const tz = zuTief.map(n => Number(n.r.Turniere));
     if (Number(X.Turniere) < Math.min(...tz) * 0.85) {
-      tiefPunkte.push(`${nm(X)} hat weniger Turniere gespielt (${X.Turniere} gegenüber ${Math.min(...tz)}–${Math.max(...tz)}),
-        also weniger Chancen auf hohe Einzelergebnisse.`);
+      tiefPunkte.push(`${nm(X)} hat weniger Turniere gespielt und damit weniger Gelegenheiten für hohe Ergebnisse.`);
+    }
+    if (mitMehrHoch.length || imFeldBesser.length) {
+      tiefPunkte.push(`Der Rang bildet hier eher den Turnierkalender ab als die direkte Spielstärke.`);
     }
   }
 
   // --- Warum zu hoch: die Tieferen haben gewonnen, aber schwaechere Best-5
   const hochPunkte = zuHoch.map(n => {
-    const dn = dt(n.r.SpielerID), t5n = top5(dn), t5x = top5(dX);
-    const siegOrte = aufzaehlen(n.ms.filter(m => !m.sieg).map(m => escapeHtml(m.turnier)));
+    const t5n = top5(dt(n.r.SpielerID)), t5x = top5(dX);
     let warum;
-    if (t5n.length < 5) warum = `hat aber nur ${t5n.length} Ergebnis${t5n.length === 1 ? "" : "se"} im Wertungszeitraum`;
+    if (t5n.length < 5) warum = "spielt aber zu wenige Turniere, um die Siege in Punkte umzusetzen";
     else {
       const stark = t5n.filter(d => d.Punkte >= (t5x[2]?.Punkte ?? 0)).length;
-      warum = stark <= 1
-        ? `hat aber nur ${stark === 1 ? "ein einziges" : "kein"} Top-Ergebnis${stark === 1 ? ` (${fmtNum(t5n[0].Punkte)})` : ""}`
-        : `kommt aber nur auf ${fmtNum(n.r.Points)} Punkte (fünftbestes Ergebnis ${fmtNum(t5n[4].Punkte)}, bei ${nm(X)} ${fmtNum(t5x[4]?.Punkte)})`;
+      warum = stark === 1 ? "hat aber neben einem Spitzenergebnis zu wenig Breite"
+        : stark === 0 ? "erreicht aber nicht die Spitzenergebnisse, die in der Rangliste zählen"
+        : "verliert aber Punkte durch die schwächeren hinteren Ergebnisse unter den besten 5";
     }
-    return `${nm(n.r)} hat ${n.l}-mal gegen ${nm(X)} gewonnen (${siegOrte}), ${warum}.`;
+    return `${nm(n.r)} gewinnt das direkte Duell, ${warum}.`;
   });
   if (hochPunkte.length) {
     hochPunkte.push(`Die Ergebnisse von ${nm(X)} sind breiter und konstanter. Das ist der Zielkonflikt einer

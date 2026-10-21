@@ -724,8 +724,8 @@ function h2hWarumLink(row) {
     id: row.SpielerID, dis: row.DIS, year: state.currentWeek.year, kw: state.currentWeek.kw,
     nachbarn: entries.map(e => e.SpielerID).join(","),
   });
-  return `<div class="h2h-warum"><a href="vergleich.html?${params.toString()}" target="_blank" rel="noopener">`
-    + `Warum passt der Rang nicht zu den H2H-Ergebnissen? &rarr;</a></div>`;
+  return `<div class="h2h-warum"><a href="vergleich.html?${params.toString()}" target="_blank" rel="noopener"`
+    + ` title="Warum passt der Rang nicht zu den H2H-Ergebnissen?">Warum rot? &rarr;</a></div>`;
 }
 
 function h2hEntryHtml(e) {
