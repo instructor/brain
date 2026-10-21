@@ -266,10 +266,10 @@ async function init() {
   if (hX?.OriginalPunkte != null) {
     const gleich = Number(hX.OriginalPunkte) === Number(X.Points);
     variante = gleich
-      ? `Die Punkte von ${nm(X)} sind hier und in der Original-Rangliste gleich (dort Rang ${hX.OriginalRang} gesamt).
-         Die Regel dieser Variante verursacht den Abstand also nicht.`
-      : `In der Original-Rangliste hat ${nm(X)} ${fmtNum(hX.OriginalPunkte)} Punkte (Rang ${hX.OriginalRang} gesamt),
-         hier ${fmtNum(X.Points)}.`;
+      // ohne Rang: OriginalRang ist global ueber alle AK und nicht mit den AK-Plaetzen oben vergleichbar (2026-10-21)
+      ? `Die Punkte von ${nm(X)} sind hier und in der Original-Rangliste gleich. Der Unterschied zwischen Rang und
+         H2H-Ergebnissen besteht also schon im Original und entsteht nicht durch die Regel dieser Variante.`
+      : `In der Original-Rangliste hat ${nm(X)} ${fmtNum(hX.OriginalPunkte)} Punkte, hier ${fmtNum(X.Points)}.`;
     const tiefHoch = zuTief.flatMap(n => hoeherTop5(dt(n.r.SpielerID)));
     if (gleich && tiefHoch.length && tiefHoch.every(d => /^vorne\s/.test(d.BonusStatus || ""))) {
       variante += ` Sie verkleinert ihn aber auch nicht, weil alle Beteiligten ihre Höherspiel-Plätze in der vorderen Hälfte
