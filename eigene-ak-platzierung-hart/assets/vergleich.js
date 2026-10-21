@@ -4,7 +4,7 @@
 // Dahiya DE U15 KW40/2026). Alles wird erst hier im Browser aus den ohnehin vorhandenen
 // Wochendateien {ranking,details,h2h_test}.json berechnet -- kein Build-Schritt; die Nachbarn kommen
 // per URL aus der Box und passen damit zur jeweiligen Filterauswahl der Tabelle. Die Gruende sind
-// feste Regeln (Hoeherspielen, fruehere AK, Turnierzahl, gemeinsame Turniere, Breite vs. Duelle,
+// feste Regeln (Hoeherspielen, fruehere AK, Turnierzahl, gemeinsame Turniere, Breite vs. Begegnungen,
 // Gegenprobe mit Punkten der eigenen AK, Vergleich mit Original), keine Einzelfallpruefung.
 
 async function fetchJson(path) {
@@ -136,7 +136,6 @@ async function init() {
   const zuHoch = nachbarn.filter(n => n.bew === "rot" && !n.oben);  // Tiefere haben gegen X gewonnen
   // Doppel/Mixed: H2H zaehlt partnerunabhaengig, Partner sind in den Daten nicht enthalten (2026-10-21)
   const doppel = ["HD", "DD", "HM", "DM"].includes(dis);
-  const duell = doppel ? "die direkten Begegnungen" : "das direkte Duell";
   // Knapper Abstand (< 1 % der Punkte von X): Reihenfolge haengt an einem einzelnen Ergebnis
   const knapp = n => Math.abs(Number(n.r.Points) - Number(X.Points)) < 0.01 * Number(X.Points);
 
@@ -222,11 +221,12 @@ async function init() {
         : stark === 0 ? "erreicht aber nicht die Spitzenergebnisse, die in der Rangliste zählen"
         : "verliert aber Punkte durch die schwächeren hinteren Ergebnisse unter den besten 5";
     }
-    return `${nm(n.r)} gewinnt ${duell}, ${warum}.`;
+    const begegnung = n.ms.length > 1 ? "die direkten Begegnungen" : "die direkte Begegnung";
+    return `${nm(n.r)} gewinnt ${begegnung}, ${warum}.`;
   });
   if (zuHoch.some(n => !knapp(n))) {
     hochPunkte.push(`Die Ergebnisse von ${nm(X)} sind breiter und konstanter. Das ist der Zielkonflikt einer
-      Best-5-Rangliste: Breite schlägt ${doppel ? "direkte Begegnungen" : "direkte Duelle"}.`);
+      Best-5-Rangliste: Breite schlägt direkte Begegnungen.`);
   }
 
   // --- Gegenprobe: Hoeherspiel-Ergebnisse mit Punkten der eigenen AK
