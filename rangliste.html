@@ -6,31 +6,56 @@
 <title>JWS U19 Rangliste (Eigenberechnung) - BRAIN</title>
 <link rel="stylesheet" href="assets/rangliste.css">
 <link rel="stylesheet" href="assets/h2h.css">
+<style>
+  /* Aufklappbare Abschnitte im Infokasten (2026-10-21) */
+  .variant-note details { margin: 4px 0; }
+  .variant-note summary { cursor: pointer; font-weight: 600; color: var(--text, #222); padding: 2px 0; }
+  .variant-note details > div { margin: 2px 0 8px 18px; }
+  .variant-note p { margin: 0 0 6px; }
+</style>
 </head>
 <body>
 <div class="page">
   <h1>JWS U19 Rangliste (Eigenberechnung)</h1>
 
-  <p class="variant-note">
-    Eigenberechnung der DBV/JWS U19 Rangliste auf Basis der Wertungsturniere 
-	(geführt ab KW 01/2024). 
+  <div class="variant-note">
+    <p>Eigenberechnung der DBV/JWS U19 Rangliste auf Basis der Wertungsturniere
+	(geführt ab KW 01/2024).
 	Die Platzierungen sollten identisch sein mit der Rangliste auf
 	<a href="https://www.badminton.de/der-dbv/jugend-wettkampf/u19-ranglistentabellen/u19-rangliste/" target="_blank">&rarr; badminton.de</a>.
 	Folgende Varianten der JWS U19 Rangliste stehen zum Testen und Vergleichen
-	bereit: 
-	<br>a) <a href="eigene-ak/rangliste-eigene-ak.html">Variante &bdquo;eigene AK mit Sieg-Bonus&ldquo;</a>: 
+	bereit (zum Aufklappen anklicken):</p>
+
+	<details><summary>Punkte der eigenen Altersklasse</summary><div>
+	e) <a href="eigene-ak-platzierung-hart/rangliste-eigene-ak-platzierung-hart.html">Variante
+	&bdquo;eigene AK mit Hälfte-Bonus&ldquo;</a>:
+	bei Teilnahme in höherer AK gibt es die Punkte der eigenen Altersklasse, bei einer
+	Platzierung in der vorderen Hälfte des Feldes (Feldgröße laut Ergebnisliste, mindestens
+	8 Teilnehmer) dagegen die Punkte der tatsächlich gespielten Altersklasse.
+	<br>a) <a href="eigene-ak/rangliste-eigene-ak.html">Variante &bdquo;eigene AK mit Sieg-Bonus&ldquo;</a>:
 	jeder Spieler erhält bei Teilnahme in höherer AK die Punkte seiner
-    eigenen Altersklasse anstatt der Punkte der tatsächlich gespielten Altersklasse. 
-	Zusätzlich gibt es einen Bonus für Siege gegen Gegner der höheren 
-	Altersklasse, der in der Spieler-Detailansicht (Klick auf den Spieler) 
+    eigenen Altersklasse anstatt der Punkte der tatsächlich gespielten Altersklasse.
+	Zusätzlich gibt es einen Bonus für Siege gegen Gegner der höheren
+	Altersklasse, der in der Spieler-Detailansicht (Klick auf den Spieler)
 	einsehbar ist. Die Höhe des Bonus ist
 	nach oben begrenzt zur Vermeidung von Übervorteilung gegenüber
 	Teilnehmern der höheren AK.
-    <br>b) <a href="u13-u15-1-9/rangliste-u13-u15-1-9.html">Variante 
-	&bdquo;AK-Verhältnis U13:U15 = 1:9&ldquo;</a>: 
+	<br>g) <a href="eigene-ak-vollbonus/rangliste-eigene-ak-vollbonus.html">Variante
+	&bdquo;eigene AK + Höherspielen-Vollbonus&ldquo;</a>:
+	wie a), aber der Bonus für Siege gegen Gegner der höheren Altersklasse wird ohne
+	Begrenzung voll vergeben, unabhängig von der Stärke des Gegners.
+	<br>h) <a href="eigene-ak-ohne-bonus/rangliste-eigene-ak.html">Variante
+	&bdquo;eigene Altersklasse (simple)&ldquo;</a>:
+	bei Teilnahme in höherer AK gibt es immer die Punkte der eigenen Altersklasse, ohne Bonus.
+	</div></details>
+
+	<details><summary>Übergang zwischen den Altersklassen</summary><div>
+    b) <a href="u13-u15-1-9/rangliste-u13-u15-1-9.html">Variante
+	&bdquo;AK-Verhältnis U13:U15 = 1:9&ldquo;</a>:
 	Der AK-Übergang von U13 nach U15 ist gegenüber dem originalen
-	Verhältnis 1:12 abgemildert, d.h. Platz 9 in U15 gibt gleiche Punktezahl 
+	Verhältnis 1:12 abgemildert, d.h. Platz 9 in U15 gibt gleiche Punktezahl
 	wie Platz 1 in U13.
+	</div></details>
 	<!-- ELO-Variante voruebergehend ausgeblendet (2026-08-25): AK-Offset-Fix wird ueberarbeitet,
 	     siehe CLAUDE.md "AK-abhaengiger Erwartungswert-Offset" -- RESULTS_ELO/ ist aktuell
 	     inkonsistent (Checkpoints vs. Wochendaten), Link bleibt bis zum naechsten sauberen
@@ -39,48 +64,63 @@
 	Das Ranking orientiert sich an Kopf-an-Kopf-Ergebnissen (Sieg/Niederlage je Match), es gibt also keine Punktetabelle.
 	Basiert auf Matches der Wertungsturniere seit KW1/2024.
 	-->
-	<br>c) <a href="bec-u17-gestuft/rangliste-bec-u17-gestuft.html">Variante 
-	&bdquo;BEC-U17 gestuft&ldquo;</a>: 
-	BEC-U17-Circuit-Turniere (Kategorien GP/IC/IS) bekommen statt einer
-	pauschal gleichen Bepunktung je Kategorie eine eigene, 
-	nach Stärke gestaffelte Bepunktung.
-	<br>d) <a href="bec-u17-gestuft-light/rangliste-bec-u17-gestuft-light.html">Variante
-	&bdquo;BEC-U17 gestuft-light&ldquo;</a>: 
-	ähnlich wie die Variante "BEC-U17 gestuft", aber IS und IC teilen
-	sich eine gemeinsame Bepunktung.
-	<br>e) <a href="eigene-ak-platzierung-hart/rangliste-eigene-ak-platzierung-hart.html">Variante
-	&bdquo;eigene AK mit Hälfte-Bonus&ldquo;</a>:
-	bei Teilnahme in höherer AK gibt es die Punkte der eigenen Altersklasse, bei einer
-	Platzierung in der vorderen Hälfte des Feldes (Feldgröße laut Ergebnisliste, mindestens
-	8 Teilnehmer) dagegen die Punkte der tatsächlich gespielten Altersklasse.
-	<br>f) <a href="original-mit-dem22/rangliste-original-mit-dem22.html">Variante
+
+	<details><summary>Aufnahme von U22-Turnieren</summary><div>
+	f) <a href="original-mit-dem22/rangliste-original-mit-dem22.html">Variante
 	&bdquo;Original mit DEM U22&ldquo;</a>:
 	wie die Original-Rangliste, zusätzlich zählt die Deutsche Meisterschaft U22 wie die DEM U19
 	und die U22-Gruppenmeisterschaften wie die U19-Gruppenmeisterschaften (nur KW40).
-	<br>---
-	<br>Separat: <a href="u15-international/rangliste-u15-international.html">Internationale
+	</div></details>
+
+	<details><summary>Differenzierung BEC-U17-Turniere</summary><div>
+	c) <a href="bec-u17-gestuft/rangliste-bec-u17-gestuft.html">Variante
+	&bdquo;BEC-U17 gestuft&ldquo;</a>:
+	BEC-U17-Circuit-Turniere (Kategorien GP/IC/IS) bekommen statt einer
+	pauschal gleichen Bepunktung je Kategorie eine eigene,
+	nach Stärke gestaffelte Bepunktung.
+	<br>d) <a href="bec-u17-gestuft-light/rangliste-bec-u17-gestuft-light.html">Variante
+	&bdquo;BEC-U17 gestuft-light&ldquo;</a>:
+	ähnlich wie die Variante "BEC-U17 gestuft", aber IS und IC teilen
+	sich eine gemeinsame Bepunktung.
+	</div></details>
+
+	<details><summary>Relevante internationale U15-Turniere</summary><div>
+	<a href="u15-international/rangliste-u15-international.html">Internationale
 	U15-Rangliste</a> &ndash; Jahreswertung aller internationalen U15-Turniere (alle Nationen,
 	Bepunktung &bdquo;IS U15&ldquo;, U15-EM &bdquo;U15 EM&ldquo;, beste 3 Ergebnisse); dazu die
 	<a href="u15-spielstaerke/rangliste-u15-spielstaerke.html">U15-Spielstärke</a> aus den Matchergebnissen
 	und die <a href="u15-international/turnierstaerke.html">Turnierstärke der U15-Turniere</a>.
-	<br>---
-	<br>Ein Güte-Vergleich aller Varianten gegen echte
-	Kopf-an-Kopf-Ergebnisse (H2H):
+	</div></details>
+
+	<details><summary>Vergleich von Varianten</summary><div>
+	<p>Die Varianten werden auf drei Wegen miteinander verglichen.
+	Der <b>H2H-Konkordanzvergleich</b> prüft, wie oft die Rangfolge einer Variante zu den echten
+	Kopf-an-Kopf-Ergebnissen der letzten 12 Monate passt.
+	Der <b>Vorhersagetest je Spiel</b> nimmt für jedes Spiel die Rangliste, die vor dem Spiel galt, und prüft,
+	ob der besser platzierte Spieler gewinnt; gezählt wird, um wie viel öfter oder seltener eine
+	Variante richtig liegt als das Original.
+	Für die <b>Expertenmeinung</b> stehen die Top 16 des Originals und der Varianten a), b), d) und e) je DBV, Gruppe und
+	Landesverband zur Inspektion und Beurteilung bereit, als fiktive Meldung der jeweils Besten
+	zu einem Ranglistenturnier der jeweiligen Ebene.</p>
+	H2H-Konkordanzvergleich aller Varianten:
 	<a href="h2h-vergleich.html">&rarr; H2H-Konkordanzvergleich</a>;
 	nur Original und die beiden BEC-U17-Varianten, auf die betroffenen Ranglistenplätze beschränkt:
 	<a href="h2h-vergleich-bec-u17.html">&rarr; H2H-Vergleich BEC-U17</a>;
 	ebenso Original und &bdquo;Original mit DEM U22&ldquo;:
 	<a href="h2h-vergleich-u22.html">&rarr; H2H-Vergleich U22</a>.
-	<br>Wie gut sagt jede Variante Spiele voraus, und um wie viel besser oder schlechter als das Original
-	(Einzel und Doppel/Mixed getrennt, mit Top 16 je Region):
-	<a href="variantenvergleich.html">&rarr; Variantenvergleich je Spiel</a>.
-	<br>(*) Spalten &bdquo;H2H&ldquo; und &bdquo;H2H in%&ldquo; zeigen beim
+	<br>Vorhersagetest je Spiel (Einzel und Doppel/Mixed getrennt):
+	<a href="variantenvergleich.html">&rarr; Vorhersagetest</a>.
+	<br>Expertenmeinung:
+	<a href="variantenvergleich.html#top16">&rarr; Top 16 je DBV, Gruppe und Landesverband</a>.
+	</div></details>
+
+	<p style="margin-top:8px">(*) Spalten &bdquo;H2H&ldquo; und &bdquo;H2H in%&ldquo; zeigen beim
 	Überfahren eines Eintrags die
 	5 nächsten Ranglisten-Nachbarn oberhalb/unterhalb mit echten
 	Kopf-an-Kopf-Ergebnissen (grün = Matchergebnisse bestätigen die
 	Rangfolge in der Rangliste; rot = widerspricht der Rangfolge).
-	<br>Anregungen und Rückmeldungen an edi.klein@badminton.de.
-  </p>
+	<br>Anregungen und Rückmeldungen an edi.klein@badminton.de.</p>
+  </div>
 
   <div class="tabs">
     <div class="tab active" id="tab-current" data-tab="current">Rangliste</div>
