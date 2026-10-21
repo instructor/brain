@@ -216,6 +216,21 @@
     .grid{ overflow-x:auto; }
     .grid-head, .kon-row{ min-width:calc(90px + var(--ncol,5) * 90px); }
   }
+
+  /* Aufklapp-Abschnitt Verteilung des Hochspielens (2026-10-21) */
+  details.hoch-vert{
+    margin:-1rem 0 1.5rem; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:.6rem .95rem;
+  }
+  details.hoch-vert summary{ cursor:pointer; font-weight:600; font-size:.88rem; }
+  details.hoch-vert p{ font-size:.82rem; color:var(--ink-2); line-height:1.5; margin:.6rem 0; }
+  details.hoch-vert h3{ font-size:.85rem; margin:1rem 0 .3rem; }
+  .hv-wrap{ overflow-x:auto; }
+  table.hv{ border-collapse:collapse; font-size:.8rem; font-variant-numeric:tabular-nums; }
+  table.hv th, table.hv td{ padding:.2rem .6rem; border-bottom:1px solid var(--grid); text-align:right; white-space:nowrap; }
+  table.hv th:first-child, table.hv td:first-child{ text-align:left; }
+  table.hv th{ font-weight:600; color:var(--ink-2); }
+  table.hv tr.hv-sum td{ font-weight:600; }
 </style>
 
 </head>
@@ -252,6 +267,28 @@
       (6075&nbsp;von&nbsp;18512&nbsp;Spielern).
       Je Konkurrenz siehe die "Hochspielen"-Badge unten bzw. die Detailtabelle.</span>
   </div>
+  <details class="hoch-vert">
+    <summary>Verteilung des Hochspielens nach Altersklasse, Sprung und Turnier-Ebene</summary>
+    <p>Gezählt wird je Spieler und Disziplin, ein Spieler mit Einzel und Doppel zählt also zweimal:
+      6.075 von 18.512 Einträgen = 32,8&nbsp;%. Nach Personen haben
+      3.366 von 9.734 Spielern = 34,6&nbsp;% in mindestens einer Disziplin
+      höher gespielt (Zeitraum 28.09.2025 bis 28.09.2026). Die eigene AK ist die jüngste AK, in der jemand in dieser
+      Disziplin gespielt hat. Wer ausschließlich höher spielt, zählt dort als nativ; der tatsächliche Anteil
+      liegt daher eher höher. Grundlage sind die BTP-Matchdaten, BEC- und die meisten internationalen
+      Turniere fehlen.</p>
+    <h3>Nach eigener AK und Disziplinart</h3>
+    <div class="hv-wrap"><table class="hv"><thead><tr><th>eigene AK</th><th>gesamt</th><th>Einzel</th><th>Doppel</th><th>Mixed</th><th>n</th></tr></thead><tbody><tr><td>U09</td><td><b>56,9&nbsp;%</b></td><td>58,8&nbsp;%</td><td>59,6&nbsp;%</td><td>27,3&nbsp;%</td><td>346</td></tr><tr><td>U11</td><td><b>39,7&nbsp;%</b></td><td>38,7&nbsp;%</td><td>44,5&nbsp;%</td><td>27,1&nbsp;%</td><td>2.341</td></tr><tr><td>U13</td><td><b>37,5&nbsp;%</b></td><td>34,6&nbsp;%</td><td>40,2&nbsp;%</td><td>40,2&nbsp;%</td><td>4.237</td></tr><tr><td>U15</td><td><b>36,0&nbsp;%</b></td><td>32,3&nbsp;%</td><td>39,0&nbsp;%</td><td>40,8&nbsp;%</td><td>4.444</td></tr><tr><td>U17</td><td><b>34,9&nbsp;%</b></td><td>32,5&nbsp;%</td><td>36,2&nbsp;%</td><td>38,1&nbsp;%</td><td>4.241</td></tr><tr><td>U19</td><td><b>9,6&nbsp;%</b></td><td>7,9&nbsp;%</td><td>10,3&nbsp;%</td><td>11,5&nbsp;%</td><td>2.903</td></tr></tbody></table></div>
+    <p>Bei U19 zählen nur O19- und U22-Turniere als höher.</p>
+    <h3>Wie weit höher (höchste gespielte AK, Anteil der Hochspieler)</h3>
+    <div class="hv-wrap"><table class="hv"><thead><tr><th>eigene AK</th><th>+1 AK</th><th>+2 AK</th><th>+3 AK</th><th>U22</th><th>O19</th><th>n</th></tr></thead><tbody><tr><td>U09</td><td>73,1&nbsp;%</td><td>26,9&nbsp;%</td><td>–</td><td>–</td><td>–</td><td>197</td></tr><tr><td>U11</td><td>79,8&nbsp;%</td><td>20,2&nbsp;%</td><td>–</td><td>–</td><td>–</td><td>930</td></tr><tr><td>U13</td><td>77,1&nbsp;%</td><td>22,4&nbsp;%</td><td>0,4&nbsp;%</td><td>–</td><td>0,1&nbsp;%</td><td>1.590</td></tr><tr><td>U15</td><td>74,6&nbsp;%</td><td>24,5&nbsp;%</td><td>–</td><td>–</td><td>0,9&nbsp;%</td><td>1.602</td></tr><tr><td>U17</td><td>90,9&nbsp;%</td><td>–</td><td>–</td><td>1,0&nbsp;%</td><td>8,1&nbsp;%</td><td>1.478</td></tr><tr><td>U19</td><td>–</td><td>–</td><td>–</td><td>23,0&nbsp;%</td><td>77,0&nbsp;%</td><td>278</td></tr></tbody></table></div>
+    <h3>Ebene der Turniere, auf denen höher gespielt wurde</h3>
+    <p>Anteil der Hochspieler mit mindestens einem höheren Spiel auf dieser Ebene (Mehrfachnennung, Zeilen
+      ergeben daher mehr als 100&nbsp;%). Ebene laut DBV-Grading des Turniers bzw. der Konkurrenz:
+      A = A-RLT/DM, B = B-RLT/GM, C = C-RLT/LM, D = D-RLT/BM, E = E-RLT/KM; International = internationale
+      Turniere mit BTP-Daten (v.a. IS U15); sonstige = ohne Ebene (GER Masters Finale U11).</p>
+    <div class="hv-wrap"><table class="hv"><thead><tr><th>eigene AK</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>International</th><th>sonstige</th><th>n</th></tr></thead><tbody><tr><td>U09</td><td>15,7&nbsp;%</td><td>2,5&nbsp;%</td><td>64,5&nbsp;%</td><td>70,6&nbsp;%</td><td>35,5&nbsp;%</td><td>–</td><td>1,5&nbsp;%</td><td>197</td></tr><tr><td>U11</td><td>9,8&nbsp;%</td><td>22,3&nbsp;%</td><td>59,9&nbsp;%</td><td>61,0&nbsp;%</td><td>27,7&nbsp;%</td><td>0,5&nbsp;%</td><td>–</td><td>930</td></tr><tr><td>U13</td><td>7,0&nbsp;%</td><td>22,3&nbsp;%</td><td>60,7&nbsp;%</td><td>62,4&nbsp;%</td><td>21,9&nbsp;%</td><td>9,9&nbsp;%</td><td>–</td><td>1.590</td></tr><tr><td>U15</td><td>10,4&nbsp;%</td><td>25,8&nbsp;%</td><td>59,0&nbsp;%</td><td>60,1&nbsp;%</td><td>19,8&nbsp;%</td><td>–</td><td>–</td><td>1.602</td></tr><tr><td>U17</td><td>10,6&nbsp;%</td><td>23,1&nbsp;%</td><td>56,6&nbsp;%</td><td>49,5&nbsp;%</td><td>16,0&nbsp;%</td><td>–</td><td>–</td><td>1.478</td></tr><tr><td>U19</td><td>41,0&nbsp;%</td><td>34,2&nbsp;%</td><td>17,3&nbsp;%</td><td>27,7&nbsp;%</td><td>2,2&nbsp;%</td><td>–</td><td>–</td><td>278</td></tr><tr class="hv-sum"><td>gesamt</td><td>11,0&nbsp;%</td><td>23,3&nbsp;%</td><td>57,3&nbsp;%</td><td>57,1&nbsp;%</td><td>20,4&nbsp;%</td><td>2,7&nbsp;%</td><td>–</td><td>6.075</td></tr></tbody></table></div>
+    <p>Verteilung aller 66.275 höheren Spiel-Einsätze auf die Ebenen: A 5,8&nbsp;% &middot; B 12,2&nbsp;% &middot; C 41,9&nbsp;% &middot; D 29,5&nbsp;% &middot; E 10,2&nbsp;% &middot; International 0,5&nbsp;%.</p>
+  </details>
 
   <div class="tiles">
     
