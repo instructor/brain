@@ -12,6 +12,10 @@
   .variant-note summary { cursor: pointer; font-weight: 600; color: var(--text, #222); padding: 2px 0; }
   .variant-note details > div { margin: 2px 0 8px 18px; }
   .variant-note p { margin: 0 0 6px; }
+  /* "Vergleich von Varianten" abgehoben (2026-10-22): kein weiterer Variantenblock, sondern die Auswertung */
+  .variant-note details.vgl-abschnitt { margin-top: 10px; padding: 6px 10px; border: 1px solid #e3c9cd;
+    border-left: 4px solid var(--accent, #8b1e2d); border-radius: 6px; background: #fbf3f4; }
+  .variant-note details.vgl-abschnitt > summary { color: var(--accent, #8b1e2d); }
   /* Rundgang-Animation (2026-10-22): auf-/zuklappbar, Vorgabe per Checkbox im Browser gemerkt */
   .demo-box { position: relative; margin: 0 0 16px; }
   .demo-box summary { cursor: pointer; font-weight: 600; padding: 4px 0; padding-right: 170px; }
@@ -99,7 +103,7 @@
 	und die <a href="u15-international/turnierstaerke.html">Turnierstärke der U15-Turniere</a>.
 	</div></details>
 
-	<details><summary>Vergleich von Varianten</summary><div>
+	<details class="vgl-abschnitt"><summary>Vergleich von Varianten</summary><div>
 	<p>Die Varianten werden auf drei Wegen miteinander verglichen.
 	Der <b>H2H-Konkordanzvergleich</b> prüft, wie oft die Rangfolge einer Variante zu den echten
 	Kopf-an-Kopf-Ergebnissen der letzten 12 Monate passt.

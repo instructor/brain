@@ -45,6 +45,42 @@
 	<br>Anregungen und Rückmeldungen an edi.klein@badminton.de.
   </p>
 
+  <style>
+  /* Rundgang-Animation (2026-10-22, wie rangliste.html): auf-/zuklappbar, Vorgabe per Checkbox im Browser gemerkt */
+  .demo-box { position: relative; margin: 0 0 16px; }
+  .demo-box summary { cursor: pointer; font-weight: 600; padding: 4px 0; padding-right: 170px; }
+  .demo-box img { display: block; width: 960px; max-width: 100%; height: auto; margin-top: 6px;
+    border: 1px solid #ddd; border-radius: 6px; }
+  .demo-pref { position: absolute; top: 4px; right: 0; font-size: 0.85rem; color: #666; cursor: pointer; }
+  </style>
+  <div class="demo-box">
+    <details id="demo-details">
+      <summary>Kurzer Rundgang: Rangliste, Spielerdetails, H2H und &bdquo;Warum rot?&ldquo; (Animation, am Beispiel der Original-Rangliste)</summary>
+      <img id="demo-gif" data-src="../demo/rangliste-demo.gif"
+        alt="Animierter Rundgang: Klick auf einen Spieler, Detailseite mit Badges und Top-5-Turnieren, H2H-Kasten mit grünen und roten Einträgen, Erklärung über den Link Warum rot?">
+    </details>
+    <label class="demo-pref" title="Wird in diesem Browser gemerkt (gilt für alle Ranglistenseiten)"><input type="checkbox" id="demo-immer-auf"> immer aufgeklappt</label>
+  </div>
+  <script>
+  // Rundgang: Checkbox = Vorgabe beim Laden (an = immer aufgeklappt, aus = immer zugeklappt), im Browser gemerkt
+  // (gleicher Schluessel wie rangliste.html); ohne gespeicherte Wahl aufgeklappt. GIF erst beim Aufklappen laden.
+  (function () {
+    const KEY = "brain-rundgang-aufgeklappt";
+    const det = document.getElementById("demo-details");
+    const box = document.getElementById("demo-immer-auf");
+    const img = document.getElementById("demo-gif");
+    let auf = true;
+    try { const v = localStorage.getItem(KEY); if (v !== null) auf = v === "1"; } catch (e) { /* ohne Speicher: Standard */ }
+    box.checked = auf;
+    det.addEventListener("toggle", () => { if (det.open && !img.src) img.src = img.dataset.src; });
+    det.open = auf;
+    box.addEventListener("change", () => {
+      try { localStorage.setItem(KEY, box.checked ? "1" : "0"); } catch (e) { /* nicht speicherbar */ }
+      det.open = box.checked;
+    });
+  })();
+  </script>
+
   <div class="tabs">
     <div class="tab active" id="tab-current" data-tab="current">Rangliste</div>
     <div class="tab" id="tab-history" data-tab="history">Vergangene Ranglisten</div>
