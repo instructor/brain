@@ -134,6 +134,11 @@ async function init() {
   const nGruen = nachbarn.filter(n => n.bew === "gruen").length, nRot = nachbarn.filter(n => n.bew === "rot").length;
   const zuTief = nachbarn.filter(n => n.bew === "rot" && n.oben);   // X hat gegen Hoehere gewonnen
   const zuHoch = nachbarn.filter(n => n.bew === "rot" && !n.oben);  // Tiefere haben gegen X gewonnen
+  // Doppel/Mixed: H2H zaehlt partnerunabhaengig, Partner sind in den Daten nicht enthalten (2026-10-21)
+  const doppel = ["HD", "DD", "HM", "DM"].includes(dis);
+  const duell = doppel ? "die direkten Begegnungen" : "das direkte Duell";
+  // Knapper Abstand (< 1 % der Punkte von X): Reihenfolge haengt an einem einzelnen Ergebnis
+  const knapp = n => Math.abs(Number(n.r.Points) - Number(X.Points)) < 0.01 * Number(X.Points);
 
   // "Sportlich": Einfuegeposition unter den Nachbarn mit den wenigsten Widerspruechen
   let besteK = nachbarn.filter(n => n.oben).length, besteFehler = Infinity;
@@ -151,17 +156,27 @@ async function init() {
     // hinter nachbarn[besteK-1], der dabei um eins aufrueckt -- X uebernimmt dessen bisherigen Platz.
     const bezug = besteK < aktK ? nachbarn[besteK].r : nachbarn[besteK - 1].r;
     const ziel = bezug.AKL2 === akl ? akPlatz(bezug) : null;
-    sportlich = ziel
-      ? `Nach den direkten Begegnungen gehört ${nm(X)} eher auf Platz ${ziel}${besteK > aktK ? " (tiefer)" : ""}.`
-      : `Nach den direkten Begegnungen gehört ${nm(X)} eher ${besteK > aktK ? "tiefer" : "höher"}.`;
+    const wo = ziel ? `auf Platz ${ziel}${besteK > aktK ? " (tiefer)" : ""}` : (besteK > aktK ? "tiefer" : "höher");
+    sportlich = doppel
+      ? `Rein nach den direkten Begegnungen stünde ${nm(X)} eher ${wo}.`
+      : `Nach den direkten Begegnungen gehört ${nm(X)} eher ${wo}.`;
   }
   if (zuTief.length && zuHoch.length) {
     sportlich += ` Der Unterschied zeigt sich aber in beide Richtungen: gegenüber ${aufzaehlen(zuHoch.map(n => nm(n.r)))} steht ${nm(X)} höher, als die direkten Begegnungen nahelegen.`;
+  }
+  if (doppel && nRot) {
+    sportlich += ` Im ${dis === "HM" || dis === "DM" ? "Mixed" : "Doppel"} zählen die Begegnungen unabhängig vom Partner. Ein Teil des Unterschieds kann deshalb an
+      wechselnden Partnern liegen.`;
   }
 
   // --- Warum zu tief: Ursachen deuten statt Ergebnisse aufzaehlen (User-Vorgabe 2026-10-21;
   // die Zahlen stehen in der H2H-Tabelle und unter "Ergebnisse im Wertungszeitraum")
   const tiefPunkte = [];
+  const knappVor = zuTief.filter(knapp);
+  if (knappVor.length) {
+    tiefPunkte.push(`${nm(X)} liegt nur knapp hinter ${aufzaehlen(knappVor.map(n => nm(n.r)))}. Schon ein etwas besseres
+      Ergebnis würde die Reihenfolge drehen.`);
+  }
   if (zuTief.length) {
     const hochX = hoeherTop5(dX);
     const mitMehrHoch = zuTief.filter(n => summe(hoeherTop5(dt(n.r.SpielerID)).map(d => d.Punkte)) > summe(hochX.map(d => d.Punkte)));
@@ -199,18 +214,19 @@ async function init() {
   const hochPunkte = zuHoch.map(n => {
     const t5n = top5(dt(n.r.SpielerID)), t5x = top5(dX);
     let warum;
-    if (t5n.length < 5) warum = "spielt aber zu wenige Turniere, um die Siege in Punkte umzusetzen";
+    if (knapp(n)) warum = "liegt aber nur knapp dahinter. Schon ein etwas besseres Ergebnis würde die Reihenfolge drehen";
+    else if (t5n.length < 5) warum = "spielt aber zu wenige Turniere, um die Siege in Punkte umzusetzen";
     else {
       const stark = t5n.filter(d => d.Punkte >= (t5x[2]?.Punkte ?? 0)).length;
       warum = stark === 1 ? "hat aber neben einem Spitzenergebnis zu wenig Breite"
         : stark === 0 ? "erreicht aber nicht die Spitzenergebnisse, die in der Rangliste zählen"
         : "verliert aber Punkte durch die schwächeren hinteren Ergebnisse unter den besten 5";
     }
-    return `${nm(n.r)} gewinnt das direkte Duell, ${warum}.`;
+    return `${nm(n.r)} gewinnt ${duell}, ${warum}.`;
   });
-  if (hochPunkte.length) {
+  if (zuHoch.some(n => !knapp(n))) {
     hochPunkte.push(`Die Ergebnisse von ${nm(X)} sind breiter und konstanter. Das ist der Zielkonflikt einer
-      Best-5-Rangliste: Breite schlägt direkte Duelle.`);
+      Best-5-Rangliste: Breite schlägt ${doppel ? "direkte Begegnungen" : "direkte Duelle"}.`);
   }
 
   // --- Gegenprobe: Hoeherspiel-Ergebnisse mit Punkten der eigenen AK
@@ -224,8 +240,16 @@ async function init() {
     const wX = neu.get(idX);
     const ueberholt = zuTief.filter(n => neu.has(n.r.SpielerID) && neu.get(n.r.SpielerID) < wX);
     const bleibt = zuTief.filter(n => neu.has(n.r.SpielerID) && neu.get(n.r.SpielerID) >= wX);
-    let satz = `Wertet man alle Höherspiel-Ergebnisse mit den Punkten der eigenen AK, rückt ${nm(X)} auf Platz ${neuPlatz(idX)}`;
-    satz += ueberholt.length ? `, vor ${aufzaehlen(ueberholt.map(n => nm(n.r)))}.` : ".";
+    const pNeu = neuPlatz(idX), pAlt = akPlatz(X);
+    let satz = `Wertet man alle Höherspiel-Ergebnisse mit den Punkten der eigenen AK, `;
+    if (pNeu < pAlt) {
+      satz += `rückt ${nm(X)} auf Platz ${pNeu}`;
+      satz += ueberholt.length ? `, vor ${aufzaehlen(ueberholt.map(n => nm(n.r)))}.` : ".";
+    } else if (pNeu === pAlt) {
+      satz += `bliebe ${nm(X)} auf Platz ${pNeu}.`;
+    } else {
+      satz += `fiele ${nm(X)} auf Platz ${pNeu}. ${nm(X)} profitiert also selbst von Ergebnissen in der höheren AK.`;
+    }
     if (bleibt.length) {
       const top = bleibt.map(n => {
         const d = eigeneAkWerte(dt(n.r.SpielerID))[0]?.d;
