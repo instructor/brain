@@ -3,29 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JWS U19 Rangliste (eigene AK mit Sieg-Bonus)</title>
+<title>JWS U19 Rangliste (eigene AK + Teilbonus bei Höherspielen-Sieg)</title>
 <link rel="stylesheet" href="assets/rangliste.css">
 <link rel="stylesheet" href="assets/h2h.css">
 </head>
 <body>
 <div class="page">
-  <h1>JWS U19 Rangliste &mdash; Variante &bdquo;eigene AK mit Sieg-Bonus&ldquo;</h1>
+  <h1>JWS U19 Rangliste &mdash; Variante &bdquo;eigene AK + Teilbonus bei Höherspielen-Sieg&ldquo;</h1>
 
   <p class="variant-note">
-	Jeder Spieler erhält bei Teilnahme in einer höheren AK die Punkte seiner eigenen Altersklasse 
-	statt der Punkte der tatsächlich gespielten Altersklasse. 
-	Zusätzlich gibt es einen &bdquo;Bonus&ldquo; 
-	für Siege gegen Gegner der höheren AK
-	&mdash; sichtbar in der Spieler-Detailansicht.
-	Die Bonushöhe ist von der relativen Stärke des Gegners 
-	abhängig: voller Bonus nur, wenn der Gegner mindestens gleich stark ist, 
-	ansonsten anteiliger Bonus mit Faktor min(1, Gegnerpunkte / eigene Punkte).
-	Der maximale Bonus ist durch die Differenz der Punkte der höheren AK und der eigenen AK
-	für die erzielte Platzierung begrenzt.
-	<br><strong>Sonderfall 1</strong>: bei O19-Turnieren gibt es immer vollen Bonus bei einem Sieg 
-	gegen einen Gegner der höheren AK (O19), da die relative Spielstärke für O19 Spielern
-	nicht verfügbar ist.
-	<br><strong>Sonderfall 2</strong>: Für Turniere mit BWF/BEC-Grading werden die vollen Punkte der 
+	Wer in einer höheren Altersklasse (AK) spielt, erhält die Punkte der <strong>eigenen</strong> AK
+	für die erreichte Platzierung, dazu einen Bonus für jeden Sieg gegen einen Gegner aus der
+	höheren AK &mdash; sichtbar in der Spieler-Detailansicht.
+	<br><strong>Obergrenze</strong>: Je Sieg gibt es höchstens den Anteil (b &minus; a) / n
+	(a = Punkte der eigenen AK, b = Punkte der gespielten AK für denselben Platz, n = Zahl der
+	eigenen Spiele im Turnier). Insgesamt gibt es also nie mehr als ein Spieler der höheren AK für
+	denselben Platz erhält.
+	<br><strong>Teilbonus</strong>: Den vollen Anteil gibt es nur, wenn der besiegte Gegner in der
+	Rangliste vor dem Turnier mindestens so viele Punkte hat wie der Höherspieler. Gegen einen Gegner
+	mit weniger Punkten wird der Anteil gekürzt, mit dem Faktor Gegnerpunkte / eigene Punkte
+	(im Doppel: Mittel der beiden Gegner).
+	<br><strong>Unterschied</strong> zur Variante
+	<a href="../eigene-ak-vollbonus/rangliste-eigene-ak-vollbonus.html">&bdquo;eigene AK + Vollbonus bei Höherspielen-Sieg&ldquo;</a>:
+	dort bringt jeder Sieg den vollen Anteil, unabhängig von den Ranglistenpunkten des Gegners. Der
+	Teilbonus ist also strenger.
+	<br><strong>Sonderfall 1</strong>: Bei O19-Turnieren gibt es für einen Sieg gegen einen Gegner
+	der höheren AK (O19) immer den vollen Anteil, da die Spielstärke von O19-Spielern in der
+	U19-Rangliste nicht bekannt ist.
+	<br><strong>Sonderfall 2</strong>: Für Turniere mit BWF/BEC-Grading werden die vollen Punkte der
 	gespielten AK vergeben, da i.d.R. keine Matchdaten vorliegen.
 	<br>(*) Spalten &bdquo;Rang&ldquo; und &bdquo;Punkte&ldquo; zeigen in Klammern den Rang 
 	desselben Spielers in der Original-Rangliste; 

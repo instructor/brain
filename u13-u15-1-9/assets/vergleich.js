@@ -8,7 +8,7 @@
 // Gegenprobe mit Punkten der eigenen AK, Vergleich mit Original), keine Einzelfallpruefung.
 // Seit 2026-10-21 in allen Varianten dieselbe Datei; Unterschiede nur ueber window.VGL_CONFIG in
 // vergleich.html: original = true -> kein Abschnitt "Bezug zur Variante"; hoeher = wie Ergebnisse
-// in der hoeheren AK zaehlen ("voll" = Punkte der gespielten AK, "bonus" = eigene AK + Sieg-Bonus,
+// in der hoeheren AK zaehlen ("voll" = Punkte der gespielten AK, "bonus" = eigene AK + Teilbonus,
 // "keine" = nur eigene AK -> Grund "hoehere AK" entfaellt).
 const VGL = Object.assign({ original: false, hoeher: "voll" }, window.VGL_CONFIG || {});
 

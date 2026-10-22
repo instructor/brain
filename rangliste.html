@@ -37,27 +37,29 @@
 	bereit (zum Aufklappen anklicken):</p>
 
 	<details><summary>Punkte der eigenen Altersklasse</summary><div>
-	<a href="eigene-ak-ohne-bonus/rangliste-eigene-ak.html">Variante
-	&bdquo;eigene Altersklasse (simple)&ldquo;</a>:
-	bei Teilnahme in höherer AK gibt es immer die Punkte der eigenen Altersklasse, ohne Bonus.
+	Alle vier Varianten werten ein Ergebnis in einer höheren Altersklasse (AK) zunächst mit den
+	Punkten der <b>eigenen</b> AK für die erreichte Platzierung. Sie unterscheiden sich darin, ob
+	und wie viel bis zu den Punkten der <b>gespielten</b> AK dazukommt. Mehr als ein Spieler
+	der höheren AK für denselben Platz erhält, gibt es in keiner Variante. Ein Bonus ist in der
+	Spieler-Detailansicht (Klick auf den Spieler) je Turnier einsehbar.
+	<br><a href="eigene-ak-ohne-bonus/rangliste-eigene-ak.html">Variante
+	&bdquo;eigene Altersklasse ohne Bonus&ldquo;</a>:
+	immer nur die Punkte der eigenen AK, kein Bonus.
+	<br><a href="eigene-ak/rangliste-eigene-ak.html">Variante
+	&bdquo;eigene AK + Teilbonus bei Höherspielen-Sieg&ldquo;</a>:
+	für jeden Sieg gegen einen Gegner aus der höheren AK gibt es einen Anteil des Unterschieds zu
+	den Punkten der gespielten AK. Den vollen Anteil gibt es nur, wenn der besiegte Gegner in der
+	Rangliste mindestens so viele Punkte hat wie der Höherspieler; gegen einen Gegner mit weniger
+	Punkten wird der Anteil im Verhältnis der Punkte gekürzt.
 	<br><a href="eigene-ak-vollbonus/rangliste-eigene-ak-vollbonus.html">Variante
-	&bdquo;eigene AK + Höherspielen-Vollbonus&ldquo;</a>:
-	bei Teilnahme in höherer AK gibt es die Punkte der eigenen Altersklasse, dazu für jeden Sieg
-	gegen Gegner der höheren Altersklasse einen Bonus in voller Höhe, unabhängig von der Stärke
-	des Gegners.
-	<br><a href="eigene-ak/rangliste-eigene-ak.html">Variante &bdquo;eigene AK mit Sieg-Bonus&ldquo;</a>:
-	jeder Spieler erhält bei Teilnahme in höherer AK die Punkte seiner
-    eigenen Altersklasse anstatt der Punkte der tatsächlich gespielten Altersklasse.
-	Zusätzlich gibt es einen Bonus für Siege gegen Gegner der höheren
-	Altersklasse, der in der Spieler-Detailansicht (Klick auf den Spieler)
-	einsehbar ist. Die Höhe des Bonus ist
-	nach oben begrenzt zur Vermeidung von Übervorteilung gegenüber
-	Teilnehmern der höheren AK.
+	&bdquo;eigene AK + Vollbonus bei Höherspielen-Sieg&ldquo;</a>:
+	wie Teilbonus, aber jeder Sieg gegen einen Gegner aus der höheren AK bringt den vollen Anteil,
+	unabhängig von dessen Ranglistenpunkten.
 	<br><a href="eigene-ak-platzierung-hart/rangliste-eigene-ak-platzierung-hart.html">Variante
-	&bdquo;eigene AK mit Hälfte-Bonus&ldquo;</a>:
-	bei Teilnahme in höherer AK gibt es die Punkte der eigenen Altersklasse, bei einer
-	Platzierung in der vorderen Hälfte des Feldes (Feldgröße laut Ergebnisliste, mindestens
-	8 Teilnehmer) dagegen die Punkte der tatsächlich gespielten Altersklasse.
+	&bdquo;eigene AK + Hälfte-Bonus&ldquo;</a>:
+	nicht der einzelne Sieg zählt, sondern die Platzierung: in der vorderen Hälfte des Feldes
+	(Feldgröße laut Ergebnisliste, mindestens 8 Teilnehmer) gibt es die vollen Punkte der gespielten
+	AK, sonst die Punkte der eigenen AK.
 	</div></details>
 
 	<details><summary>Übergang zwischen den Altersklassen</summary><div>
@@ -67,6 +69,9 @@
 	Verhältnis 1:12 abgemildert, d.h. Platz 9 in U15 gibt gleiche Punktezahl
 	wie Platz 1 in U13. Alle Plätze in U13 und jünger werden dafür mit demselben Faktor angehoben
 	(knapp ein Fünftel mehr Punkte, &times; 1,19).
+	Durch den Übergang 1:12 &rarr; 1:9 wird der Übergang von U13 nach U15 einfacher, sowohl beim
+	AK-Wechsel als auch bei der Qualifikation fürs Teilnehmerfeld bei Meldung in einer höheren AK
+	für ein RLT.
 	</div></details>
 	<!-- ELO-Variante voruebergehend ausgeblendet (2026-08-25): AK-Offset-Fix wird ueberarbeitet,
 	     siehe CLAUDE.md "AK-abhaengiger Erwartungswert-Offset" -- RESULTS_ELO/ ist aktuell
@@ -81,7 +86,7 @@
 	<a href="original-mit-dem22/rangliste-original-mit-dem22.html">Variante
 	&bdquo;Original mit DEM U22&ldquo;</a>:
 	wie die Original-Rangliste, zusätzlich zählt die Deutsche Meisterschaft U22 wie die DEM U19
-	und die U22-Gruppenmeisterschaften wie die U19-Gruppenmeisterschaften (nur KW40).
+	und die U22-Gruppenmeisterschaften wie die U19-Gruppenmeisterschaften (nur in der Rangliste KW40/2026 eingearbeitet).
 	</div></details>
 
 	<details><summary>Differenzierung BEC-U17-Turniere</summary><div>
@@ -111,8 +116,8 @@
 	Der <b>Vorhersagetest je Spiel</b> nimmt für jedes Spiel die Rangliste, die vor dem Spiel galt, und prüft,
 	ob der besser platzierte Spieler gewinnt; gezählt wird, um wie viel öfter oder seltener eine
 	Variante richtig liegt als das Original.
-	Für die <b>Expertenmeinung</b> stehen die Top 16 des Originals und der Varianten &bdquo;eigene AK mit Sieg-Bonus&ldquo;,
-	&bdquo;eigene AK mit Hälfte-Bonus&ldquo;, &bdquo;AK-Verhältnis U13:U15 = 1:9&ldquo; und
+	Für die <b>Expertenmeinung</b> stehen die Top 16 des Originals und der Varianten &bdquo;eigene AK + Teilbonus bei Höherspielen-Sieg&ldquo;,
+	&bdquo;eigene AK + Hälfte-Bonus&ldquo;, &bdquo;AK-Verhältnis U13:U15 = 1:9&ldquo; und
 	&bdquo;BEC-U17 gestuft-light&ldquo; je DBV, Gruppe und
 	Landesverband zur Inspektion und Beurteilung bereit, als fiktive Meldung der jeweils Besten
 	zu einem Ranglistenturnier der jeweiligen Ebene.</p>
