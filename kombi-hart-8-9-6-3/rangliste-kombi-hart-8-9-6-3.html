@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JWS U19 Rangliste (Hälfte-Bonus + AK-Tabelle 8-9-6-3)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/rangliste.css">
+<link rel="stylesheet" href="assets/h2h.css">
+</head>
+<body>
+<div class="page">
+  <h1>JWS U19 Rangliste &mdash; Variante &bdquo;Hälfte-Bonus + AK-Tabelle 8-9-6-3&ldquo; (Entwurf)</h1>
+
+  <p class="variant-note">
+	<strong>Entwurf aus der Kombinationssuche</strong>: Hälfte-Bonus beim Höherspielen
+	<strong>plus</strong> eine geänderte Punktetabelle mit engeren Abständen zwischen den Altersklassen.
+	<br><strong>1. Punktetabelle</strong>: Verhältnisse zwischen den AK-Blöcken (Platz 1 der unteren AK
+	= Platz x der oberen AK) U11:U13 = 1:8 (bisher 1:10), U13:U15 = 1:9 (bisher 1:12), U15:U17 = 1:6
+	(bisher 1:7), U17:U19 = 1:3 (bisher 1:5); U09:U11 = 1:12 und U19/O19 unverändert. Jeder Block U17
+	und jünger behält die Form der DBV-Punktetabelle und wird nur insgesamt mit einem Faktor
+	angehoben. Jüngere Altersklassen bekommen dadurch im Verhältnis zu älteren mehr Punkte, und zwar
+	bei <strong>allen</strong> Ergebnissen, nicht nur beim Höherspielen.
+	<br><strong>2. Hälfte-Bonus</strong>: wer in einer höheren Altersklasse spielt, bekommt die Punkte
+	der <strong>gespielten</strong> AK, wenn die Platzierung in der vorderen Hälfte des Feldes liegt
+	(Platz &le; N/2, aufgerundet), sonst die Punkte der <strong>eigenen</strong> AK. Als Platz zählt
+	die Zahl in der Spalte &bdquo;Platz&ldquo; der Spielerseite, bei Platzbereichen wie
+	&bdquo;9/16&ldquo; also der Anfang des Bereichs (9).
+	<br>Die Feldgröße N wird allein aus der Ergebnisliste des Turniers abgelesen: tiefster Platz
+	&minus; 1 + Zahl der Teilnehmer/Paare auf diesem Platz. Beispiel: das letzte Band 17/32 ist mit
+	5 Spielern besetzt &rarr; N = 16 + 5 = 21 &rarr; Platz 11 oder besser zählt als vordere Hälfte.
+	Bei internationalen Turnieren (BWF/BEC, Jugend-EM) enthält die Ergebnisliste nur deutsche
+	Spieler; dort wird N aus den Auslosungen (Draws) aller Nationen bestimmt.
+	Ohne Höherspielen gelten die Punkte der gespielten Konkurrenz (aus der geänderten Tabelle).
+	<br><strong>Unterschied</strong> zur Variante
+	<a href="../eigene-ak-platzierung-hart/rangliste-eigene-ak-platzierung-hart.html">&bdquo;eigene AK + Hälfte-Bonus&ldquo;</a>:
+	gleiche Höherspiel-Regel, dort aber mit der unveränderten DBV-Punktetabelle.
+	<br>Sonderfall 1: Felder mit weniger als 8 Teilnehmern/Paaren &rarr; immer Punkte der eigenen AK.
+	<br>Sonderfall 2: Internationale Turniere ohne verfügbare Auslosung (z.&nbsp;B. Junioren-WM,
+	Indonesien-GP) &rarr; volle Punkte der gespielten AK.
+	<br>(*) Spalten &bdquo;Rang&ldquo; und &bdquo;Punkte&ldquo; zeigen in Klammern den Rang
+	desselben Spielers in der Original-Rangliste; 
+	<br>(*) Spalte &bdquo;H2H&ldquo; zeigt beim Überfahren die
+	5 nächsten Ranglisten-Nachbarn oberhalb/unterhalb mit echten Kopf-an-Kopf-Ergebnissen (grün =
+	Rangfolge bestätigt, rot = widerspricht der Rangfolge).
+    <br>Zur <a href="../rangliste.html">&rarr; Original-Rangliste</a>
+    <br>Anregungen und Rückmeldungen bitte an edi.klein@badminton.de.
+  </p>
+
+  <style>
+  /* Rundgang-Animation (2026-10-22, wie rangliste.html): auf-/zuklappbar, Vorgabe per Checkbox im Browser gemerkt */
+  .demo-box { position: relative; margin: 0 0 16px; }
+  .demo-box summary { cursor: pointer; font-weight: 600; padding: 4px 0; padding-right: 170px; }
+  .demo-box img { display: block; width: 960px; max-width: 100%; height: auto; margin-top: 6px;
+    border: 1px solid #ddd; border-radius: 6px; }
+  .demo-pref { position: absolute; top: 4px; right: 0; font-size: 0.85rem; color: #666; cursor: pointer; }
+  </style>
+  <div class="demo-box">
+    <details id="demo-details">
+      <summary>Kurzer Rundgang: Rangliste, Spielerdetails, H2H und Erklärtext (Animation, am Beispiel der Original-Rangliste)</summary>
+      <img id="demo-gif" data-src="../demo/rangliste-demo.gif"
+        alt="Animierter Rundgang: Klick auf einen Spieler, Detailseite mit Badges und Top-5-Turnieren, H2H-Kasten mit grünen und roten Einträgen, Erklärung über den Link Warum rot?">
+    </details>
+    <label class="demo-pref" title="Wird in diesem Browser gemerkt (gilt für alle Ranglistenseiten)"><input type="checkbox" id="demo-immer-auf"> immer aufgeklappt</label>
+  </div>
+  <script>
+  // Rundgang: Checkbox = Vorgabe beim Laden (an = immer aufgeklappt, aus = immer zugeklappt), im Browser gemerkt
+  // (gleicher Schluessel wie rangliste.html); ohne gespeicherte Wahl aufgeklappt. GIF erst beim Aufklappen laden.
+  (function () {
+    const KEY = "brain-rundgang-aufgeklappt";
+    const det = document.getElementById("demo-details");
+    const box = document.getElementById("demo-immer-auf");
+    const img = document.getElementById("demo-gif");
+    let auf = true;
+    try { const v = localStorage.getItem(KEY); if (v !== null) auf = v === "1"; } catch (e) { /* ohne Speicher: Standard */ }
+    box.checked = auf;
+    det.addEventListener("toggle", () => { if (det.open && !img.src) img.src = img.dataset.src; });
+    det.open = auf;
+    box.addEventListener("change", () => {
+      try { localStorage.setItem(KEY, box.checked ? "1" : "0"); } catch (e) { /* nicht speicherbar */ }
+      det.open = box.checked;
+    });
+  })();
+  </script>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-current" data-tab="current">Rangliste</div>
+    <div class="tab" id="tab-history" data-tab="history">Vergangene Ranglisten</div>
+  </div>
+
+  <div id="history-picker" style="display:none; margin-bottom:14px;">
+    <label for="week-select" style="font-size:0.85rem; color:#666;">Kalenderwoche wählen:</label>
+    <select id="week-select"></select>
+  </div>
+
+  <div class="filters">
+    <div>
+      <label for="f-dis">Disziplin</label>
+      <select id="f-dis"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-gs">Geschlecht</label>
+      <select id="f-gs"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-akl-input">Altersklasse</label>
+      <div class="ms" id="f-akl-ms">
+        <div class="ms-control" id="f-akl-control">
+          <span class="ms-chips" id="f-akl-chips"></span>
+          <input type="text" id="f-akl-input" class="ms-input" autocomplete="off" placeholder="-- alle --">
+          <button type="button" class="ms-clear" id="f-akl-clearall" title="Auswahl löschen" hidden>&times;</button>
+        </div>
+        <ul class="ms-options" id="f-akl-options" role="listbox" hidden></ul>
+      </div>
+    </div>
+    <div>
+      <label for="f-gruppe">Gruppe</label>
+      <select id="f-gruppe"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-lv">Landesverband</label>
+      <select id="f-lv"><option value="">-- alle --</option></select>
+    </div>
+    <div>
+      <label for="f-bezirk-input">Bezirk</label>
+      <div class="ms" id="f-bezirk-ms">
+        <div class="ms-control" id="f-bezirk-control">
+          <span class="ms-chips" id="f-bezirk-chips"></span>
+          <input type="text" id="f-bezirk-input" class="ms-input" autocomplete="off" placeholder="-- alle --">
+          <button type="button" class="ms-clear" id="f-bezirk-clearall" title="Auswahl löschen" hidden>&times;</button>
+        </div>
+        <ul class="ms-options" id="f-bezirk-options" role="listbox" hidden></ul>
+      </div>
+    </div>
+    <div>
+      <label for="f-vorname">Vorname</label>
+      <input type="text" id="f-vorname" placeholder="">
+    </div>
+    <div>
+      <label for="f-nachname">Nachname</label>
+      <input type="text" id="f-nachname" placeholder="">
+    </div>
+    <div>
+      <label for="f-verein">Verein</label>
+      <input type="text" id="f-verein" placeholder="">
+    </div>
+  </div>
+
+  <div class="filters-actions">
+    <button id="btn-search" type="button" class="search-btn">&#128269; Suche</button>
+  </div>
+
+  <div class="meta-row">
+    <div>
+      <em>Hinweis: Klick auf Spieler zeigt gespielte Turniere</em>
+      &nbsp;|&nbsp;
+      <button id="reset-filters" type="button">Filter zurücksetzen</button>
+      <span id="loading-indicator" class="loading-indicator" style="display:none;">wird geladen …</span>
+    </div>
+    <div id="updated-at"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="ranking-table">
+      <thead><tr id="table-head"></tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+  <div id="load-more-row" class="load-more-row" style="display:none;">
+    <button id="btn-load-more" type="button">Mehr laden</button>
+    <span id="load-more-info"></span>
+  </div>
+  <p class="row-count" id="row-count"></p>
+</div>
+
+<script src="assets/rangliste.js"></script>
+</body>
+</html>
