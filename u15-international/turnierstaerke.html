@@ -175,7 +175,7 @@
   <footer class="note">
     Quelle: <code>export_u15_bt_web.py</code>,
     Matchdaten aus tournamentsoftware, BTP-Exporten, badnet und dem BEC-Datahub.
-    <br>Analyse vom 25.10.2026; Rückfragen und Anregungen an Edi Klein (edi.klein@badminton.de)
+    <br>Analyse vom <span id="analyse-datum">25.10.2026</span>; Rückfragen und Anregungen an Edi Klein (edi.klein@badminton.de)
   </footer>
 </div>
 
@@ -291,6 +291,10 @@
     var json = res[0];
     state.stand = formatStand(res[1].pushed_at || json.generated_at);
     state.data = json;
+    // Analysedatum = Erzeugungsdatum der Daten (export_u15_bt_web.py, User-Vorgabe 2026-10-25)
+    if (json.generated_at) {
+      document.getElementById("analyse-datum").textContent = formatStand(json.generated_at.slice(0, 10));
+    }
     state.jahre = Array.from(new Set(json.gesamt.map(function (r) { return r.jahr; }))).sort().reverse();
     state.jahr = state.jahre[0];
     var jeJahr = {};
