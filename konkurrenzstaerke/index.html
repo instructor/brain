@@ -81,7 +81,9 @@
   th[data-sort]::after { content: " ↕"; color: var(--text-muted); font-weight: 400; }
   th.asc::after { content: " ↑"; color: var(--text-primary); } th.desc::after { content: " ↓"; color: var(--text-primary); }
   td.num { text-align: right; }
-  td.turnier { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
+  /* schmal, damit die Tabelle ohne Querscrollen in den Rahmen passt; voller Text im Tooltip */
+  td.turnier { max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+  td.staerkste { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
   tr.zeile { cursor: pointer; }
   tr.zeile:hover td { background: var(--surface-2); }
   tr.unsicher td { color: var(--text-muted); }
@@ -120,8 +122,10 @@
       deutsche und internationale Turniere, über alle Altersklassen). Das Turnier selbst zählt nicht mit.
       Je Konkurrenz zählt das Mittel der <b>8 stärksten Spieler</b> (Einzel) bzw. <b>4 stärksten Paare</b>
       (Doppel, Mixed); kleinere Felder werden mit einem schwachen „Feldboden“ aufgefüllt.
-      <b>Stärke</b> = Gewinnwahrscheinlichkeit dieses Spitzenfelds gegen einen <b>durchschnittlichen Spieler
-      derselben Altersklasse</b>. 50&nbsp;% = Durchschnitt, 99&nbsp;% = sehr stark.</p>
+      <b>Top-Mittel (Elo)</b> = dieses Mittel auf einer gemeinsamen Skala aller Spieler (Durchschnitt = 1500); danach
+      sind Diagramm und Balken angeordnet, eine stärkere Konkurrenz liegt immer rechts von einer schwächeren.
+      <b>Stärke in eigener AK</b> = Gewinnwahrscheinlichkeit dieses Spitzenfelds gegen einen <b>durchschnittlichen
+      Spieler derselben Altersklasse</b> (50&nbsp;% = Durchschnitt, 99&nbsp;% = sehr stark).</p>
     <p class="meta" id="meta-line">Lädt…</p>
     <p class="meta"><a href="../rangliste.html">&larr; zur Startseite (Rangliste)</a></p>
   </header>
@@ -169,7 +173,7 @@
     der Durchschnitt aller Erwachsenen, bei U19 (Jugend) der Durchschnitt der jeweiligen Altersklasse. Die Stärke in % ist
     deshalb nur <b>innerhalb eines Bereichs</b> vergleichbar (eine U19-DM erreicht ~99 %, die O19-DM ~90 %, obwohl die O19-DM
     deutlich stärker besetzt ist). Über alle Bereiche hinweg vergleicht das <b>Top-Mittel (Elo)</b>, gemeinsame Skala aller
-    Spieler; danach ist die Liste standardmäßig sortiert. Ein Klick auf eine Zeile zeigt das Teilnehmerfeld mit Spielstärke vor dem
+    Spieler: Danach sind Punkte und Balken angeordnet (feste Achse 0–3000) und die Liste standardmäßig sortiert. Ein Klick auf eine Zeile zeigt das Teilnehmerfeld mit Spielstärke vor dem
     Turnier (Elo-Skala, Durchschnitt aller Spieler = 1500) und Zahl der Matches im Jahr davor; die Top&nbsp;8/4 sind fett.
     <br>Quelle: <code>export_konkurrenzstaerke_web.py</code> (Matchdaten aus BTP-Exporten, BEC-Datahub, badnet);
     Analyse vom <span id="analyse-datum"></span>.
@@ -186,6 +190,10 @@
   // Streudiagramm in Bereichen (User-Vorgabe 2026-10-26): O19 A/B/international, U22 A/B, U19 = Jugend U09-U19 mit allen Ebenen
   var BEREICHE = [["O19", "O19", ["A", "B", "INT"]], ["U22", "U22", ["A", "B"]],
                   ["U19", "U19 (Jugend U09–U19)", ["A", "B", "C", "D", "E", "INT", "SONST"]]];
+  // Gemeinsame Skala fuer Punkte und Balken (User-Vorgabe 2026-10-26): Top-Mittel (Elo), fest 0-3000 -> eine staerkere
+  // Konkurrenz liegt immer rechts von einer schwaecheren, egal aus welchem Bereich/welcher Ebene
+  var ELO_MIN = 0, ELO_MAX = 3000;
+  function eloAnteil(v) { return Math.max(0, Math.min(1, (v - ELO_MIN) / (ELO_MAX - ELO_MIN))); }
   function bereich(r) { return r.ak === "O19" || r.ak === "U22" ? r.ak : "U19"; }
   var DIS = [["", "Alle"], ["JE", "JE"], ["ME", "ME"], ["JD", "JD"], ["MD", "MD"], ["XD", "XD"]];
   var AKS = ["U09", "U11", "U13", "U15", "U17", "U19", "U22", "O19"];
@@ -263,11 +271,11 @@
     var H = y + 26;
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("height", H);
-    function x(v) { return links + v / 100 * (W - links - rechts); }
+    function x(v) { return links + eloAnteil(v) * (W - links - rechts); }
     var h = [];
-    [0, 25, 50, 75, 100].forEach(function (t) {
+    [0, 500, 1000, 1500, 2000, 2500, 3000].forEach(function (t) {
       h.push('<line class="gitter" x1="' + x(t) + '" x2="' + x(t) + '" y1="' + oben + '" y2="' + (H - 22) + '"/>');
-      h.push('<text class="achse" x="' + x(t) + '" y="' + (H - 6) + '" text-anchor="middle">' + t + " %</text>");
+      h.push('<text class="achse" x="' + x(t) + '" y="' + (H - 6) + '" text-anchor="' + (t === ELO_MAX ? "end" : t === ELO_MIN ? "start" : "middle") + '">' + t + "</text>");
     });
     zeilen.forEach(function (z, i) {
       if (z.kopf) {
@@ -276,7 +284,7 @@
         return;
       }
       var y0 = z.y, e = z.e, rs = z.rs;
-      var v = rs.map(stK).sort(function (a, b) { return a - b; });
+      var v = rs.map(eloK).sort(function (a, b) { return a - b; });
       h.push('<text x="' + (links - 10) + '" y="' + (y0 + 4) + '" text-anchor="end">' + esc(EBENE_TEXT[e] || e)
         + ' <tspan class="achse">(' + rs.length + ")</tspan></text>");
       if (v.length >= 4) {
@@ -285,7 +293,7 @@
       }
       rs.forEach(function (r) {
         var j = ((r.id * 9301 + 49297) % 233280) / 233280 - 0.5;      // feste Streuung je Konkurrenz
-        h.push('<circle r="3" cx="' + x(stK(r)).toFixed(1) + '" cy="' + (y0 + j * 20).toFixed(1) + '" data-id="' + r.id + '"/>');
+        h.push('<circle r="3" cx="' + x(eloK(r)).toFixed(1) + '" cy="' + (y0 + j * 20).toFixed(1) + '" data-id="' + r.id + '"/>');
       });
       if (v.length) {
         var m = quantil(v, .5);
@@ -294,7 +302,7 @@
     });
     svg.innerHTML = h.join("");
     $("strip-sub").textContent = rows.length + " Konkurrenzen · Punkt = eine Konkurrenz, Strich = Median, "
-      + "Fläche = mittlere Hälfte · rechts = stärker";
+      + "Fläche = mittlere Hälfte · x-Achse: Top-Mittel (Elo), gemeinsame Skala aller Bereiche · rechts = stärker";
   }
   var nachId = {};
   $("strip").addEventListener("mousemove", function (ev) {
@@ -303,7 +311,7 @@
     var r = nachId[t.getAttribute("data-id")];
     if (!r) return;
     tip.innerHTML = esc(r.turnier) + "<br>" + esc(r.konkurrenz) + " · KW " + r.kw + " · " + esc(r.lv) + " · " + esc(r.grading)
-      + "<br>Stärke " + stK(r).toFixed(1) + " % · Feld " + r.n + (r.aufgefuellt ? " (aufgefüllt)" : "");
+      + "<br>Top-Mittel " + eloK(r) + " Elo · Stärke in eigener AK " + stK(r).toFixed(1) + " % · Feld " + r.n + (r.aufgefuellt ? " (aufgefüllt)" : "");
     tip.style.display = "block";
     tip.style.left = Math.min(ev.clientX + 12, window.innerWidth - 370) + "px";
     tip.style.top = (ev.clientY + 14) + "px";
@@ -317,7 +325,7 @@
 
   // ---- Tabelle ----
   var SPALTEN = [["turnier", "Turnier"], ["kw", "KW"], ["ebene", "Ebene"], ["lv", "LV"], ["konkurrenz", "Konkurrenz"],
-                 ["n", "Feld"], ["staerke", "Stärke"], ["elo", "Top-Mittel (Elo)"], ["hochspieler", "Hochspieler"],
+                 ["n", "Feld"], ["elo", "Top-Mittel (Elo)"], ["staerke", "Stärke in eigener AK"], ["hochspieler", "Hochspieler"],
                  ["auslaender", "Ausländer"], ["staerkste", "Stärkste/r"]];
   function kopf() {
     $("kopf").innerHTML = SPALTEN.map(function (s) {
@@ -340,11 +348,13 @@
       + "<td>" + esc(r.lv) + "</td><td>" + esc(r.konkurrenz) + "</td>"
       + '<td class="num">' + r.n + (r.aufgefuellt ? "*" : "") + "</td>"
       + '<td class="num"><span class="q ' + qual(r) + '" title="Top mit ≥ 6 Matches: ' + Math.round(r.top6 * 100) + ' %"></span>'
-        + '<span class="bar"><span class="' + ({ U19: "jugend", U22: "u22" }[bereich(r)] || "") + '" style="width:' + st + '%"></span></span>' + st.toFixed(1) + " %</td>"
-      + '<td class="num">' + eloK(r) + "</td>"
+        + '<span class="bar"><span class="' + ({ U19: "jugend", U22: "u22" }[bereich(r)] || "") + '" style="width:'
+        + (eloAnteil(eloK(r)) * 100).toFixed(1) + '%"></span></span>' + eloK(r) + "</td>"
+      + '<td class="num">' + st.toFixed(1) + " %</td>"
       + '<td class="num">' + Math.round(r.hochspieler * 100) + " %</td>"
       + '<td class="num">' + Math.round(r.auslaender * 100) + " %</td>"
-      + "<td>" + esc(r.staerkste) + (r.staerkste_elo ? ' <span class="achse">(' + r.staerkste_elo + ")</span>" : "") + "</td></tr>"
+      + '<td class="staerkste" title="' + esc(r.staerkste) + (r.staerkste_elo ? " (" + r.staerkste_elo + ")" : "") + '">'
+        + esc(r.staerkste) + (r.staerkste_elo ? ' <span class="achse">(' + r.staerkste_elo + ")</span>" : "") + "</td></tr>"
       + (S.offen === r.id ? '<tr class="drill"><td colspan="' + SPALTEN.length + '" id="drill-' + r.id + '">lädt…</td></tr>' : "");
   }
   function drill(r) {
