@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konkurrenzstärke</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Vorlage fuer export_konkurrenzstaerke_web.py (PLAN_KONKURRENZSTAERKE.md, Schritt 6); Stil wie
+     u15-international/turnierstaerke.html. Daten: data/konkurrenzen_<J>.json, data/teilnehmer_<J>.json. -->
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #fbfaf7; --surface-1: #ffffff; --surface-2: #f1efe9; --border: #e2ded3;
+    --text-primary: #17150f; --text-secondary: #5c5a51; --text-muted: #8b887c;
+    --accent: #184f95; --focus: #184f95; --dot: #2a78d6; --dot-hi: #eb6834; --soft: #e6eefa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-0: #16161a; --surface-1: #1e1e22; --surface-2: #26262b; --border: #37373d;
+      --text-primary: #f3f2ee; --text-secondary: #b8b6ad; --text-muted: #86847c;
+      --accent: #5fa0e8; --focus: #5fa0e8; --dot: #3987e5; --dot-hi: #d95926; --soft: #1d2c40;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #16161a; --surface-1: #1e1e22; --surface-2: #26262b; --border: #37373d;
+    --text-primary: #f3f2ee; --text-secondary: #b8b6ad; --text-muted: #86847c;
+    --accent: #5fa0e8; --focus: #5fa0e8; --dot: #3987e5; --dot-hi: #d95926; --soft: #1d2c40;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--surface-0); color: var(--text-primary);
+    font-family: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums;
+    padding-inline: 16px; padding-block: 20px 48px; }
+  h1, h2 { font-family: "Fraunces", Georgia, serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1180px; margin-inline: auto; display: flex; flex-direction: column; gap: 18px; }
+  header.page { display: flex; flex-direction: column; gap: 6px; }
+  header.page h1 { font-size: clamp(24px, 4vw, 34px); margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+  header.page p { margin: 0; color: var(--text-secondary); font-size: 14px; max-width: 80ch; line-height: 1.55; }
+  header.page p.subtitle { color: var(--text-muted); }
+  header.page .meta { color: var(--text-muted); font-size: 12.5px; }
+  .fn { position: relative; font-size: 0.75em; vertical-align: super; line-height: 0; cursor: help; outline: none; }
+  .fn-text { display: none; position: absolute; left: 0; top: 1.6em; z-index: 20; width: min(34em, 85vw);
+    padding: 10px 12px; background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.18); font-size: 13px; line-height: 1.5; white-space: normal; }
+  .fn:hover .fn-text, .fn:focus .fn-text { display: block; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 13px; }
+  .controls label { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+  .controls select, .controls input[type=search] { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 7px;
+    border: 1px solid var(--border); background: var(--surface-0); color: var(--text-primary); }
+  .controls input[type=search] { width: 200px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; background: var(--surface-2); border-radius: 9px; padding: 4px; }
+  .tabs button { font: inherit; font-size: 13px; font-weight: 600; color: var(--text-secondary); background: transparent;
+    border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+  .tabs button[aria-pressed="true"] { background: var(--surface-1); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .tabs button:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .panel-head { padding: 14px 16px 6px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+  .panel-head h2 { font-size: 17px; margin: 0 0 2px; font-weight: 600; }
+  .panel-head .sub { font-size: 12.5px; color: var(--text-muted); }
+  #strip { display: block; width: 100%; height: auto; }
+  #strip text { font-family: inherit; fill: var(--text-secondary); font-size: 12px; }
+  #strip .achse { fill: var(--text-muted); font-size: 11px; }
+  #strip .gitter { stroke: var(--border); stroke-width: 1; }
+  #strip circle { fill: var(--dot); fill-opacity: .35; }
+  #strip circle:hover { fill-opacity: 1; stroke: var(--surface-1); stroke-width: 2; }
+  #strip .median { stroke: var(--text-primary); stroke-width: 2.5; stroke-linecap: round; }
+  #strip .iqr { fill: var(--text-primary); fill-opacity: .08; }
+  .tip { position: fixed; z-index: 30; pointer-events: none; background: var(--text-primary); color: var(--surface-1);
+    font-size: 11.5px; line-height: 1.5; padding: 7px 10px; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.18);
+    max-width: 360px; display: none; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 8px; text-align: left; border-top: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--text-secondary); font-weight: 600; font-size: 12px; cursor: pointer; user-select: none; position: sticky; top: 0;
+    background: var(--surface-1); }
+  th[data-sort]::after { content: " ↕"; color: var(--text-muted); font-weight: 400; }
+  th.asc::after { content: " ↑"; color: var(--text-primary); } th.desc::after { content: " ↓"; color: var(--text-primary); }
+  td.num { text-align: right; }
+  td.turnier { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
+  tr.zeile { cursor: pointer; }
+  tr.zeile:hover td { background: var(--surface-2); }
+  tr.unsicher td { color: var(--text-muted); }
+  .bar { display: inline-block; width: 70px; height: 9px; background: var(--surface-2); border-radius: 4px; vertical-align: middle;
+    margin-right: 6px; position: relative; overflow: hidden; }
+  .bar span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--dot); border-radius: 4px; }
+  .pill { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; background: var(--soft); color: var(--accent); }
+  .q { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .q.gut { background: var(--dot); } .q.mittel { background: var(--text-muted); } .q.schwach { border: 1.5px solid var(--text-muted); }
+  tr.drill td { background: var(--surface-0); white-space: normal; padding: 8px 12px 12px; }
+  .drill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px 18px; font-size: 12.5px; }
+  .drill-grid div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px dotted var(--border); padding: 2px 0; }
+  .drill-grid .top { font-weight: 600; }
+  .drill-grid .meta { color: var(--text-muted); }
+  .mehr { margin: 10px 16px 16px; font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text-primary); cursor: pointer; }
+  footer.note { font-size: 12px; color: var(--text-muted); line-height: 1.6; max-width: 90ch; }
+  footer.note code { background: var(--surface-2); border-radius: 4px; padding: 1px 5px; font-size: 11.5px; }
+  @media (max-width: 640px) { .controls input[type=search] { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>Konkurrenzstärke</h1>
+    <p class="subtitle">DBV Jugend &middot; experimentelle Auswertung
+      <span class="fn" tabindex="0">(*)<span class="fn-text">(*) Dies ist keine offizielle Auswertung des
+        DBV (Deutscher Badminton-Verband). Sie wurde experimentell erstellt und soll Zusammenhänge
+        verdeutlichen, neue Einsichten ermöglichen und dadurch der Weiterentwicklung des JWS
+        (Jugendwettkampfsystem) dienen.<br><br>Edi Klein (Vorsitzender des DBV Ausschuss für Jugend)<br>
+        Anmerkungen an: edi.klein@badminton.de</span></span></p>
+    <p>Wie stark war das Feld einer Konkurrenz (z.&nbsp;B. „ME U13 beim D1-RLT NIS“)? Grundlage ist eine
+      <b>Spielstärke je Spieler</b> aus allen Matchergebnissen der 52 Wochen <b>vor</b> dem Turnier (Bradley-Terry,
+      deutsche und internationale Turniere, über alle Altersklassen). Das Turnier selbst zählt nicht mit.
+      Je Konkurrenz zählt das Mittel der <b>8 stärksten Spieler</b> (Einzel) bzw. <b>4 stärksten Paare</b>
+      (Doppel, Mixed); kleinere Felder werden mit einem schwachen „Feldboden“ aufgefüllt.
+      <b>Stärke</b> = Gewinnwahrscheinlichkeit dieses Spitzenfelds gegen einen <b>durchschnittlichen Spieler
+      derselben Altersklasse</b>. 50&nbsp;% = Durchschnitt, 99&nbsp;% = sehr stark.</p>
+    <p class="meta" id="meta-line">Lädt…</p>
+    <p class="meta"><a href="../rangliste.html">&larr; zur Startseite (Rangliste)</a></p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Filter">
+    <div class="tabs" id="jahr-tabs" aria-label="Jahr"></div>
+    <div class="tabs" id="dis-tabs" aria-label="Disziplin"></div>
+    <label>AK <select id="f-ak"></select></label>
+    <label>Ebene <select id="f-ebene"></select></label>
+    <label>Gruppe <select id="f-gruppe"></select></label>
+    <label>LV <select id="f-lv"></select></label>
+    <label>Top <select id="f-top"><option value="8">8 / 4 Paare</option><option value="16">16 / 8 Paare</option></select></label>
+    <input type="search" id="f-suche" placeholder="Turnier suchen…" aria-label="Turnier suchen">
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div><h2>Verteilung je Ebene</h2>
+        <div class="sub" id="strip-sub"></div></div>
+    </div>
+    <svg id="strip" role="img" aria-label="Stärke der Konkurrenzen je Ebene"></svg>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div><h2>Konkurrenzen</h2><div class="sub" id="tab-sub"></div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr id="kopf"></tr></thead>
+        <tbody id="koerper"></tbody>
+      </table>
+    </div>
+    <button class="mehr" id="mehr" hidden>weitere anzeigen</button>
+  </section>
+
+  <footer class="note">
+    <b>Qualität</b> (Punkt vor der Stärke): ● alle bzw. die meisten der Top 8/4 haben mindestens 6 Matches im Jahr vor dem
+    Turnier; ○ weniger als die Hälfte – Wert unsicher (blass dargestellt, ebenso Turniere ohne Matchdaten, bei denen
+    nur die deutschen Teilnehmer bekannt sind). <b>Doppel und Mixed</b> sind generell unsicherer: Die Spielstärke eines
+    Paares wird als Mittel der beiden Einzelstärken geschätzt; im Vorhersagetest lag das Modell dort etwa auf dem Niveau
+    der Rangliste, im Einzel klar darüber (+6&nbsp;Prozentpunkte). Bei <b>U22/O19</b> ist der Vergleichsspieler
+    der Durchschnitt aller Erwachsenen. Ein Klick auf eine Zeile zeigt das Teilnehmerfeld mit Spielstärke vor dem
+    Turnier (Elo-Skala, Durchschnitt aller Spieler = 1500) und Zahl der Matches im Jahr davor; die Top&nbsp;8/4 sind fett.
+    <br>Quelle: <code>export_konkurrenzstaerke_web.py</code> (Matchdaten aus BTP-Exporten, BEC-Datahub, badnet);
+    Analyse vom <span id="analyse-datum"></span>.
+  </footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+(function () {
+  "use strict";
+  var EBENEN = ["A", "B", "C1", "C2", "D1", "D2", "E", "INT", "SONST"];
+  var EBENE_TEXT = { INT: "international", SONST: "sonstige" };
+  var DIS = [["", "Alle"], ["JE", "JE"], ["ME", "ME"], ["JD", "JD"], ["MD", "MD"], ["XD", "XD"]];
+  var AKS = ["U09", "U11", "U13", "U15", "U17", "U19", "U22", "O19"];
+  var GRUPPEN = ["Nord", "West", "Mitte", "Südost", "DBV"];
+  var SEITE = 200;
+  var S = { jahre: [], jahr: null, pool: "", daten: {}, teil: {}, sort: "staerke", asc: false, zeige: SEITE, offen: null };
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function $(id) { return document.getElementById(id); }
+  function wert(id) { return $(id).value; }
+  function stK(r) { return wert("f-top") === "16" ? r.staerke16 : r.staerke; }
+  function eloK(r) { return wert("f-top") === "16" ? r.elo16 : r.elo; }
+  function unsicher(r) { return r.top6 < 0.5 || r.quelle === "D"; }
+  function qual(r) { return r.top6 >= 0.75 ? "gut" : r.top6 >= 0.5 ? "mittel" : "schwach"; }
+
+  function optionen(sel, werte, alle) {
+    var alt = sel.value;
+    sel.innerHTML = '<option value="">' + alle + "</option>" + werte.map(function (v) {
+      return '<option value="' + esc(v[0]) + '">' + esc(v[1]) + "</option>"; }).join("");
+    if (werte.some(function (v) { return v[0] === alt; })) sel.value = alt;
+  }
+  function tabs(el, werte, aktiv, klick) {
+    el.innerHTML = "";
+    werte.forEach(function (v) {
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = v[1]; b.setAttribute("aria-pressed", v[0] === aktiv ? "true" : "false");
+      b.addEventListener("click", function () { klick(v[0]); });
+      el.appendChild(b);
+    });
+  }
+
+  function laden(jahr) {
+    if (S.daten[jahr]) return Promise.resolve(S.daten[jahr]);
+    return fetch("data/konkurrenzen_" + jahr + ".json").then(function (r) { return r.json(); }).then(function (j) {
+      S.daten[jahr] = j.zeilen.map(function (z) { var o = {}; j.felder.forEach(function (f, i) { o[f] = z[i]; }); return o; });
+      return S.daten[jahr];
+    });
+  }
+  function ladeTeil(jahr) {
+    if (S.teil[jahr]) return Promise.resolve(S.teil[jahr]);
+    return fetch("data/teilnehmer_" + jahr + ".json").then(function (r) { return r.json(); })
+      .then(function (j) { S.teil[jahr] = j; return j; });
+  }
+
+  function gefiltert() {
+    var ak = wert("f-ak"), eb = wert("f-ebene"), gr = wert("f-gruppe"), lv = wert("f-lv"),
+        q = wert("f-suche").trim().toLowerCase();
+    return (S.daten[S.jahr] || []).filter(function (r) {
+      return (!S.pool || r.pool === S.pool) && (!ak || r.ak === ak) && (!eb || r.ebene === eb)
+        && (!gr || r.gruppe === gr || (gr === "INT" && r.lv === "INT")) && (!lv || r.lv === lv)
+        && (!q || r.turnier.toLowerCase().indexOf(q) >= 0);
+    });
+  }
+
+  // ---- Streudiagramm je Ebene (x = Staerke 0-100 %) ----
+  function quantil(a, p) { var i = (a.length - 1) * p, u = Math.floor(i); return a[u] + (a[Math.min(u + 1, a.length - 1)] - a[u]) * (i - u); }
+  function strip(rows) {
+    var svg = $("strip"), W = Math.max(svg.clientWidth || 900, 320), links = 112, rechts = 16, zeileH = 34, oben = 8;
+    var ebenen = EBENEN.filter(function (e) { return rows.some(function (r) { return r.ebene === e; }); });
+    var H = oben + ebenen.length * zeileH + 26;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("height", H);
+    function x(v) { return links + v / 100 * (W - links - rechts); }
+    var h = [];
+    [0, 25, 50, 75, 100].forEach(function (t) {
+      h.push('<line class="gitter" x1="' + x(t) + '" x2="' + x(t) + '" y1="' + oben + '" y2="' + (H - 22) + '"/>');
+      h.push('<text class="achse" x="' + x(t) + '" y="' + (H - 6) + '" text-anchor="middle">' + t + " %</text>");
+    });
+    ebenen.forEach(function (e, i) {
+      var y0 = oben + i * zeileH + zeileH / 2;
+      var rs = rows.filter(function (r) { return r.ebene === e; });
+      var v = rs.map(stK).sort(function (a, b) { return a - b; });
+      h.push('<text x="' + (links - 10) + '" y="' + (y0 + 4) + '" text-anchor="end">' + esc(EBENE_TEXT[e] || e)
+        + ' <tspan class="achse">(' + rs.length + ")</tspan></text>");
+      if (v.length >= 4) {
+        var q1 = quantil(v, .25), q3 = quantil(v, .75);
+        h.push('<rect class="iqr" x="' + x(q1) + '" y="' + (y0 - 12) + '" width="' + Math.max(1, x(q3) - x(q1)) + '" height="24" rx="4"/>');
+      }
+      rs.forEach(function (r) {
+        var j = ((r.id * 9301 + 49297) % 233280) / 233280 - 0.5;      // feste Streuung je Konkurrenz
+        h.push('<circle r="3" cx="' + x(stK(r)).toFixed(1) + '" cy="' + (y0 + j * 20).toFixed(1) + '" data-id="' + r.id + '"/>');
+      });
+      if (v.length) {
+        var m = quantil(v, .5);
+        h.push('<line class="median" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (y0 - 13) + '" y2="' + (y0 + 13) + '"/>');
+      }
+    });
+    svg.innerHTML = h.join("");
+    $("strip-sub").textContent = rows.length + " Konkurrenzen · Punkt = eine Konkurrenz, Strich = Median, "
+      + "Fläche = mittlere Hälfte · rechts = stärker";
+  }
+  var nachId = {};
+  $("strip").addEventListener("mousemove", function (ev) {
+    var t = ev.target, tip = $("tip");
+    if (t.tagName !== "circle") { tip.style.display = "none"; return; }
+    var r = nachId[t.getAttribute("data-id")];
+    if (!r) return;
+    tip.innerHTML = esc(r.turnier) + "<br>" + esc(r.konkurrenz) + " · KW " + r.kw + " · " + esc(r.lv) + " · " + esc(r.grading)
+      + "<br>Stärke " + stK(r).toFixed(1) + " % · Feld " + r.n + (r.aufgefuellt ? " (aufgefüllt)" : "");
+    tip.style.display = "block";
+    tip.style.left = Math.min(ev.clientX + 12, window.innerWidth - 370) + "px";
+    tip.style.top = (ev.clientY + 14) + "px";
+  });
+  $("strip").addEventListener("mouseleave", function () { $("tip").style.display = "none"; });
+  $("strip").addEventListener("click", function (ev) {
+    if (ev.target.tagName !== "circle") return;
+    var r = nachId[ev.target.getAttribute("data-id")];
+    if (r) { $("f-suche").value = r.turnier; S.offen = r.id; render(); }
+  });
+
+  // ---- Tabelle ----
+  var SPALTEN = [["turnier", "Turnier"], ["kw", "KW"], ["ebene", "Ebene"], ["lv", "LV"], ["konkurrenz", "Konkurrenz"],
+                 ["n", "Feld"], ["staerke", "Stärke"], ["elo", "Top-Mittel (Elo)"], ["hochspieler", "Hochspieler"],
+                 ["auslaender", "Ausländer"], ["staerkste", "Stärkste/r"]];
+  function kopf() {
+    $("kopf").innerHTML = SPALTEN.map(function (s) {
+      var k = S.sort === s[0] ? (S.asc ? "asc" : "desc") : "";
+      return '<th data-sort="' + s[0] + '" class="' + k + '">' + s[1] + "</th>"; }).join("");
+  }
+  $("kopf").addEventListener("click", function (ev) {
+    var s = ev.target.getAttribute("data-sort"); if (!s) return;
+    if (S.sort === s) S.asc = !S.asc; else { S.sort = s; S.asc = ["turnier", "lv", "konkurrenz", "ebene", "staerkste"].indexOf(s) >= 0; }
+    render();
+  });
+  function sortWert(r, s) { return s === "staerke" ? stK(r) : s === "elo" ? eloK(r) : r[s]; }
+  function zeileHtml(r) {
+    var st = stK(r);
+    return '<tr class="zeile' + (unsicher(r) ? " unsicher" : "") + '" data-id="' + r.id + '">'
+      + '<td class="turnier" title="' + esc(r.turnier) + '">' + (r.url ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
+        + esc(r.turnier) + "</a>" : esc(r.turnier)) + "</td>"
+      + '<td class="num">' + r.kw + "</td>"
+      + '<td><span class="pill" title="' + esc(r.grading) + '">' + esc(EBENE_TEXT[r.ebene] || r.ebene) + "</span></td>"
+      + "<td>" + esc(r.lv) + "</td><td>" + esc(r.konkurrenz) + "</td>"
+      + '<td class="num">' + r.n + (r.aufgefuellt ? "*" : "") + "</td>"
+      + '<td class="num"><span class="q ' + qual(r) + '" title="Top mit ≥ 6 Matches: ' + Math.round(r.top6 * 100) + ' %"></span>'
+        + '<span class="bar"><span style="width:' + st + '%"></span></span>' + st.toFixed(1) + " %</td>"
+      + '<td class="num">' + eloK(r) + "</td>"
+      + '<td class="num">' + Math.round(r.hochspieler * 100) + " %</td>"
+      + '<td class="num">' + Math.round(r.auslaender * 100) + " %</td>"
+      + "<td>" + esc(r.staerkste) + (r.staerkste_elo ? ' <span class="achse">(' + r.staerkste_elo + ")</span>" : "") + "</td></tr>"
+      + (S.offen === r.id ? '<tr class="drill"><td colspan="' + SPALTEN.length + '" id="drill-' + r.id + '">lädt…</td></tr>' : "");
+  }
+  function drill(r) {
+    ladeTeil(S.jahr).then(function (t) {
+      var zelle = $("drill-" + r.id); if (!zelle) return;
+      var es = t.felder[r.id] || [], top = r.pool === "JE" || r.pool === "ME" ? (wert("f-top") === "16" ? 16 : 8) : (wert("f-top") === "16" ? 8 : 4);
+      zelle.innerHTML = '<div class="drill-grid">' + es.map(function (e, i) {
+        var namen = e[0].map(function (u) { var s = t.spieler[u] || ["?", null]; return esc(s[0]) + (s[1] ? ' <span class="meta">' + s[1] + "</span>" : ""); });
+        return '<div class="' + (i < top ? "top" : "") + '"><span>' + (i + 1) + ". " + namen.join(" / ") + "</span>"
+          + '<span class="meta">' + e[1] + " · " + e[2] + " M.</span></div>"; }).join("") + "</div>"
+        + (r.aufgefuellt ? '<div class="meta" style="margin-top:6px">* Feld kleiner als ' + top + ": " + r.aufgefuellt
+          + " Platz/Plätze mit dem Feldboden (20. Perzentil der Altersklasse) aufgefüllt.</div>" : "");
+    });
+  }
+  $("koerper").addEventListener("click", function (ev) {
+    if (ev.target.tagName === "A") return;
+    var tr = ev.target.closest("tr.zeile"); if (!tr) return;
+    var id = +tr.getAttribute("data-id");
+    S.offen = S.offen === id ? null : id;
+    render(false);
+  });
+  $("mehr").addEventListener("click", function () { S.zeige += SEITE; render(false); });
+
+  function render(neuStrip) {
+    var rows = gefiltert();
+    nachId = {}; rows.forEach(function (r) { nachId[r.id] = r; });
+    if (neuStrip !== false) strip(rows);
+    var s = S.sort, a = S.asc ? 1 : -1;
+    rows.sort(function (x, y) { var u = sortWert(x, s), v = sortWert(y, s);
+      return (u < v ? -1 : u > v ? 1 : 0) * a || (stK(y) - stK(x)); });
+    kopf();
+    $("koerper").innerHTML = rows.slice(0, S.zeige).map(zeileHtml).join("");
+    $("mehr").hidden = rows.length <= S.zeige;
+    $("tab-sub").textContent = rows.length + " Konkurrenzen" + (rows.length > S.zeige ? ", die ersten " + S.zeige + " angezeigt" : "")
+      + " · Klick auf eine Zeile zeigt das Teilnehmerfeld · * = Feld aufgefüllt";
+    if (S.offen != null && nachId[S.offen]) drill(nachId[S.offen]);
+  }
+
+  function filterAufbauen() {
+    var d = S.daten[S.jahr];
+    tabs($("jahr-tabs"), S.jahre.map(function (j) { return [j, String(j)]; }), S.jahr, function (j) {
+      S.jahr = j; S.offen = null; laden(j).then(function () { filterAufbauen(); render(); }); });
+    tabs($("dis-tabs"), DIS, S.pool, function (p) { S.pool = p; S.offen = null; filterAufbauen(); render(); });
+    optionen($("f-ak"), AKS.filter(function (a) { return d.some(function (r) { return r.ak === a; }); }).map(function (a) { return [a, a]; }), "alle");
+    optionen($("f-ebene"), EBENEN.filter(function (e) { return d.some(function (r) { return r.ebene === e; }); })
+      .map(function (e) { return [e, EBENE_TEXT[e] || e]; }), "alle");
+    optionen($("f-gruppe"), GRUPPEN.map(function (g) { return [g, g]; }).concat([["INT", "international"]]), "alle");
+    var lvs = Array.from(new Set(d.map(function (r) { return r.lv; }))).filter(Boolean).sort();
+    optionen($("f-lv"), lvs.map(function (l) { return [l, l]; }), "alle");
+  }
+  ["f-ak", "f-ebene", "f-gruppe", "f-lv", "f-top"].forEach(function (id) {
+    $(id).addEventListener("change", function () { S.zeige = SEITE; S.offen = null; render(); }); });
+  var timer; $("f-suche").addEventListener("input", function () { clearTimeout(timer);
+    timer = setTimeout(function () { S.zeige = SEITE; render(); }, 250); });
+  window.addEventListener("resize", function () { clearTimeout(timer); timer = setTimeout(function () { strip(gefiltert()); }, 200); });
+
+  function datum(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ""); return m ? m[3] + "." + m[2] + "." + m[1] : ""; }
+  fetch("data/index.json").then(function (r) { return r.json(); }).then(function (idx) {
+    S.jahre = Object.keys(idx.jahre).map(Number).sort().reverse();
+    S.jahr = S.jahre[0];
+    $("analyse-datum").textContent = datum(idx.generated_at);
+    $("meta-line").textContent = S.jahre.slice().reverse().map(function (j) { return j + ": " + idx.jahre[j] + " Konkurrenzen"; }).join(" · ")
+      + " · Stand " + datum(idx.pushed_at || idx.generated_at);
+    return laden(S.jahr);
+  }).then(function () { filterAufbauen(); render(); }).catch(function (e) {
+    $("meta-line").textContent = "Daten konnten nicht geladen werden (Seite über einen Webserver öffnen)."; console.error(e); });
+})();
+</script>
+</body>
+</html>
