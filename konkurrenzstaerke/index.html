@@ -13,21 +13,21 @@
     color-scheme: light;
     --surface-0: #fbfaf7; --surface-1: #ffffff; --surface-2: #f1efe9; --border: #e2ded3;
     --text-primary: #17150f; --text-secondary: #5c5a51; --text-muted: #8b887c;
-    --accent: #184f95; --focus: #184f95; --dot: #2a78d6; --dot-hi: #eb6834; --soft: #e6eefa;
+    --accent: #184f95; --focus: #184f95; --dot: #2a78d6; --dot-hi: #eb6834; --soft: #e6eefa; --bar-jugend: #2f9a57; --bar-u22: #8dbdf0;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
       --surface-0: #16161a; --surface-1: #1e1e22; --surface-2: #26262b; --border: #37373d;
       --text-primary: #f3f2ee; --text-secondary: #b8b6ad; --text-muted: #86847c;
-      --accent: #5fa0e8; --focus: #5fa0e8; --dot: #3987e5; --dot-hi: #d95926; --soft: #1d2c40;
+      --accent: #5fa0e8; --focus: #5fa0e8; --dot: #3987e5; --dot-hi: #d95926; --soft: #1d2c40; --bar-jugend: #3fb36b; --bar-u22: #a9cff5;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
     --surface-0: #16161a; --surface-1: #1e1e22; --surface-2: #26262b; --border: #37373d;
     --text-primary: #f3f2ee; --text-secondary: #b8b6ad; --text-muted: #86847c;
-    --accent: #5fa0e8; --focus: #5fa0e8; --dot: #3987e5; --dot-hi: #d95926; --soft: #1d2c40;
+    --accent: #5fa0e8; --focus: #5fa0e8; --dot: #3987e5; --dot-hi: #d95926; --soft: #1d2c40; --bar-jugend: #3fb36b; --bar-u22: #a9cff5;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--surface-0); color: var(--text-primary);
@@ -64,6 +64,7 @@
   #strip { display: block; width: 100%; height: auto; }
   #strip text { font-family: inherit; fill: var(--text-secondary); font-size: 12px; }
   #strip .achse { fill: var(--text-muted); font-size: 11px; }
+  #strip .bereich { fill: var(--text-primary); font-size: 12.5px; font-weight: 700; }
   #strip .gitter { stroke: var(--border); stroke-width: 1; }
   #strip circle { fill: var(--dot); fill-opacity: .35; }
   #strip circle:hover { fill-opacity: 1; stroke: var(--surface-1); stroke-width: 2; }
@@ -87,6 +88,8 @@
   .bar { display: inline-block; width: 70px; height: 9px; background: var(--surface-2); border-radius: 4px; vertical-align: middle;
     margin-right: 6px; position: relative; overflow: hidden; }
   .bar span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--dot); border-radius: 4px; }
+  .bar span.jugend { background: var(--bar-jugend); }   /* U09-U19 gruen, U22 hellblau, O19 blau */
+  .bar span.u22 { background: var(--bar-u22); }
   .pill { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; background: var(--soft); color: var(--accent); }
   .q { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
   .q.gut { background: var(--dot); } .q.mittel { background: var(--text-muted); } .q.schwach { border: 1.5px solid var(--text-muted); }
@@ -177,6 +180,10 @@
   // C1/C2 bzw. D1/D2 sind EINE Ebene (LV-abhaengige Bepunktung) -> zusammengefasst, Detail in ebene_detail
   var EBENEN = ["A", "B", "C", "D", "E", "INT", "SONST"];
   var EBENE_TEXT = { INT: "international", SONST: "sonstige" };
+  // Streudiagramm in Bereichen (User-Vorgabe 2026-10-26): O19 A/B/international, U22 A/B, U19 = Jugend U09-U19 mit allen Ebenen
+  var BEREICHE = [["O19", "O19", ["A", "B", "INT"]], ["U22", "U22", ["A", "B"]],
+                  ["U19", "U19 (Jugend U09–U19)", ["A", "B", "C", "D", "E", "INT", "SONST"]]];
+  function bereich(r) { return r.ak === "O19" || r.ak === "U22" ? r.ak : "U19"; }
   var DIS = [["", "Alle"], ["JE", "JE"], ["ME", "ME"], ["JD", "JD"], ["MD", "MD"], ["XD", "XD"]];
   var AKS = ["U09", "U11", "U13", "U15", "U17", "U19", "U22", "O19"];
   var GRUPPEN = ["Nord", "West", "Mitte", "Südost", "DBV"];
@@ -238,9 +245,18 @@
   // ---- Streudiagramm je Ebene (x = Staerke 0-100 %) ----
   function quantil(a, p) { var i = (a.length - 1) * p, u = Math.floor(i); return a[u] + (a[Math.min(u + 1, a.length - 1)] - a[u]) * (i - u); }
   function strip(rows) {
-    var svg = $("strip"), W = Math.max(svg.clientWidth || 900, 320), links = 112, rechts = 16, zeileH = 34, oben = 8;
-    var ebenen = EBENEN.filter(function (e) { return rows.some(function (r) { return r.ebene === e; }); });
-    var H = oben + ebenen.length * zeileH + 26;
+    var svg = $("strip"), W = Math.max(svg.clientWidth || 900, 320), links = 112, rechts = 16, zeileH = 34, kopfH = 24, oben = 4;
+    // Zeilen: je Bereich eine Kopfzeile, darunter die Ebenen mit Daten
+    var zeilen = [], y = oben;
+    BEREICHE.forEach(function (b) {
+      var rb = rows.filter(function (r) { return bereich(r) === b[0]; });
+      var ebs = b[2].filter(function (e) { return rb.some(function (r) { return r.ebene === e; }); });
+      if (!ebs.length) return;
+      zeilen.push({ kopf: b[1], y: y + 17 }); y += kopfH;
+      ebs.forEach(function (e) {
+        zeilen.push({ rs: rb.filter(function (r) { return r.ebene === e; }), e: e, y: y + zeileH / 2 }); y += zeileH; });
+    });
+    var H = y + 26;
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("height", H);
     function x(v) { return links + v / 100 * (W - links - rechts); }
@@ -249,9 +265,13 @@
       h.push('<line class="gitter" x1="' + x(t) + '" x2="' + x(t) + '" y1="' + oben + '" y2="' + (H - 22) + '"/>');
       h.push('<text class="achse" x="' + x(t) + '" y="' + (H - 6) + '" text-anchor="middle">' + t + " %</text>");
     });
-    ebenen.forEach(function (e, i) {
-      var y0 = oben + i * zeileH + zeileH / 2;
-      var rs = rows.filter(function (r) { return r.ebene === e; });
+    zeilen.forEach(function (z, i) {
+      if (z.kopf) {
+        if (i) h.push('<line class="gitter" x1="0" x2="' + W + '" y1="' + (z.y - 19) + '" y2="' + (z.y - 19) + '"/>');
+        h.push('<text class="bereich" x="4" y="' + z.y + '">' + esc(z.kopf) + "</text>");
+        return;
+      }
+      var y0 = z.y, e = z.e, rs = z.rs;
       var v = rs.map(stK).sort(function (a, b) { return a - b; });
       h.push('<text x="' + (links - 10) + '" y="' + (y0 + 4) + '" text-anchor="end">' + esc(EBENE_TEXT[e] || e)
         + ' <tspan class="achse">(' + rs.length + ")</tspan></text>");
@@ -316,7 +336,7 @@
       + "<td>" + esc(r.lv) + "</td><td>" + esc(r.konkurrenz) + "</td>"
       + '<td class="num">' + r.n + (r.aufgefuellt ? "*" : "") + "</td>"
       + '<td class="num"><span class="q ' + qual(r) + '" title="Top mit ≥ 6 Matches: ' + Math.round(r.top6 * 100) + ' %"></span>'
-        + '<span class="bar"><span style="width:' + st + '%"></span></span>' + st.toFixed(1) + " %</td>"
+        + '<span class="bar"><span class="' + ({ U19: "jugend", U22: "u22" }[bereich(r)] || "") + '" style="width:' + st + '%"></span></span>' + st.toFixed(1) + " %</td>"
       + '<td class="num">' + eloK(r) + "</td>"
       + '<td class="num">' + Math.round(r.hochspieler * 100) + " %</td>"
       + '<td class="num">' + Math.round(r.auslaender * 100) + " %</td>"
