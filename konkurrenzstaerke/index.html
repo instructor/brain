@@ -166,7 +166,10 @@
     nur die deutschen Teilnehmer bekannt sind). <b>Doppel und Mixed</b> sind generell unsicherer: Die Spielstärke eines
     Paares wird als Mittel der beiden Einzelstärken geschätzt; im Vorhersagetest lag das Modell dort etwa auf dem Niveau
     der Rangliste, im Einzel klar darüber (+6&nbsp;Prozentpunkte). Bei <b>U22/O19</b> ist der Vergleichsspieler
-    der Durchschnitt aller Erwachsenen. Ein Klick auf eine Zeile zeigt das Teilnehmerfeld mit Spielstärke vor dem
+    der Durchschnitt aller Erwachsenen, bei U19 (Jugend) der Durchschnitt der jeweiligen Altersklasse. Die Stärke in % ist
+    deshalb nur <b>innerhalb eines Bereichs</b> vergleichbar (eine U19-DM erreicht ~99 %, die O19-DM ~90 %, obwohl die O19-DM
+    deutlich stärker besetzt ist). Über alle Bereiche hinweg vergleicht das <b>Top-Mittel (Elo)</b>, gemeinsame Skala aller
+    Spieler; danach ist die Liste standardmäßig sortiert. Ein Klick auf eine Zeile zeigt das Teilnehmerfeld mit Spielstärke vor dem
     Turnier (Elo-Skala, Durchschnitt aller Spieler = 1500) und Zahl der Matches im Jahr davor; die Top&nbsp;8/4 sind fett.
     <br>Quelle: <code>export_konkurrenzstaerke_web.py</code> (Matchdaten aus BTP-Exporten, BEC-Datahub, badnet);
     Analyse vom <span id="analyse-datum"></span>.
@@ -188,7 +191,8 @@
   var AKS = ["U09", "U11", "U13", "U15", "U17", "U19", "U22", "O19"];
   var GRUPPEN = ["Nord", "West", "Mitte", "Südost", "DBV"];
   var SEITE = 200;
-  var S = { jahre: [], jahr: null, pool: "", daten: {}, teil: {}, sort: "staerke", asc: false, zeige: SEITE, offen: null };
+  // Standard-Sortierung Top-Mittel (Elo): die einzige ueber alle Bereiche vergleichbare Zahl (User 2026-10-26)
+  var S = { jahre: [], jahr: null, pool: "", daten: {}, teil: {}, sort: "elo", asc: false, zeige: SEITE, offen: null };
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -370,7 +374,7 @@
     if (neuStrip !== false) strip(rows);
     var s = S.sort, a = S.asc ? 1 : -1;
     rows.sort(function (x, y) { var u = sortWert(x, s), v = sortWert(y, s);
-      return (u < v ? -1 : u > v ? 1 : 0) * a || (stK(y) - stK(x)); });
+      return (u < v ? -1 : u > v ? 1 : 0) * a || (eloK(y) - eloK(x)); });
     kopf();
     $("koerper").innerHTML = rows.slice(0, S.zeige).map(zeileHtml).join("");
     $("mehr").hidden = rows.length <= S.zeige;
