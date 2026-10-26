@@ -156,7 +156,9 @@
   </section>
 
   <footer class="note">
-    <b>Qualität</b> (Punkt vor der Stärke): ● alle bzw. die meisten der Top 8/4 haben mindestens 6 Matches im Jahr vor dem
+    <b>Ebenen C und D</b>: C1/C2 bzw. D1/D2 sind jeweils eine Ebene; sechs Landesverbände bepunkten ihre
+    C- bzw. D-Turniere mit C1/D1, die übrigen mit C2/D2 (in der Tabelle angegeben).
+    <br><b>Qualität</b> (Punkt vor der Stärke): ● alle bzw. die meisten der Top 8/4 haben mindestens 6 Matches im Jahr vor dem
     Turnier; ○ weniger als die Hälfte – Wert unsicher (blass dargestellt, ebenso Turniere ohne Matchdaten, bei denen
     nur die deutschen Teilnehmer bekannt sind). <b>Doppel und Mixed</b> sind generell unsicherer: Die Spielstärke eines
     Paares wird als Mittel der beiden Einzelstärken geschätzt; im Vorhersagetest lag das Modell dort etwa auf dem Niveau
@@ -172,7 +174,8 @@
 <script>
 (function () {
   "use strict";
-  var EBENEN = ["A", "B", "C1", "C2", "D1", "D2", "E", "INT", "SONST"];
+  // C1/C2 bzw. D1/D2 sind EINE Ebene (LV-abhaengige Bepunktung) -> zusammengefasst, Detail in ebene_detail
+  var EBENEN = ["A", "B", "C", "D", "E", "INT", "SONST"];
   var EBENE_TEXT = { INT: "international", SONST: "sonstige" };
   var DIS = [["", "Alle"], ["JE", "JE"], ["ME", "ME"], ["JD", "JD"], ["MD", "MD"], ["XD", "XD"]];
   var AKS = ["U09", "U11", "U13", "U15", "U17", "U19", "U22", "O19"];
@@ -208,7 +211,11 @@
   function laden(jahr) {
     if (S.daten[jahr]) return Promise.resolve(S.daten[jahr]);
     return fetch("data/konkurrenzen_" + jahr + ".json").then(function (r) { return r.json(); }).then(function (j) {
-      S.daten[jahr] = j.zeilen.map(function (z) { var o = {}; j.felder.forEach(function (f, i) { o[f] = z[i]; }); return o; });
+      S.daten[jahr] = j.zeilen.map(function (z) {
+        var o = {}; j.felder.forEach(function (f, i) { o[f] = z[i]; });
+        o.ebene_detail = o.ebene;
+        if (/^[CD][12]$/.test(o.ebene)) o.ebene = o.ebene.charAt(0);
+        return o; });
       return S.daten[jahr];
     });
   }
@@ -305,7 +312,7 @@
       + '<td class="turnier" title="' + esc(r.turnier) + '">' + (r.url ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
         + esc(r.turnier) + "</a>" : esc(r.turnier)) + "</td>"
       + '<td class="num">' + r.kw + "</td>"
-      + '<td><span class="pill" title="' + esc(r.grading) + '">' + esc(EBENE_TEXT[r.ebene] || r.ebene) + "</span></td>"
+      + '<td><span class="pill" title="' + esc(r.grading) + '">' + esc(EBENE_TEXT[r.ebene_detail] || r.ebene_detail) + "</span></td>"
       + "<td>" + esc(r.lv) + "</td><td>" + esc(r.konkurrenz) + "</td>"
       + '<td class="num">' + r.n + (r.aufgefuellt ? "*" : "") + "</td>"
       + '<td class="num"><span class="q ' + qual(r) + '" title="Top mit ≥ 6 Matches: ' + Math.round(r.top6 * 100) + ' %"></span>'
