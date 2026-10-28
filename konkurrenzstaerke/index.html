@@ -172,6 +172,9 @@
     <div class="panel-head">
       <div><h2>Verteilung je Ebene</h2>
         <div class="sub" id="strip-sub"></div></div>
+      <!-- Schalter (User-Vorgabe 2026-10-28): nur Konkurrenzen mit vollem Feld im Diagramm, Tabelle unveraendert -->
+      <label class="sub" style="cursor:pointer"><input type="checkbox" id="f-voll"> nur volle Felder
+        (Einzel ≥ 8, Doppel/Mixed ≥ 4 Paare)</label>
     </div>
     <svg id="strip" role="img" aria-label="Stärke der Konkurrenzen je Ebene"></svg>
     <!-- Hinweis: im Modus Ranglistenpunkte fehlen O19/U22 (keine Rangliste in der Datenbasis) und internationale
@@ -244,7 +247,7 @@
   var DIS = [["", "Alle"], ["JE", "JE"], ["ME", "ME"], ["JD", "JD"], ["MD", "MD"], ["XD", "XD"]];
   var AKS = ["U09", "U11", "U13", "U15", "U17", "U19", "U22", "O19"];
   var GRUPPEN = ["Nord", "West", "Mitte", "Südost", "DBV"];
-  var SEITE = 200;
+  var SEITE = 200, VERSION = "";
   // Standard-Sortierung Top-Mittel (Elo): die einzige ueber alle Bereiche vergleichbare Zahl (User 2026-10-26)
   var S = { jahre: [], jahr: null, pool: "", daten: {}, teil: {}, sort: "elo", asc: false, zeige: SEITE, offen: null,
             modus: location.hash === "#rangliste" ? "rl" : "spiel" };
@@ -286,7 +289,7 @@
 
   function laden(jahr) {
     if (S.daten[jahr]) return Promise.resolve(S.daten[jahr]);
-    return fetch("data/konkurrenzen_" + jahr + ".json").then(function (r) { return r.json(); }).then(function (j) {
+    return fetch("data/konkurrenzen_" + jahr + ".json" + VERSION).then(function (r) { return r.json(); }).then(function (j) {
       S.daten[jahr] = j.zeilen.map(function (z) {
         var o = {}; j.felder.forEach(function (f, i) { o[f] = z[i]; });
         o.ebene_detail = o.ebene;
@@ -297,7 +300,7 @@
   }
   function ladeTeil(jahr) {
     if (S.teil[jahr]) return Promise.resolve(S.teil[jahr]);
-    return fetch("data/teilnehmer_" + jahr + ".json").then(function (r) { return r.json(); })
+    return fetch("data/teilnehmer_" + jahr + ".json" + VERSION).then(function (r) { return r.json(); })
       .then(function (j) { S.teil[jahr] = j; return j; });
   }
 
@@ -313,7 +316,10 @@
 
   // ---- Streudiagramm je Ebene (x = Staerke 0-100 %) ----
   function quantil(a, p) { var i = (a.length - 1) * p, u = Math.floor(i); return a[u] + (a[Math.min(u + 1, a.length - 1)] - a[u]) * (i - u); }
-  function strip(rows) {
+  // volles Feld: Einzel >= 8 Teilnehmer, Doppel/Mixed >= 4 Paare (Schalter "nur volle Felder", nur fuer das Diagramm)
+  function vollesFeld(r) { return r.n >= (r.pool === "JE" || r.pool === "ME" ? 8 : 4); }
+  function strip(alle) {
+    var nurVoll = $("f-voll").checked, rows = nurVoll ? alle.filter(vollesFeld) : alle;
     var svg = $("strip"), W = Math.max(svg.clientWidth || 900, 320), links = 112, rechts = 16, zeileH = 34, kopfH = 24, oben = 4;
     // Zeilen: je Bereich eine Kopfzeile, darunter die Ebenen mit Daten
     var zeilen = [], y = oben;
@@ -361,7 +367,8 @@
       }
     });
     svg.innerHTML = h.join("");
-    $("strip-sub").textContent = rows.length + " Konkurrenzen · Punkt = eine Konkurrenz, Strich = Median, "
+    $("strip-sub").textContent = rows.length + " Konkurrenzen"
+      + (nurVoll ? " (nur volle Felder, " + (alle.length - rows.length) + " kleinere ausgeblendet)" : "") + " · Punkt = eine Konkurrenz, Strich = Median, "
       + "Kasten = die mittleren 50 % der Konkurrenzen einer Ebene (je ein Viertel liegt links und rechts davon) · x-Achse: " + (rl()
         ? "Top-Mittel der Ranglistenpunkte (logarithmisch)"
         : "Top-Mittel (Elo), gemeinsame Skala aller Bereiche") + " · rechts = stärker";
@@ -498,6 +505,7 @@
     var lvs = Array.from(new Set(d.map(function (r) { return r.lv; }))).filter(Boolean).sort();
     optionen($("f-lv"), lvs.map(function (l) { return [l, l]; }), "alle");
   }
+  $("f-voll").addEventListener("change", function () { strip(gefiltert()); });
   ["f-ak", "f-ebene", "f-gruppe", "f-lv", "f-top"].forEach(function (id) {
     $(id).addEventListener("change", function () { S.zeige = SEITE; S.offen = null; render(); }); });
   var timer; $("f-suche").addEventListener("input", function () { clearTimeout(timer);
@@ -505,7 +513,10 @@
   window.addEventListener("resize", function () { clearTimeout(timer); timer = setTimeout(function () { strip(gefiltert()); }, 200); });
 
   function datum(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ""); return m ? m[3] + "." + m[2] + "." + m[1] : ""; }
-  fetch("data/index.json").then(function (r) { return r.json(); }).then(function (idx) {
+  // index.json nie aus dem Cache, Daten mit Versionskennung laden: sonst kombiniert der Browser nach einem Push die neue
+  // Seite mit alten Daten (2026-10-28: neue Punkte-Achse mit gecachten Platz-Daten -> A links, E rechts)
+  fetch("data/index.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (idx) {
+    VERSION = "?v=" + encodeURIComponent(idx.generated_at || "");
     S.jahre = Object.keys(idx.jahre).map(Number).sort().reverse();
     S.jahr = S.jahre[0];
     $("analyse-datum").textContent = datum(idx.generated_at);
