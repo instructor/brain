@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Konkurrenzstärke</title>
+<title>Turnierstärken im Vergleich</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Vorlage fuer export_konkurrenzstaerke_web.py (PLAN_KONKURRENZSTAERKE.md, Schritt 6); Stil wie
@@ -40,6 +40,11 @@
   header.page h1 { font-size: clamp(24px, 4vw, 34px); margin: 0; font-weight: 600; letter-spacing: -0.01em; }
   header.page p { margin: 0; color: var(--text-secondary); font-size: 14px; max-width: 80ch; line-height: 1.55; }
   header.page p.subtitle { color: var(--text-muted); }
+  header.page p.h1-sub { font-family: "Fraunces", Georgia, serif; font-size: clamp(16px, 2.4vw, 20px); color: var(--text-secondary); margin-top: -2px; }
+  p.kontakt { margin: 10px 0 0; font-size: 13px; color: var(--text-secondary); }
+  .modus { background: var(--soft); }
+  .modus button[aria-pressed="true"] { color: var(--accent); }
+  [data-modus="spiel"] .nur-rl, [data-modus="rl"] .nur-spiel { display: none; }
   header.page .meta { color: var(--text-muted); font-size: 12.5px; }
   .fn { position: relative; font-size: 0.75em; vertical-align: super; line-height: 0; cursor: help; outline: none; }
   .fn-text { display: none; position: absolute; left: 0; top: 1.6em; z-index: 20; width: min(34em, 85vw);
@@ -69,7 +74,9 @@
   #strip circle { fill: var(--dot); fill-opacity: .35; }
   #strip circle:hover { fill-opacity: 1; stroke: var(--surface-1); stroke-width: 2; }
   #strip .median { stroke: var(--text-primary); stroke-width: 2.5; stroke-linecap: round; }
-  #strip .iqr { fill: var(--text-primary); fill-opacity: .08; }
+  /* mittlere Haelfte (25.-75. Perzentil); dunkler als frueher (.08, User 2026-10-28 "kaum sichtbar") */
+  #strip .iqr { fill: var(--text-primary); fill-opacity: .14; stroke: var(--text-primary); stroke-opacity: .75; stroke-width: 1.5;
+    pointer-events: none; }   /* ueber den Punkten gezeichnet, sonst bei dichten Ebenen verdeckt */
   .tip { position: fixed; z-index: 30; pointer-events: none; background: var(--text-primary); color: var(--surface-1);
     font-size: 11.5px; line-height: 1.5; padding: 7px 10px; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.18);
     max-width: 360px; display: none; }
@@ -107,17 +114,33 @@
   @media (max-width: 640px) { .controls input[type=search] { width: 100%; } }
 </style>
 </head>
-<body>
+<body data-modus="spiel">
 <div class="wrap">
   <header class="page">
-    <h1>Konkurrenzstärke</h1>
+    <h1>Turnierstärken im Vergleich</h1>
+    <p class="h1-sub"><span class="nur-spiel">– basierend auf Spielstärke der Teilnehmer –</span><span
+      class="nur-rl">– basierend auf Ranglistenpositionen der Teilnehmer –</span></p>
     <p class="subtitle">DBV Jugend &middot; experimentelle Auswertung
       <span class="fn" tabindex="0">(*)<span class="fn-text">(*) Dies ist keine offizielle Auswertung des
         DBV (Deutscher Badminton-Verband). Sie wurde experimentell erstellt und soll Zusammenhänge
         verdeutlichen, neue Einsichten ermöglichen und dadurch der Weiterentwicklung des JWS
         (Jugendwettkampfsystem) dienen.<br><br>Edi Klein (Vorsitzender des DBV Ausschuss für Jugend)<br>
         Anmerkungen an: edi.klein@badminton.de</span></span></p>
-    <p>Wie stark war das Feld einer Konkurrenz (z.&nbsp;B. „ME U13 beim D1-RLT NIS“)? Grundlage ist eine
+    <p class="nur-rl">Wie stark war das Feld einer Konkurrenz (z.&nbsp;B. „ME U13 beim D1-RLT NIS“)? Grundlage sind hier die
+      <b>Ranglistenplätze der Teilnehmer</b> in der offiziellen DBV-Rangliste U19, die <b>am Turniertag gilt</b>
+      (Rangliste der Turnierwoche, sie enthält die Ergebnisse bis zur Vorwoche; Platz über alle Altersklassen der
+      Disziplin, also z.&nbsp;B. ein Platz in der HE-Liste von U09 bis U19).
+      Je Konkurrenz zählt das Mittel der Plätze der <b>8 bestplatzierten Spieler</b> (Einzel) bzw. <b>4 bestplatzierten
+      Paare</b> (Doppel, Mixed; ein Paar mit dem Mittel beider Plätze). Wer nicht in der Rangliste steht (z.&nbsp;B.
+      Ausländer), zählt mit dem Platz <b>hinter dem Letzten</b> der Liste; kleinere Felder werden ebenso aufgefüllt.
+      <b>Top-Mittel (RL-Platz)</b>: kleiner = stärker; eine stärkere Konkurrenz liegt immer rechts. Diagramm und Balken
+      sind <b>logarithmisch</b> angeordnet: Die Werte reichen von etwa Platz 2 (DM, A-RLT) bis über Platz 5.000; linear
+      lägen alle A-, B- und viele C-Konkurrenzen ganz rechts übereinander. Inhaltlich ist der Abstand zwischen Platz 5 und
+      Platz 50 viel größer als zwischen Platz 2.005 und 2.050 – auf der logarithmischen Achse ist jede Verzehnfachung gleich
+      weit (1→10, 10→100, 100→1.000). Diese Sicht gibt es nur für <b>nationale Jugendkonkurrenzen</b> (U09–U19):
+      Internationale Turniere fehlen, weil ausländische Teilnehmer keinen Platz in der DBV-Rangliste haben – ein stark
+      besetztes internationales Feld sähe sonst schwach aus.</p>
+    <p class="nur-spiel">Wie stark war das Feld einer Konkurrenz (z.&nbsp;B. „ME U13 beim D1-RLT NIS“)? Grundlage ist eine
       <b>Spielstärke je Spieler</b> aus allen Matchergebnissen der 52 Wochen <b>vor</b> dem Turnier (Bradley-Terry,
       deutsche und internationale Turniere, über alle Altersklassen). Das Turnier selbst zählt nicht mit.
       Je Konkurrenz zählt das Mittel der <b>8 stärksten Spieler</b> (Einzel) bzw. <b>4 stärksten Paare</b>
@@ -131,6 +154,7 @@
   </header>
 
   <div class="controls" role="group" aria-label="Filter">
+    <div class="tabs modus" id="modus-tabs" aria-label="Berechnungsart"></div>
     <div class="tabs" id="jahr-tabs" aria-label="Jahr"></div>
     <div class="tabs" id="dis-tabs" aria-label="Disziplin"></div>
     <label>AK <select id="f-ak"></select></label>
@@ -147,6 +171,11 @@
         <div class="sub" id="strip-sub"></div></div>
     </div>
     <svg id="strip" role="img" aria-label="Stärke der Konkurrenzen je Ebene"></svg>
+    <!-- Hinweis: im Modus Ranglistenposition fehlen O19/U22 (keine Rangliste in der Datenbasis) und internationale
+         Turniere (Auslaender ohne DBV-RL-Platz; User-Entscheidung 2026-10-28) -->
+    <div class="sub nur-rl" style="padding: 0 16px 12px; font-size: 12.5px; color: var(--text-muted)">Nicht enthalten:
+      O19 und U22 (die DBV-Rangliste U19 führt keine Erwachsenen) und internationale Turniere (Ausländer ohne
+      Ranglistenplatz).</div>
   </section>
 
   <section class="panel">
@@ -163,9 +192,14 @@
   </section>
 
   <footer class="note">
+    <span class="nur-rl"><b>Ranglistenposition</b>: Rangliste = offizielle DBV-RL U19 der Turnierwoche, also die am Turniertag
+    gültige (enthält die Ergebnisse bis zur Vorwoche; fehlt sie, die nächstältere). <b>Qualität</b> (Punkt vor dem Wert):
+    ● mindestens drei Viertel der Top 8/4 stehen in der Rangliste; ○ weniger als die Hälfte – Wert unsicher (blass), z.&nbsp;B.
+    kleine Felder oder viele Spieler ohne Ranglistenergebnis. Ein Klick auf eine Zeile zeigt das Teilnehmerfeld mit den
+    Ranglistenplätzen (– = nicht gelistet), sortiert nach Platz; die Top&nbsp;8/4 sind fett.<br></span>
     <b>Ebenen C und D</b>: C1/C2 bzw. D1/D2 sind jeweils eine Ebene; sechs Landesverbände bepunkten ihre
     C- bzw. D-Turniere mit C1/D1, die übrigen mit C2/D2 (in der Tabelle angegeben).
-    <br><b>Qualität</b> (Punkt vor der Stärke): ● alle bzw. die meisten der Top 8/4 haben mindestens 6 Matches im Jahr vor dem
+    <span class="nur-spiel"><br><b>Qualität</b> (Punkt vor der Stärke): ● alle bzw. die meisten der Top 8/4 haben mindestens 6 Matches im Jahr vor dem
     Turnier; ○ weniger als die Hälfte – Wert unsicher (blass dargestellt, ebenso Turniere ohne Matchdaten, bei denen
     nur die deutschen Teilnehmer bekannt sind). <b>Doppel und Mixed</b> sind generell unsicherer: Die Spielstärke eines
     Paares wird als Mittel der beiden Einzelstärken geschätzt; im Vorhersagetest lag das Modell dort etwa auf dem Niveau
@@ -174,9 +208,11 @@
     deshalb nur <b>innerhalb eines Bereichs</b> vergleichbar (eine U19-DM erreicht ~99 %, die O19-DM ~90 %, obwohl die O19-DM
     deutlich stärker besetzt ist). Über alle Bereiche hinweg vergleicht das <b>Top-Mittel (Elo)</b>, gemeinsame Skala aller
     Spieler: Danach sind Punkte und Balken angeordnet (feste Achse 0–3000) und die Liste standardmäßig sortiert. Ein Klick auf eine Zeile zeigt das Teilnehmerfeld mit Spielstärke vor dem
-    Turnier (Elo-Skala, Durchschnitt aller Spieler = 1500) und Zahl der Matches im Jahr davor; die Top&nbsp;8/4 sind fett.
-    <br>Quelle: <code>export_konkurrenzstaerke_web.py</code> (Matchdaten aus BTP-Exporten, BEC-Datahub, badnet);
+    Turnier (Elo-Skala, Durchschnitt aller Spieler = 1500) und Zahl der Matches im Jahr davor; die Top&nbsp;8/4 sind fett.</span>
+    <br>Quelle: <code>export_konkurrenzstaerke_web.py</code> (Matchdaten aus BTP-Exporten, BEC-Datahub, badnet; Ranglisten
+    von badminton.de);
     Analyse vom <span id="analyse-datum"></span>.
+    <p class="kontakt brain-kontakt">Anregungen und Rückmeldungen an edi.klein@badminton.de</p>
   </footer>
 </div>
 <div class="tip" id="tip"></div>
@@ -194,13 +230,19 @@
   // Konkurrenz liegt immer rechts von einer schwaecheren, egal aus welchem Bereich/welcher Ebene
   var ELO_MIN = 0, ELO_MAX = 3000;
   function eloAnteil(v) { return Math.max(0, Math.min(1, (v - ELO_MIN) / (ELO_MAX - ELO_MIN))); }
+  // Modus Ranglistenposition (Entwurf 2026-10-28): Top-Mittel der RL-Plaetze, logarithmisch, Platz 1 rechts
+  var RL_MAX = 5000, RL_TICKS = [5000, 1000, 300, 100, 30, 10, 3, 1];
+  function rlAnteil(v) { return Math.max(0, Math.min(1, 1 - Math.log(Math.max(1, v)) / Math.log(RL_MAX))); }
+  var MODI = [["spiel", "Spielstärke"], ["rl", "Ranglistenposition"]];
   function bereich(r) { return r.ak === "O19" || r.ak === "U22" ? r.ak : "U19"; }
   var DIS = [["", "Alle"], ["JE", "JE"], ["ME", "ME"], ["JD", "JD"], ["MD", "MD"], ["XD", "XD"]];
   var AKS = ["U09", "U11", "U13", "U15", "U17", "U19", "U22", "O19"];
   var GRUPPEN = ["Nord", "West", "Mitte", "Südost", "DBV"];
   var SEITE = 200;
   // Standard-Sortierung Top-Mittel (Elo): die einzige ueber alle Bereiche vergleichbare Zahl (User 2026-10-26)
-  var S = { jahre: [], jahr: null, pool: "", daten: {}, teil: {}, sort: "elo", asc: false, zeige: SEITE, offen: null };
+  var S = { jahre: [], jahr: null, pool: "", daten: {}, teil: {}, sort: "elo", asc: false, zeige: SEITE, offen: null,
+            modus: location.hash === "#rangliste" ? "rl" : "spiel" };
+  if (S.modus === "rl") { S.sort = "rl"; S.asc = true; }
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -208,8 +250,17 @@
   function wert(id) { return $(id).value; }
   function stK(r) { return wert("f-top") === "16" ? r.staerke16 : r.staerke; }
   function eloK(r) { return wert("f-top") === "16" ? r.elo16 : r.elo; }
-  function unsicher(r) { return r.top6 < 0.5 || r.quelle === "D"; }
-  function qual(r) { return r.top6 >= 0.75 ? "gut" : r.top6 >= 0.5 ? "mittel" : "schwach"; }
+  function rl() { return S.modus === "rl"; }
+  // RL-Sicht nur national + Jugend: O19/U22 ohne Rangliste, international Auslaender ohne RL-Platz (User 2026-10-28)
+  function imModus(r) { return !rl() || (bereich(r) === "U19" && r.ebene !== "INT" && r.rl != null); }
+  function rlK(r) { return wert("f-top") === "16" ? r.rl16 : r.rl; }
+  function wertK(r) { return rl() ? rlK(r) : eloK(r); }                 // Wert fuer Diagramm, Balken, Sortierung
+  function anteil(v) { return rl() ? rlAnteil(v) : eloAnteil(v); }
+  function wertText(v) { return rl() ? Math.round(v) : v; }
+  function staerker(x, y) { return rl() ? rlK(x) - rlK(y) : eloK(y) - eloK(x); }   // staerkere zuerst
+  function qWert(r) { return rl() ? r.rl_gelistet : r.top6; }
+  function unsicher(r) { return qWert(r) < 0.5 || (!rl() && r.quelle === "D"); }
+  function qual(r) { var q = qWert(r); return q >= 0.75 ? "gut" : q >= 0.5 ? "mittel" : "schwach"; }
 
   function optionen(sel, werte, alle) {
     var alt = sel.value;
@@ -248,7 +299,7 @@
     var ak = wert("f-ak"), eb = wert("f-ebene"), gr = wert("f-gruppe"), lv = wert("f-lv"),
         q = wert("f-suche").trim().toLowerCase();
     return (S.daten[S.jahr] || []).filter(function (r) {
-      return (!S.pool || r.pool === S.pool) && (!ak || r.ak === ak) && (!eb || r.ebene === eb)
+      return imModus(r) && (!S.pool || r.pool === S.pool) && (!ak || r.ak === ak) && (!eb || r.ebene === eb)
         && (!gr || r.gruppe === gr || (gr === "INT" && r.lv === "INT")) && (!lv || r.lv === lv)
         && (!q || r.turnier.toLowerCase().indexOf(q) >= 0);
     });
@@ -261,6 +312,7 @@
     // Zeilen: je Bereich eine Kopfzeile, darunter die Ebenen mit Daten
     var zeilen = [], y = oben;
     BEREICHE.forEach(function (b) {
+      if (rl() && b[0] !== "U19") return;
       var rb = rows.filter(function (r) { return bereich(r) === b[0]; });
       var ebs = b[2].filter(function (e) { return rb.some(function (r) { return r.ebene === e; }); });
       if (!ebs.length) return;
@@ -271,11 +323,13 @@
     var H = y + 26;
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("height", H);
-    function x(v) { return links + eloAnteil(v) * (W - links - rechts); }
+    function x(v) { return links + anteil(v) * (W - links - rechts); }
     var h = [];
-    [0, 500, 1000, 1500, 2000, 2500, 3000].forEach(function (t) {
+    (rl() ? RL_TICKS : [0, 500, 1000, 1500, 2000, 2500, 3000]).forEach(function (t) {
+      var a = anteil(t);
       h.push('<line class="gitter" x1="' + x(t) + '" x2="' + x(t) + '" y1="' + oben + '" y2="' + (H - 22) + '"/>');
-      h.push('<text class="achse" x="' + x(t) + '" y="' + (H - 6) + '" text-anchor="' + (t === ELO_MAX ? "end" : t === ELO_MIN ? "start" : "middle") + '">' + t + "</text>");
+      h.push('<text class="achse" x="' + x(t) + '" y="' + (H - 6) + '" text-anchor="' + (a >= 1 ? "end" : a <= 0 ? "start" : "middle") + '">'
+        + (rl() ? "Pl. " + t : t) + "</text>");
     });
     zeilen.forEach(function (z, i) {
       if (z.kopf) {
@@ -284,17 +338,17 @@
         return;
       }
       var y0 = z.y, e = z.e, rs = z.rs;
-      var v = rs.map(eloK).sort(function (a, b) { return a - b; });
+      var v = rs.map(wertK).sort(function (a, b) { return a - b; });
       h.push('<text x="' + (links - 10) + '" y="' + (y0 + 4) + '" text-anchor="end">' + esc(EBENE_TEXT[e] || e)
         + ' <tspan class="achse">(' + rs.length + ")</tspan></text>");
-      if (v.length >= 4) {
-        var q1 = quantil(v, .25), q3 = quantil(v, .75);
-        h.push('<rect class="iqr" x="' + x(q1) + '" y="' + (y0 - 12) + '" width="' + Math.max(1, x(q3) - x(q1)) + '" height="24" rx="4"/>');
-      }
       rs.forEach(function (r) {
         var j = ((r.id * 9301 + 49297) % 233280) / 233280 - 0.5;      // feste Streuung je Konkurrenz
-        h.push('<circle r="3" cx="' + x(eloK(r)).toFixed(1) + '" cy="' + (y0 + j * 20).toFixed(1) + '" data-id="' + r.id + '"/>');
+        h.push('<circle r="3" cx="' + x(wertK(r)).toFixed(1) + '" cy="' + (y0 + j * 20).toFixed(1) + '" data-id="' + r.id + '"/>');
       });
+      if (v.length >= 4) {      // nach den Punkten, damit er sichtbar bleibt; nimmt keine Maus-Ereignisse an
+        var q1 = quantil(v, .25), q3 = quantil(v, .75), xa = Math.min(x(q1), x(q3));
+        h.push('<rect class="iqr" x="' + xa + '" y="' + (y0 - 12) + '" width="' + Math.max(1, Math.abs(x(q3) - x(q1))) + '" height="24" rx="4"/>');
+      }
       if (v.length) {
         var m = quantil(v, .5);
         h.push('<line class="median" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (y0 - 13) + '" y2="' + (y0 + 13) + '"/>');
@@ -302,7 +356,9 @@
     });
     svg.innerHTML = h.join("");
     $("strip-sub").textContent = rows.length + " Konkurrenzen · Punkt = eine Konkurrenz, Strich = Median, "
-      + "Fläche = mittlere Hälfte · x-Achse: Top-Mittel (Elo), gemeinsame Skala aller Bereiche · rechts = stärker";
+      + "Kasten = die mittleren 50 % der Konkurrenzen einer Ebene (je ein Viertel liegt links und rechts davon) · x-Achse: " + (rl()
+        ? "Top-Mittel der Ranglistenplätze (logarithmisch, Platz 1 rechts)"
+        : "Top-Mittel (Elo), gemeinsame Skala aller Bereiche") + " · rechts = stärker";
   }
   var nachId = {};
   $("strip").addEventListener("mousemove", function (ev) {
@@ -311,7 +367,10 @@
     var r = nachId[t.getAttribute("data-id")];
     if (!r) return;
     tip.innerHTML = esc(r.turnier) + "<br>" + esc(r.konkurrenz) + " · KW " + r.kw + " · " + esc(r.lv) + " · " + esc(r.grading)
-      + "<br>Top-Mittel " + eloK(r) + " Elo · Stärke in eigener AK " + stK(r).toFixed(1) + " % · Feld " + r.n + (r.aufgefuellt ? " (aufgefüllt)" : "");
+      + (rl() ? "<br>Top-Mittel RL-Platz " + Math.round(rlK(r)) + " (RL KW " + esc(r.rl_woche) + ") · gelistet "
+                + Math.round(r.rl_gelistet * 100) + " % · Feld " + r.n
+              : "<br>Top-Mittel " + eloK(r) + " Elo · Stärke in eigener AK " + stK(r).toFixed(1) + " % · Feld " + r.n
+                + (r.aufgefuellt ? " (aufgefüllt)" : ""));
     tip.style.display = "block";
     tip.style.left = Math.min(ev.clientX + 12, window.innerWidth - 370) + "px";
     tip.style.top = (ev.clientY + 14) + "px";
@@ -324,22 +383,39 @@
   });
 
   // ---- Tabelle ----
-  var SPALTEN = [["turnier", "Turnier"], ["kw", "KW"], ["ebene", "Ebene"], ["lv", "LV"], ["konkurrenz", "Konkurrenz"],
+  var SPALTEN_SPIEL = [["turnier", "Turnier"], ["kw", "KW"], ["ebene", "Ebene"], ["lv", "LV"], ["konkurrenz", "Konkurrenz"],
                  ["n", "Feld"], ["elo", "Top-Mittel (Elo)"], ["staerke", "Stärke in eigener AK"], ["hochspieler", "Hochspieler"],
                  ["auslaender", "Ausländer"], ["staerkste", "Stärkste/r"]];
+  var SPALTEN_RL = [["turnier", "Turnier"], ["kw", "KW"], ["ebene", "Ebene"], ["lv", "LV"], ["konkurrenz", "Konkurrenz"],
+                 ["n", "Feld"], ["rl", "Top-Mittel (RL-Platz)"], ["rl_gelistet", "in RL gelistet"], ["hochspieler", "Hochspieler"],
+                 ["auslaender", "Ausländer"], ["rl_staerkste", "Bestplatzierte/r"]];
+  function spalten() { return rl() ? SPALTEN_RL : SPALTEN_SPIEL; }
   function kopf() {
-    $("kopf").innerHTML = SPALTEN.map(function (s) {
+    $("kopf").innerHTML = spalten().map(function (s) {
       var k = S.sort === s[0] ? (S.asc ? "asc" : "desc") : "";
       return '<th data-sort="' + s[0] + '" class="' + k + '">' + s[1] + "</th>"; }).join("");
   }
   $("kopf").addEventListener("click", function (ev) {
     var s = ev.target.getAttribute("data-sort"); if (!s) return;
-    if (S.sort === s) S.asc = !S.asc; else { S.sort = s; S.asc = ["turnier", "lv", "konkurrenz", "ebene", "staerkste"].indexOf(s) >= 0; }
+    if (S.sort === s) S.asc = !S.asc;
+    else { S.sort = s; S.asc = ["turnier", "lv", "konkurrenz", "ebene", "staerkste", "rl_staerkste", "rl"].indexOf(s) >= 0; }
     render();
   });
-  function sortWert(r, s) { return s === "staerke" ? stK(r) : s === "elo" ? eloK(r) : r[s]; }
+  function sortWert(r, s) { return s === "staerke" ? stK(r) : s === "elo" ? eloK(r) : s === "rl" ? rlK(r) : r[s]; }
+  function wertZellen(r) {
+    var balken = '<td class="num"><span class="q ' + qual(r) + '" title="' + (rl() ? "Top in der Rangliste: " : "Top mit ≥ 6 Matches: ")
+        + Math.round(qWert(r) * 100) + ' %"></span>'
+      + '<span class="bar"><span class="' + ({ U19: "jugend", U22: "u22" }[bereich(r)] || "") + '" style="width:'
+      + (anteil(wertK(r)) * 100).toFixed(1) + '%"></span></span>' + wertText(wertK(r)) + "</td>";
+    if (rl()) return balken + '<td class="num" title="RL KW ' + esc(r.rl_woche) + '">' + Math.round(r.rl_gelistet * 100) + " %</td>";
+    return balken + '<td class="num">' + stK(r).toFixed(1) + " %</td>";
+  }
+  function staerksteZelle(r) {
+    var name = rl() ? r.rl_staerkste : r.staerkste, w = rl() ? (r.rl_staerkste_platz != null ? "Pl. " + Math.round(r.rl_staerkste_platz) : "") : r.staerkste_elo;
+    return '<td class="staerkste" title="' + esc(name) + (w ? " (" + w + ")" : "") + '">'
+      + esc(name) + (w ? ' <span class="achse">(' + w + ")</span>" : "") + "</td>";
+  }
   function zeileHtml(r) {
-    var st = stK(r);
     return '<tr class="zeile' + (unsicher(r) ? " unsicher" : "") + '" data-id="' + r.id + '">'
       + '<td class="turnier" title="' + esc(r.turnier) + '">' + (r.url ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">'
         + esc(r.turnier) + "</a>" : esc(r.turnier)) + "</td>"
@@ -347,25 +423,28 @@
       + '<td><span class="pill" title="' + esc(r.grading) + '">' + esc(EBENE_TEXT[r.ebene_detail] || r.ebene_detail) + "</span></td>"
       + "<td>" + esc(r.lv) + "</td><td>" + esc(r.konkurrenz) + "</td>"
       + '<td class="num">' + r.n + (r.aufgefuellt ? "*" : "") + "</td>"
-      + '<td class="num"><span class="q ' + qual(r) + '" title="Top mit ≥ 6 Matches: ' + Math.round(r.top6 * 100) + ' %"></span>'
-        + '<span class="bar"><span class="' + ({ U19: "jugend", U22: "u22" }[bereich(r)] || "") + '" style="width:'
-        + (eloAnteil(eloK(r)) * 100).toFixed(1) + '%"></span></span>' + eloK(r) + "</td>"
-      + '<td class="num">' + st.toFixed(1) + " %</td>"
+      + wertZellen(r)
       + '<td class="num">' + Math.round(r.hochspieler * 100) + " %</td>"
       + '<td class="num">' + Math.round(r.auslaender * 100) + " %</td>"
-      + '<td class="staerkste" title="' + esc(r.staerkste) + (r.staerkste_elo ? " (" + r.staerkste_elo + ")" : "") + '">'
-        + esc(r.staerkste) + (r.staerkste_elo ? ' <span class="achse">(' + r.staerkste_elo + ")</span>" : "") + "</td></tr>"
-      + (S.offen === r.id ? '<tr class="drill"><td colspan="' + SPALTEN.length + '" id="drill-' + r.id + '">lädt…</td></tr>' : "");
+      + staerksteZelle(r) + "</tr>"
+      + (S.offen === r.id ? '<tr class="drill"><td colspan="' + spalten().length + '" id="drill-' + r.id + '">lädt…</td></tr>' : "");
   }
+  // RL-Wert einer Einheit: Mittel der Plaetze, nicht gelistet = hinter dem Letzten (wie konkurrenz_staerke_rl.py)
+  function rlEinheit(e, hinten) { var p = e[3] || []; return p.length ? p.reduce(function (s, x) { return s + (x == null ? hinten : x); }, 0) / p.length : hinten; }
   function drill(r) {
     ladeTeil(S.jahr).then(function (t) {
       var zelle = $("drill-" + r.id); if (!zelle) return;
-      var es = t.felder[r.id] || [], top = r.pool === "JE" || r.pool === "ME" ? (wert("f-top") === "16" ? 16 : 8) : (wert("f-top") === "16" ? 8 : 4);
+      var es = (t.felder[r.id] || []).slice(), top = r.pool === "JE" || r.pool === "ME" ? (wert("f-top") === "16" ? 16 : 8) : (wert("f-top") === "16" ? 8 : 4);
+      if (rl()) es.sort(function (a, b) { return rlEinheit(a, r.rl_hinten) - rlEinheit(b, r.rl_hinten); });
       zelle.innerHTML = '<div class="drill-grid">' + es.map(function (e, i) {
         var namen = e[0].map(function (u) { var s = t.spieler[u] || ["?", null]; return esc(s[0]) + (s[1] ? ' <span class="meta">' + s[1] + "</span>" : ""); });
+        var rechts = rl() ? (e[3] || []).map(function (p) { return p == null ? "–" : "Pl. " + p; }).join(" / ")
+                          : e[1] + " · " + e[2] + " M.";
         return '<div class="' + (i < top ? "top" : "") + '"><span>' + (i + 1) + ". " + namen.join(" / ") + "</span>"
-          + '<span class="meta">' + e[1] + " · " + e[2] + " M.</span></div>"; }).join("") + "</div>"
-        + (r.aufgefuellt ? '<div class="meta" style="margin-top:6px">* Feld kleiner als ' + top + ": " + r.aufgefuellt
+          + '<span class="meta">' + rechts + "</span></div>"; }).join("") + "</div>"
+        + (rl() ? '<div class="meta" style="margin-top:6px">Rangliste KW ' + esc(r.rl_woche) + " · – = nicht gelistet, zählt als Platz "
+            + r.rl_hinten + " (hinter dem Letzten)" + (es.length < top ? "; Feld kleiner als " + top + ", ebenso aufgefüllt" : "") + ".</div>"
+          : r.aufgefuellt ? '<div class="meta" style="margin-top:6px">* Feld kleiner als ' + top + ": " + r.aufgefuellt
           + " Platz/Plätze mit dem Feldboden (20. Perzentil der Altersklasse) aufgefüllt.</div>" : "");
     });
   }
@@ -384,7 +463,7 @@
     if (neuStrip !== false) strip(rows);
     var s = S.sort, a = S.asc ? 1 : -1;
     rows.sort(function (x, y) { var u = sortWert(x, s), v = sortWert(y, s);
-      return (u < v ? -1 : u > v ? 1 : 0) * a || (eloK(y) - eloK(x)); });
+      return (u < v ? -1 : u > v ? 1 : 0) * a || staerker(x, y); });
     kopf();
     $("koerper").innerHTML = rows.slice(0, S.zeige).map(zeileHtml).join("");
     $("mehr").hidden = rows.length <= S.zeige;
@@ -394,7 +473,14 @@
   }
 
   function filterAufbauen() {
-    var d = S.daten[S.jahr];
+    var d = (S.daten[S.jahr] || []).filter(imModus);
+    document.body.setAttribute("data-modus", S.modus);
+    tabs($("modus-tabs"), MODI, S.modus, function (m) {
+      if (m === S.modus) return;
+      S.modus = m; S.offen = null; S.zeige = SEITE;
+      S.sort = m === "rl" ? "rl" : "elo"; S.asc = m === "rl";
+      history.replaceState(null, "", m === "rl" ? "#rangliste" : location.pathname + location.search);
+      filterAufbauen(); render(); });
     tabs($("jahr-tabs"), S.jahre.map(function (j) { return [j, String(j)]; }), S.jahr, function (j) {
       S.jahr = j; S.offen = null; laden(j).then(function () { filterAufbauen(); render(); }); });
     tabs($("dis-tabs"), DIS, S.pool, function (p) { S.pool = p; S.offen = null; filterAufbauen(); render(); });
